@@ -13,11 +13,6 @@ if [ -d "$git_dir/rebase-merge" ] || [ -d "$git_dir/rebase-apply" ] \
   exit 0
 fi
 
-# Manual bump already staged for this commit.
-if git diff --cached --name-only | grep -qx VERSION; then
-  exit 0
-fi
-
 root=$(git rev-parse --show-toplevel)
 cd "$root" || exit 1
 
