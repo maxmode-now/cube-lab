@@ -2,7 +2,7 @@
 
 A browser trainer for Rubik’s cubes. Play 2×2 through 5×5, learn the beginner method and CFOP, scan a physical 3×3, and follow an optimal solve — all on one page, with no account and no build step.
 
-**Demo:** [maxmode-now.github.io/cube-lab](https://maxmode-now.github.io/cube-lab/)
+**Demo:** [cube.maxmode-now.com](https://cube.maxmode-now.com/)
 
 <p align="center">
   <img src="docs/play.png" alt="Cube Lab in Play mode, showing a scrambled 3×3" width="920">
