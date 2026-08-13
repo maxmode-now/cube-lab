@@ -75,9 +75,10 @@
     /* ── 앱 셸 치수 ── */
     --rail-w: 64px;                         /* 세로 레일 (데스크톱) */
     --rail-btn-h: 52px;
-    /* 하단 탭바 (모바일) = 버튼 + 상하 패딩 12px + 상단 보더 1px */
+    /* 하단 탭바 (모바일) = 버튼 + 상하 패딩 12px + 상단 보더 1px + 홈 인디케이터 */
     --rail-h: calc(var(--rail-btn-h) + 13px + var(--safe-b));
-    --top-h: 48px;
+    /* 상단 바 = 컨트롤 높이 + 노치/상태바. padding-top 과 짝을 맞춰 잘리지 않게 한다 */
+    --top-h: calc(48px + var(--safe-t));
     --act-h: 56px;
     --panel-open: 340px;                    /* 패널이 열렸을 때의 폭 */
     --panel-w: 0px;                         /* 닫힘 기본값 */
@@ -184,9 +185,9 @@
   /* ── 설정 팝오버 (⚙) — 세션당 한두 번 쓰는 것들만 모아둔다 ── */
   #ui {
     position: absolute; z-index: 40; display: none; flex-direction: column;
-    top: calc(var(--top-h) + var(--safe-t) + 8px);
+    top: calc(var(--top-h) + 8px);
     right: calc(12px + var(--safe-r));
-    width: 300px; max-height: calc(100dvh - var(--top-h) - var(--safe-t) - 24px);
+    width: 300px; max-height: calc(100dvh - var(--top-h) - 24px);
     background: var(--glass); backdrop-filter: blur(10px);
     border: 1px solid var(--border); border-radius: var(--r-md); box-shadow: var(--shadow);
   }
@@ -548,12 +549,12 @@
 
   /* ── 아주 좁은 폭: 액션 라벨이 잘리지 않도록 ── */
   @media (max-width: 380px) {
-    #actions { gap: 4px; padding: 0 8px; }
+    #actions { gap: 4px; padding: 0 calc(8px + var(--safe-r)) 0 calc(8px + var(--safe-l)); }
   }
 
   /* ── 가로형 모바일: 세로 높이가 귀하다. 레일은 왼쪽, 액션은 오른쪽 세로 스택 ── */
   @media (max-height: 520px) and (orientation: landscape) {
-    :root { --top-h: 44px; --rail-w: 60px; --panel-open: min(300px, 38vw); }
+    :root { --top-h: calc(44px + var(--safe-t)); --rail-w: 60px; --panel-open: min(300px, 38vw); }
     #shell {
       grid-template-columns: var(--rail-w) minmax(0, 1fr) auto var(--panel-w);
       grid-template-rows: var(--top-h) minmax(0, 1fr);
