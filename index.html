@@ -13,7 +13,8 @@
   function syncFrame() {
     if (standalone()) {
       root.classList.add('standalone');
-      root.style.removeProperty('--app-h');
+      // iOS PWA: 100dvh/innerHeight 는 노치만큼 짧다. 100vh 만 실제 화면 높이.
+      root.style.setProperty('--app-h', '100vh');
       return;
     }
     root.classList.remove('standalone');
@@ -110,6 +111,7 @@
     --panel-open: 340px;                    /* 패널이 열렸을 때의 폭 */
     --panel-w: 0px;                         /* 닫힘 기본값 */
     --panel-h: 0px;                         /* 모바일: 시트 높이 */
+    --app-h: 100dvh;                        /* 사파리: 주소창 제외. PWA는 100vh 로 덮어쓴다 */
 
     /* ── 노치 · 홈 인디케이터 ── */
     --safe-t: env(safe-area-inset-top, 0px);
@@ -121,25 +123,21 @@
   html, body {
     margin: 0; overflow: hidden; background: var(--bg); color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    height: 100%; height: 100dvh; height: var(--app-h, 100dvh);
+    height: var(--app-h);
   }
-  /* iOS PWA: 100dvh/inset:0 이 사파리 주소창 높이만큼 짧게 잡히는 버그 → 큰 뷰포트로 채운다 */
+  /* iOS PWA: 100dvh 는 노치를 빼서 아래에 빈칸이 생긴다. 100vh 만 화면 전체.
+     -webkit-fill-available 도 같은 이유로 쓰면 안 된다. */
   @media (display-mode: standalone) {
-    :root { --safe-b-chrome: var(--safe-b); }
-    html, body { height: 100lvh; height: -webkit-fill-available; }
+    :root { --app-h: 100vh; --safe-b-chrome: var(--safe-b); }
   }
-  html.standalone { --safe-b-chrome: var(--safe-b); }
-  html.standalone, html.standalone body {
-    height: 100lvh; height: -webkit-fill-available;
-  }
+  html.standalone { --app-h: 100vh; --safe-b-chrome: var(--safe-b); }
   /* ══════════════════════════════════════════════════════════════
      앱 셸 — 큐브가 중앙(stage)을 소유하고, 크롬은 가장자리 트랙에 붙는다.
      패널은 큐브 위에 뜨지 않고 grid 컬럼/행을 차지해 stage 를 밀어낸다.
      스크롤되는 요소는 #panel-body / #ui-body 둘뿐이다.
      ══════════════════════════════════════════════════════════════ */
   #shell {
-    position: fixed; top: 0; left: 0; right: 0; bottom: auto;
-    width: 100%; height: 100%; height: 100dvh; height: var(--app-h, 100dvh);
+    position: relative; width: 100%; height: 100%;
     display: grid;
     grid-template-columns: var(--rail-w) minmax(0, 1fr) var(--panel-w);
     grid-template-rows: var(--top-h) minmax(0, 1fr) var(--act-h);
@@ -148,10 +146,6 @@
       "rail stage panel"
       "rail act   panel";
   }
-  @media (display-mode: standalone) {
-    #shell { height: 100lvh; height: -webkit-fill-available; }
-  }
-  html.standalone #shell { height: 100lvh; height: -webkit-fill-available; }
   #shell[data-panel="open"] { --panel-w: var(--panel-open); }
   #shell:not([data-panel="open"]) #panel { display: none; }
 
@@ -665,7 +659,7 @@
         <option value="4" data-i18n="size4">4×4</option>
         <option value="5" data-i18n="size5">5×5</option>
       </select>
-      <span id="app-version" aria-label="Version">v1.1</span>
+      <span id="app-version" aria-label="Version">v1.2</span>
       <button type="button" id="settings-btn" class="btn-icon" aria-label="Settings" aria-expanded="false">⚙</button>
     </div>
   </header>
