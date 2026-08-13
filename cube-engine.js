@@ -12,6 +12,52 @@
     B: 0x2563eb,
     inner: 0x0d0e12,
   };
+  const THEMES = {
+    classic: {
+      style: 'sticker',
+      colors: Object.assign({}, COLORS_DEFAULT),
+      plastic: {
+        roughness: 0.34,
+        metalness: 0.10,
+        clearcoat: 0.45,
+        clearcoatRoughness: 0.28,
+        envMapIntensity: 0.28,
+      },
+      sticker: {
+        roughness: 0.28,
+        metalness: 0.0,
+        clearcoat: 0.22,
+        clearcoatRoughness: 0.35,
+        envMapIntensity: 0.12,
+      },
+    },
+    lego: {
+      style: 'lego',
+      colors: {
+        R: 0xc91a09,
+        L: 0xfe8a18,
+        U: 0xf6f6f6,
+        D: 0xf5cd2f,
+        F: 0x00852b,
+        B: 0x0055bf,
+        inner: 0x141414,
+      },
+      plastic: {
+        roughness: 0.30,
+        metalness: 0.0,
+        clearcoat: 0.42,
+        clearcoatRoughness: 0.22,
+        envMapIntensity: 0.22,
+      },
+      sticker: {
+        roughness: 0.18,
+        metalness: 0.0,
+        clearcoat: 0.72,
+        clearcoatRoughness: 0.10,
+        envMapIntensity: 0.28,
+      },
+    },
+  };
   const CUBIE = 0.94;
   const GAP = 1.0;
   const AXES = ['x', 'y', 'z'];
@@ -35,14 +81,128 @@
     const RenderPass = opts.RenderPass;
     const UnrealBloomPass = opts.UnrealBloomPass;
     const OutputPass = opts.OutputPass;
+    const RoomEnvironment = opts.RoomEnvironment;
+    const SMAAPass = opts.SMAAPass;
     const CubeMath = opts.CubeMath;
     const mount = opts.mount;
     let N = opts.n == null ? 3 : opts.n;
     if (N !== 2 && N !== 3 && N !== 4 && N !== 5) N = 3;
 
     const COLORS = Object.assign({}, COLORS_DEFAULT);
-    let plasticLook = { roughness: 0.38, metalness: 0.20 };
-    let stickerLook = { roughness: 0.12, metalness: 0.05 };
+    let plasticLook = Object.assign({}, THEMES.classic.plastic);
+    let stickerLook = Object.assign({}, THEMES.classic.sticker);
+    let themeId = 'classic';
+    let themeStyle = 'sticker';
+
+    function applyThemeLooks(theme) {
+      Object.assign(COLORS, theme.colors);
+      plasticLook = Object.assign({}, theme.plastic || plasticLook);
+      stickerLook = Object.assign({}, theme.sticker || stickerLook);
+      themeStyle = theme.style || 'sticker';
+    }
+    if (opts.theme && THEMES[opts.theme]) {
+      themeId = opts.theme;
+      applyThemeLooks(THEMES[themeId]);
+    }
+
+    let studBodyGeo = null;
+    let studWellGeo = null;
+    let studNumGeo = null;
+    let plateGeo = null;
+    let logoDecalGeo = null;
+    let legoLogoTex = null;
+    function legoPlateSize() { return CUBIE * 0.80; }
+    function legoPlateThick() { return CUBIE * 0.125; }
+    function legoStudRadius() { return legoPlateSize() * 0.15; }
+    function legoStudHeight() { return legoPlateSize() * 0.115; }
+    function makeLegoLogoTexture() {
+      const size = 256;
+      const c = document.createElement('canvas');
+      c.width = size; c.height = size;
+      const ctx = c.getContext('2d');
+      ctx.clearRect(0, 0, size, size);
+      ctx.fillStyle = 'rgba(0,0,0,0.40)';
+      ctx.font = '700 20px system-ui,Segoe UI,sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      const cx = size / 2, cy = size / 2, rad = size * 0.30;
+      for (let i = 0; i < 4; i++) {
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(i * Math.PI / 2);
+        ctx.fillText('LEGO', 0, -rad);
+        ctx.restore();
+      }
+      const tex = new THREE.CanvasTexture(c);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.needsUpdate = true;
+      return tex;
+    }
+    function ensureLegoGeo() {
+      if (studBodyGeo) return;
+      const size = legoPlateSize();
+      const r = legoStudRadius();
+      const h = legoStudHeight();
+      const t = legoPlateThick();
+      plateGeo = new RoundedBoxGeometry(size, size, t, 2, 0.032);
+      studBodyGeo = new THREE.CylinderGeometry(r, r, h, 20);
+      studWellGeo = new THREE.CylinderGeometry(r * 0.62, r * 0.62, h * 0.22, 16);
+      logoDecalGeo = new THREE.PlaneGeometry(r * 1.72, r * 1.72);
+      studNumGeo = new THREE.PlaneGeometry(size * 0.42, size * 0.42);
+      legoLogoTex = makeLegoLogoTexture();
+    }
+    function isSharedGeo(geo) {
+      return geo === studBodyGeo || geo === studWellGeo || geo === studNumGeo
+        || geo === plateGeo || geo === logoDecalGeo;
+    }
+    function makeCubieGeometry() {
+      return themeStyle === 'lego'
+        ? new RoundedBoxGeometry(CUBIE, CUBIE, CUBIE, 3, 0.03)
+        : new RoundedBoxGeometry(CUBIE, CUBIE, CUBIE, 6, 0.065);
+    }
+
+    function currentPixelRatio() {
+      return Math.min(window.devicePixelRatio || 1, 3);
+    }
+
+    function applyPhysicalLook(mat, look) {
+      mat.roughness = look.roughness;
+      mat.metalness = look.metalness;
+      if ('clearcoat' in mat) {
+        mat.clearcoat = look.clearcoat != null ? look.clearcoat : 0;
+        mat.clearcoatRoughness = look.clearcoatRoughness != null ? look.clearcoatRoughness : 0;
+      }
+      if (look.envMapIntensity != null) mat.envMapIntensity = look.envMapIntensity;
+    }
+
+    function disposeObject3D(obj) {
+      obj.traverse(node => {
+        if (node.geometry && !isSharedGeo(node.geometry)) node.geometry.dispose();
+        const mats = node.material;
+        if (!mats) return;
+        const list = Array.isArray(mats) ? mats : [mats];
+        for (let i = 0; i < list.length; i++) {
+          const m = list[i];
+          if (m.map && m.map !== legoLogoTex) m.map.dispose();
+          m.dispose();
+        }
+      });
+    }
+
+    function disposeStickers(mesh) {
+      [...mesh.children].forEach(ch => {
+        disposeObject3D(ch);
+        mesh.remove(ch);
+      });
+    }
+
+    function disposeCubies() {
+      cubies.forEach(c => {
+        disposeObject3D(c);
+        cube.remove(c);
+      });
+      cubies.length = 0;
+    }
 
     const { outerOf, layerCoordsOf, snapCoord, isOuterCoord, coordToIndex, assertCubeMath } = CubeMath;
     assertCubeMath();
@@ -82,13 +242,18 @@
     const vs0 = viewSize();
     const camera = new THREE.PerspectiveCamera(45, vs0.w / vs0.h, 0.1, 100);
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    const renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      powerPreference: 'high-performance',
+      alpha: false,
+    });
     renderer.setSize(vs0.w, vs0.h);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(currentPixelRatio());
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.3;
+    renderer.toneMappingExposure = 1.18;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
     mount.appendChild(renderer.domElement);
 
     const bgCanvas = document.createElement('canvas');
@@ -106,29 +271,43 @@
     bgTex.colorSpace = THREE.SRGBColorSpace;
     scene.background = bgTex;
 
-    const ambientLight = new THREE.AmbientLight(0xd0d8ff, 0.42);
+    if (RoomEnvironment) {
+      const pmrem = new THREE.PMREMGenerator(renderer);
+      const envScene = new RoomEnvironment(renderer);
+      scene.environment = pmrem.fromScene(envScene, 0.04).texture;
+      envScene.dispose();
+      pmrem.dispose();
+    }
+
+    const ambientLight = new THREE.AmbientLight(0xd0d8ff, 0.32);
     scene.add(ambientLight);
 
-    const keyLight = new THREE.DirectionalLight(0xffffff, 0.7);
+    const keyLight = new THREE.DirectionalLight(0xffffff, 0.62);
     keyLight.position.set(6, 10, 8);
     keyLight.castShadow = true;
-    keyLight.shadow.mapSize.set(1024, 1024);
+    keyLight.shadow.mapSize.set(2048, 2048);
     keyLight.shadow.camera.near = 0.5;
     keyLight.shadow.camera.far = 40;
     keyLight.shadow.camera.top = 6;
     keyLight.shadow.camera.bottom = -6;
     keyLight.shadow.camera.left = -6;
     keyLight.shadow.camera.right = 6;
-    keyLight.shadow.bias = -0.001;
+    keyLight.shadow.bias = -0.0004;
+    keyLight.shadow.normalBias = 0.025;
+    keyLight.shadow.radius = 2;
     scene.add(keyLight);
 
-    const fillLight = new THREE.DirectionalLight(0x8ab4ff, 0.34);
+    const fillLight = new THREE.DirectionalLight(0x8ab4ff, 0.28);
     fillLight.position.set(-5, 2, -4);
     scene.add(fillLight);
 
-    const rimLight = new THREE.DirectionalLight(0xfff0cc, 0.26);
+    const rimLight = new THREE.DirectionalLight(0xfff0cc, 0.22);
     rimLight.position.set(0, -6, -8);
     scene.add(rimLight);
+
+    const kickLight = new THREE.DirectionalLight(0xffffff, 0);
+    kickLight.position.set(-7, 9, 3);
+    scene.add(kickLight);
 
     const shadowPlane = new THREE.Mesh(
       new THREE.PlaneGeometry(20, 20),
@@ -190,15 +369,42 @@
     fitCamera();
 
     const composer = new EffectComposer(renderer);
-    composer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    composer.setPixelRatio(currentPixelRatio());
     composer.setSize(vs0.w, vs0.h);
+    if (renderer.capabilities.isWebGL2) {
+      composer.renderTarget1.samples = 4;
+      composer.renderTarget2.samples = 4;
+    }
     composer.addPass(new RenderPass(scene, camera));
     const bloomPass = new UnrealBloomPass(
       new THREE.Vector2(vs0.w, vs0.h),
-      0.08, 0.5, 1.35
+      0.04, 0.4, 1.5
     );
     composer.addPass(bloomPass);
     composer.addPass(new OutputPass());
+    let smaaPass = null;
+    if (SMAAPass) {
+      const pr0 = currentPixelRatio();
+      smaaPass = new SMAAPass(Math.round(vs0.w * pr0), Math.round(vs0.h * pr0));
+      composer.addPass(smaaPass);
+    }
+
+    function applyThemePresentation() {
+      const lego = themeStyle === 'lego';
+      ambientLight.intensity = lego ? 0.18 : 0.32;
+      ambientLight.color.setHex(lego ? 0xb8c0cc : 0xd0d8ff);
+      keyLight.intensity = lego ? 1.35 : 0.62;
+      keyLight.color.setHex(lego ? 0xfff3e4 : 0xffffff);
+      fillLight.intensity = lego ? 0.14 : 0.28;
+      rimLight.intensity = lego ? 0.48 : 0.22;
+      kickLight.intensity = lego ? 0.42 : 0;
+      renderer.toneMappingExposure = lego ? 1.06 : 1.18;
+      bloomPass.strength = lego ? 0.055 : 0.04;
+      paintBackground(lego ? '#101218' : '#2a2c3a', lego ? '#08090c' : '#1b1f27');
+      bgTex.needsUpdate = true;
+      shadowPlane.material.opacity = lego ? 0.46 : 0.22;
+    }
+    applyThemePresentation();
 
     const cube = new THREE.Group();
     scene.add(cube);
@@ -219,28 +425,50 @@
       return cell < 0 ? null : cell + 1;
     }
 
+    function roundRectPath(ctx, x, y, w, h, r) {
+      const rr = Math.min(r, w / 2, h / 2);
+      ctx.beginPath();
+      ctx.moveTo(x + rr, y);
+      ctx.arcTo(x + w, y, x + w, y + h, rr);
+      ctx.arcTo(x + w, y + h, x, y + h, rr);
+      ctx.arcTo(x, y + h, x, y, rr);
+      ctx.arcTo(x, y, x + w, y, rr);
+      ctx.closePath();
+    }
+
     function makeStickerTexture(hex, num) {
-      const size = 128;
+      const size = 512;
       const c = document.createElement('canvas');
       c.width = size; c.height = size;
       const ctx = c.getContext('2d');
+      ctx.clearRect(0, 0, size, size);
       const r = (hex >> 16) & 255, g = (hex >> 8) & 255, b = hex & 255;
+      const isLego = themeStyle === 'lego';
+      const pad = Math.round(size * (isLego ? 0.012 : 0.02));
+      const radius = Math.round(size * (isLego ? 0.07 : 0.11));
+      roundRectPath(ctx, pad, pad, size - pad * 2, size - pad * 2, radius);
       ctx.fillStyle = `rgb(${r},${g},${b})`;
-      ctx.fillRect(0, 0, size, size);
-      if (showNumbers && num != null) {
+      ctx.fill();
+      ctx.strokeStyle = isLego ? 'rgba(0,0,0,0.10)' : 'rgba(0,0,0,0.14)';
+      ctx.lineWidth = Math.max(2, size * (isLego ? 0.008 : 0.01));
+      ctx.stroke();
+      if (showNumbers && num != null && !isLego) {
         const lum = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
         ctx.fillStyle = lum > 0.55 ? '#14161c' : '#ffffff';
         const fontPx = num > 9
-          ? Math.max(36, Math.floor(58 - Math.min(N, 5) * 3))
-          : Math.max(44, Math.floor(72 - Math.min(N, 5) * 4));
+          ? Math.max(144, Math.floor(232 - Math.min(N, 5) * 12))
+          : Math.max(176, Math.floor(288 - Math.min(N, 5) * 16));
         ctx.font = `700 ${fontPx}px system-ui,Segoe UI,sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(String(num), size / 2, size / 2 + 1);
+        ctx.fillText(String(num), size / 2, size / 2 + 2);
       }
       const tex = new THREE.CanvasTexture(c);
       tex.colorSpace = THREE.SRGBColorSpace;
-      tex.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+      tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+      tex.minFilter = THREE.LinearMipmapLinearFilter;
+      tex.magFilter = THREE.LinearFilter;
+      tex.generateMipmaps = true;
       tex.needsUpdate = true;
       return tex;
     }
@@ -251,15 +479,117 @@
       else plane.rotation.set(0, sign > 0 ? 0 : Math.PI, 0);
     }
 
+    function makeStudNumberPlane(hex, num) {
+      const size = 256;
+      const c = document.createElement('canvas');
+      c.width = size; c.height = size;
+      const ctx = c.getContext('2d');
+      ctx.clearRect(0, 0, size, size);
+      const r = (hex >> 16) & 255, g = (hex >> 8) & 255, b = hex & 255;
+      const lum = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+      ctx.fillStyle = lum > 0.55 ? '#14161c' : '#ffffff';
+      const fontPx = num > 9 ? 108 : 140;
+      ctx.font = `700 ${fontPx}px system-ui,Segoe UI,sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(String(num), size / 2, size / 2 + 2);
+      const tex = new THREE.CanvasTexture(c);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.needsUpdate = true;
+      const mat = new THREE.MeshBasicMaterial({
+        map: tex,
+        transparent: true,
+        depthWrite: false,
+      });
+      const plane = new THREE.Mesh(studNumGeo, mat);
+      plane.userData.isStud = true;
+      return plane;
+    }
+
+    function makeOneStud(hex) {
+      const h = legoStudHeight();
+      const group = new THREE.Group();
+      const bodyMat = new THREE.MeshPhysicalMaterial({ color: hex });
+      applyPhysicalLook(bodyMat, stickerLook);
+      const body = new THREE.Mesh(studBodyGeo, bodyMat);
+      body.rotation.x = -Math.PI / 2;
+      body.position.z = h / 2;
+      body.castShadow = true;
+      body.receiveShadow = true;
+      body.userData.isStud = true;
+      body.userData.stickerHex = hex;
+      group.add(body);
+
+      const wellMat = new THREE.MeshPhysicalMaterial({ color: hex });
+      applyPhysicalLook(wellMat, stickerLook);
+      wellMat.color.multiplyScalar(0.76);
+      const well = new THREE.Mesh(studWellGeo, wellMat);
+      well.rotation.x = -Math.PI / 2;
+      well.position.z = h - (h * 0.22) / 2 + 0.001;
+      well.userData.isStud = true;
+      well.userData.stickerHex = hex;
+      group.add(well);
+
+      const logoMat = new THREE.MeshBasicMaterial({
+        map: legoLogoTex,
+        transparent: true,
+        depthWrite: false,
+        polygonOffset: true,
+        polygonOffsetFactor: -1,
+      });
+      const logo = new THREE.Mesh(logoDecalGeo, logoMat);
+      logo.position.z = h + 0.002;
+      logo.userData.isStud = true;
+      group.add(logo);
+      return group;
+    }
+
+    function makeLegoStudGrid(hex, num) {
+      ensureLegoGeo();
+      const group = new THREE.Group();
+      const size = legoPlateSize();
+      const t = legoPlateThick();
+      const off = size * 0.25;
+      const spots = [[off, off], [off, -off], [-off, off], [-off, -off]];
+      for (let i = 0; i < spots.length; i++) {
+        const stud = makeOneStud(hex);
+        stud.position.set(spots[i][0], spots[i][1], t / 2);
+        group.add(stud);
+      }
+      if (showNumbers && num != null) {
+        const n = makeStudNumberPlane(hex, num);
+        n.position.z = t / 2 + 0.006;
+        group.add(n);
+      }
+      return group;
+    }
+
     function makeStickerMesh(hex, axis, sign, num) {
+      const isLego = themeStyle === 'lego';
+      if (isLego) {
+        ensureLegoGeo();
+        const t = legoPlateThick();
+        const mat = new THREE.MeshPhysicalMaterial({ color: hex });
+        applyPhysicalLook(mat, stickerLook);
+        const m = new THREE.Mesh(plateGeo, mat);
+        orientStickerPlane(m, axis, sign);
+        m.position[axis] = sign * (CUBIE / 2 + t / 2);
+        m.castShadow = true;
+        m.receiveShadow = true;
+        m.userData.isSticker = true;
+        m.userData.stickerNum = num;
+        m.userData.stickerHex = hex;
+        m.add(makeLegoStudGrid(hex, num));
+        return m;
+      }
       // Plane으로 붙여 가장자리가 직선으로 보이게 한다 (얇은 박스는 옆면·블룸에 선이 깨져 보임)
       const SIZE = CUBIE * 0.84;
       const OFFSET = CUBIE / 2 + 0.0012;
-      const mat = new THREE.MeshStandardMaterial({
+      const mat = new THREE.MeshPhysicalMaterial({
         map: makeStickerTexture(hex, num),
-        roughness: stickerLook.roughness,
-        metalness: stickerLook.metalness,
+        alphaTest: 0.5,
       });
+      applyPhysicalLook(mat, stickerLook);
       const m = new THREE.Mesh(new THREE.PlaneGeometry(SIZE, SIZE), mat);
       orientStickerPlane(m, axis, sign);
       m.position[axis] = sign * OFFSET;
@@ -275,7 +605,7 @@
       for (let ci = 0; ci < cubies.length; ci++) {
         const mesh = cubies[ci];
         const nums = mesh.userData.faceNumbers || [];
-        [...mesh.children].forEach(ch => mesh.remove(ch));
+        disposeStickers(mesh);
         mesh.userData.faceColors.forEach((hex, i) => {
           if (hex !== COLORS.inner) {
             mesh.add(makeStickerMesh(hex, AXIS_MAP[i], SIGN_MAP[i], nums[i]));
@@ -306,12 +636,11 @@
         hex === COLORS.inner ? null : faceCellNumber(i, x, y, z)
       );
 
-      const geo = new RoundedBoxGeometry(CUBIE, CUBIE, CUBIE, 2, 0.04);
-      const bodyMat = new THREE.MeshStandardMaterial({
+      const geo = makeCubieGeometry();
+      const bodyMat = new THREE.MeshPhysicalMaterial({
         color: COLORS.inner,
-        roughness: plasticLook.roughness,
-        metalness: plasticLook.metalness,
       });
+      applyPhysicalLook(bodyMat, plasticLook);
       const mesh = new THREE.Mesh(geo, bodyMat);
       mesh.position.set(x * GAP, y * GAP, z * GAP);
       mesh.castShadow = true;
@@ -330,8 +659,7 @@
     }
 
     function buildCube() {
-      cubies.forEach(c => cube.remove(c));
-      cubies.length = 0;
+      disposeCubies();
       const layers = layerCoordsOf(N);
       for (let i = 0; i < layers.length; i++) {
         const x = layers[i];
@@ -591,8 +919,6 @@
       drag = null;
       controls.enabled = true;
       clearHighlight();
-      cube.clear();
-      cubies.length = 0;
       buildCube();
       resetStats();
       notify({ solver: true });
@@ -914,7 +1240,7 @@
           y: gridCoord(cubie.position.y),
           z: gridCoord(cubie.position.z),
           clearStickers() {
-            [...cubie.children].forEach(ch => cubie.remove(ch));
+            disposeStickers(cubie);
           },
           setFace(fi, hex) {
             cubie.userData.faceColors[fi] = hex;
@@ -927,17 +1253,22 @@
       });
     }
 
-    function setTheme(theme) {
+    function setTheme(idOrObj) {
+      const id = typeof idOrObj === 'string' ? idOrObj : null;
+      const theme = id ? THEMES[id] : idOrObj;
       if (!theme || !theme.colors) return false;
+      const nextStyle = theme.style || 'sticker';
+      if (id && id === themeId && nextStyle === themeStyle) return true;
+
       const letters = cubies.map(c => c.userData.faceColors.map(hex => {
         if (hex === COLORS.inner) return null;
         return FACE_BY_HEX[hex] || null;
       }));
 
-      Object.assign(COLORS, theme.colors);
+      applyThemeLooks(theme);
+      if (id) themeId = id;
       rebuildFaceMap();
-      plasticLook = Object.assign({}, theme.plastic || plasticLook);
-      stickerLook = Object.assign({}, theme.sticker || stickerLook);
+      applyThemePresentation();
 
       for (let ci = 0; ci < cubies.length; ci++) {
         const mesh = cubies[ci];
@@ -945,12 +1276,15 @@
         for (let i = 0; i < 6; i++) {
           mesh.userData.faceColors[i] = faces[i] ? COLORS[faces[i]] : COLORS.inner;
         }
+        if (mesh.geometry) {
+          mesh.geometry.dispose();
+          mesh.geometry = makeCubieGeometry();
+        }
         if (mesh.material) {
           mesh.material.color.setHex(COLORS.inner);
-          mesh.material.roughness = plasticLook.roughness;
-          mesh.material.metalness = plasticLook.metalness;
+          applyPhysicalLook(mesh.material, plasticLook);
         }
-        [...mesh.children].forEach(ch => mesh.remove(ch));
+        disposeStickers(mesh);
         mesh.userData.faceColors.forEach((hex, i) => {
           if (hex !== COLORS.inner) {
             mesh.add(makeStickerMesh(hex, AXIS_MAP[i], SIGN_MAP[i], (mesh.userData.faceNumbers || [])[i]));
@@ -975,8 +1309,12 @@
       const { w, h } = viewSize();
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
+      const pr = currentPixelRatio();
+      renderer.setPixelRatio(pr);
       renderer.setSize(w, h);
+      composer.setPixelRatio(pr);
       composer.setSize(w, h);
+      if (smaaPass) smaaPass.setSize(Math.round(w * pr), Math.round(h * pr));
       const need = requiredDistance();
       applyFitLimits(need);
       const current = camera.position.distanceTo(controls.target);
@@ -1039,10 +1377,11 @@
       resize,
       setN,
       setTheme,
+      get theme() { return themeId; },
       setShowNumbers,
       get showNumbers() { return showNumbers; },
     };
   }
 
-  g.CubeEngine = { create, COLORS: COLORS_DEFAULT };
+  g.CubeEngine = { create, COLORS: COLORS_DEFAULT, THEMES };
 })(typeof globalThis !== 'undefined' ? globalThis : this);

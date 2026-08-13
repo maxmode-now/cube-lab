@@ -775,6 +775,12 @@
         <option value="on" data-i18n="numbersOn">On</option>
       </select>
 
+      <div class="label" data-i18n="themeLabel">Theme</div>
+      <select id="theme-select" class="menu-select" aria-label="Cube theme">
+        <option value="classic" data-i18n="themeClassic">Classic</option>
+        <option value="lego" data-i18n="themeLego">LEGO</option>
+      </select>
+
       <div class="n4-only">
         <div class="label" data-i18n="layerMode">Layer</div>
         <div id="layer-mode" class="seg">
@@ -836,6 +842,8 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { SMAAPass } from 'three/addons/postprocessing/SMAAPass.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 // ──────────────────────────────────────────────────────────
 // i18n — 영어 기본, 한국어 선택 가능 (선택은 localStorage에 저장)
@@ -895,6 +903,7 @@ const I18N = {
     layerWide: 'Wide', layerWide3: '3-Wide',
     sizeLabel: 'Size',
     numbersLabel: 'Numbers', numbersOff: 'Off', numbersOn: 'On',
+    themeLabel: 'Theme', themeClassic: 'Classic', themeLego: 'LEGO',
     openScan: '📷 Scan cube',
     scanUpload: 'Upload photo', scanReplace: 'Replace photo',
     scanCam: 'Camera', scanSnap: 'Capture',
@@ -974,6 +983,7 @@ const I18N = {
     layerWide: '와이드', layerWide3: '3와이드',
     sizeLabel: '크기',
     numbersLabel: '번호', numbersOff: '끄기', numbersOn: '켜기',
+    themeLabel: '테마', themeClassic: '기본', themeLego: '레고',
     openScan: '📷 큐브 스캔',
     scanUpload: '사진 올리기', scanReplace: '사진 바꾸기',
     scanCam: '카메라', scanSnap: '촬영',
@@ -1020,6 +1030,12 @@ try {
   cubeNumbers = localStorage.getItem('cubeNumbers') === 'on';
 } catch (e) { /* localStorage 차단 환경 — 기본값 유지 */ }
 
+let cubeTheme = 'classic';
+try {
+  const savedTheme = localStorage.getItem('cubeTheme');
+  if (savedTheme === 'classic' || savedTheme === 'lego') cubeTheme = savedTheme;
+} catch (e) { /* localStorage 차단 환경 — 기본값 유지 */ }
+
 // 누락 키는 영어로 폴백해, 한쪽 사전에 빠진 항목이 빈칸으로 나오지 않게 한다
 const t = k => (I18N[lang][k] !== undefined ? I18N[lang][k] : I18N.en[k]);
 
@@ -1030,13 +1046,16 @@ function cssHex(n) {
 const engine = globalThis.CubeEngine.create({
   THREE, OrbitControls, RoundedBoxGeometry,
   EffectComposer, RenderPass, UnrealBloomPass, OutputPass,
+  RoomEnvironment, SMAAPass,
   CubeMath: globalThis.CubeMath,
   mount: document.getElementById('app'),
   n: cubeN,
+  theme: cubeTheme,
 });
 document.body.dataset.n = String(engine.n);
 if (cubeNumbers) engine.setShowNumbers(true);
 document.getElementById('numbers-select').value = cubeNumbers ? 'on' : 'off';
+document.getElementById('theme-select').value = engine.theme;
 
 function requireN3(label) {
   if (engine.n === 3) return true;
@@ -2205,6 +2224,27 @@ document.getElementById('numbers-select').addEventListener('change', e => {
   catch (err) { /* 저장 불가 — 이 세션에서만 적용 */ }
 });
 
+function applyCubeTheme(id) {
+  if (!engine.setTheme(id)) {
+    document.getElementById('theme-select').value = engine.theme;
+    return;
+  }
+  cubeTheme = engine.theme;
+  try { localStorage.setItem('cubeTheme', cubeTheme); }
+  catch (err) { /* 저장 불가 — 이 세션에서만 적용 */ }
+  syncDiagPalette();
+  if (panelMode === 'tutorial') { syncTutExpandBtn(); renderLesson(); }
+  renderStageBox();
+}
+
+document.getElementById('theme-select').addEventListener('change', e => {
+  if (engine.busy) {
+    e.target.value = engine.theme;
+    return;
+  }
+  applyCubeTheme(e.target.value);
+});
+
 // ──────────────────────────────────────────────────────────
 // 언어 적용 — 정적 텍스트 교체 + 열려 있는 동적 패널 재렌더
 //   next 없이 호출하면 저장된 값으로 초기 적용만 한다.
@@ -2222,6 +2262,7 @@ function applyLang(next) {
   document.querySelectorAll('#lang-switch button').forEach(b => {
     b.classList.toggle('active', b.dataset.lang === lang);
   });
+  syncDiagPalette();
 
   // JS가 그리는 부분은 따로 다시 렌더한다.
   // syncChrome 이 패널 제목을 기본값으로 되돌리므로 renderLesson 보다 먼저 부른다.
