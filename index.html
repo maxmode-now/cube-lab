@@ -33,14 +33,45 @@
 })();
 </script>
 <meta name="theme-color" content="#0f1117" />
+<meta name="description" content="Free browser trainer for 2×2–5×5. Learn beginner and CFOP, scan a 3×3 from photos, and follow an optimal solve. No account." />
+<link rel="canonical" href="https://cube.maxmode-now.com/" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://cube.maxmode-now.com/" />
+<meta property="og:title" content="Cube Lab — Play, Learn, Scan &amp; Solve Rubik's Cubes" />
+<meta property="og:description" content="Free browser trainer for 2×2–5×5. Learn beginner and CFOP, scan a 3×3 from photos, and follow an optimal solve. No account." />
+<meta property="og:image" content="https://cube.maxmode-now.com/docs/play.png" />
+<meta property="og:locale" content="en_US" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Cube Lab — Play, Learn, Scan &amp; Solve Rubik's Cubes" />
+<meta name="twitter:description" content="Free browser trainer for 2×2–5×5. Learn beginner and CFOP, scan a 3×3 from photos, and follow an optimal solve. No account." />
+<meta name="twitter:image" content="https://cube.maxmode-now.com/docs/play.png" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="Cube" />
+<meta name="apple-mobile-web-app-title" content="Cube Lab" />
 <link rel="manifest" href="./manifest.json" />
 <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
 <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
-<title>3×3 Cube — Free Play</title>
+<title>Cube Lab — Play, Learn, Scan &amp; Solve Rubik's Cubes</title>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Cube Lab",
+  "url": "https://cube.maxmode-now.com/",
+  "description": "Free browser trainer for 2×2–5×5. Learn beginner and CFOP, scan a 3×3 from photos, and follow an optimal solve. No account.",
+  "applicationCategory": "GameApplication",
+  "operatingSystem": "Any",
+  "browserRequirements": "Requires JavaScript. HTML5.",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "author": {
+    "@type": "Person",
+    "name": "maxmode",
+    "url": "https://maxmode-now.com/",
+    "email": "maxmode.now@gmail.com"
+  }
+}
+</script>
 <style>
   /* ══════════════════════════════════════════════════════════════
      디자인 토큰 — 색 / 모양 / 크기는 여기서만 정의한다.
@@ -254,6 +285,7 @@
     text-decoration: none; width: max-content;
   }
   #about a:hover { color: var(--accent); }
+  #about-blurb { margin: 0 0 8px; font-size: var(--fs-xs); color: var(--muted); line-height: 1.6; }
   .learn-list { display: flex; flex-direction: column; gap: var(--gap); }
   .learn-list button { width: 100%; justify-content: flex-start; }
 
@@ -672,7 +704,7 @@
         <option value="4" data-i18n="size4">4×4</option>
         <option value="5" data-i18n="size5">5×5</option>
       </select>
-      <span id="app-version" aria-label="Version">v1.4</span>
+      <span id="app-version" aria-label="Version">v1.5</span>
       <button type="button" id="settings-btn" class="btn-icon" aria-label="Settings" aria-expanded="false">⚙</button>
     </div>
   </header>
@@ -869,6 +901,7 @@
 
       <p class="hint-text" data-i18n="hint">Drag a face: turn · Drag empty space: orbit · Wheel: zoom</p>
       <div id="about">
+        <p id="about-blurb">Cube Lab is a free browser trainer for Rubik’s cubes. Play 2×2 through 5×5, learn the beginner method and CFOP, scan a physical 3×3, and follow an optimal solve — no account required.</p>
         <a href="https://maxmode-now.com/" target="_blank" rel="noopener noreferrer">maxmode-now.com</a>
         <a href="mailto:maxmode.now@gmail.com">maxmode.now@gmail.com</a>
       </div>
@@ -876,6 +909,10 @@
   </aside>
 
 </div>
+
+<noscript>
+  <p>Cube Lab is a free browser trainer for Rubik’s cubes. Play 2×2 through 5×5, learn the beginner method and CFOP, scan a physical 3×3, and follow an optimal solve — no account required.</p>
+</noscript>
 
 <script type="importmap">
 {
@@ -2229,13 +2266,9 @@ document.getElementById('detect-stage').addEventListener('click', () => {
 function sizeTitleKey() {
   return ({ 2: 'appTitle2', 4: 'appTitle4', 5: 'appTitle5' })[engine.n] || 'appTitle';
 }
-function sizeDocTitleKey() {
-  return ({ 2: 'docTitle2', 4: 'docTitle4', 5: 'docTitle5' })[engine.n] || 'docTitle';
-}
 
 function syncSizeLabels() {
   document.body.dataset.n = String(engine.n);
-  document.title = t(sizeDocTitleKey());
   const h1 = document.getElementById('app-title');
   if (h1) h1.textContent = t(sizeTitleKey());
   const sizeSel = document.getElementById('size-select');
