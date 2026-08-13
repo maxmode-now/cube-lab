@@ -1,0 +1,18 @@
+# Claude
+.claude/
+
+# Local notes / unused
+future.txt
+redesign-plan.md
+lbl.js
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*~

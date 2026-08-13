@@ -1,0 +1,2261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#0f1117" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Cube" />
+<link rel="manifest" href="./manifest.json" />
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
+<title>3×3 Cube — Free Play</title>
+<style>
+  /* ══════════════════════════════════════════════════════════════
+     디자인 토큰 — 색 / 모양 / 크기는 여기서만 정의한다.
+     규칙 안에 hex 리터럴이나 임의의 px 를 직접 쓰지 않는다.
+     ══════════════════════════════════════════════════════════════ */
+  :root {
+    /* ── 표면 ── */
+    --bg: #0f1117;                          /* 페이지 */
+    --sunken: #0e1018;                      /* 우물: 프리뷰·다이어그램 바닥 */
+    --inset: #12151f;                       /* 셀렉트·세그먼트 트랙·카드 안쪽 */
+    --surface-1: #181b24;                   /* 패널 */
+    --surface-2: #212533;                   /* 컨트롤 기본 */
+    --surface-3: #2b3142;                   /* 컨트롤 hover · 비활성 트랙 */
+    --glass: rgba(24, 27, 36, 0.9);         /* 캔버스 위에 뜨는 패널 */
+    --glass-deep: rgba(15, 17, 23, 0.92);   /* 모바일 dock */
+
+    /* ── 선 ── */
+    --border: #272b36;
+    --border-strong: #3a4255;
+    --border-swatch: rgba(0, 0, 0, 0.4);    /* 색칸 테두리 */
+    --guide: rgba(255, 255, 255, 0.85);     /* 카메라 조준 격자 */
+    --guide-weak: rgba(255, 255, 255, 0.35);
+
+    /* ── 글자색 ── */
+    --text: #e6e8ee;
+    --text-strong: #fff;
+    --muted: #9aa0ad;
+    --on-accent: #fff;
+    --on-swatch: #111;                      /* 밝은 색칸 위 글자 */
+
+    /* ── 강조 · 상태 ── */
+    --accent: #4c8dff;
+    --accent-hover: #5d99ff;
+    --success: #4ade80;
+    --warn: #ffd60a;                        /* 회전 표기(R U' F2) · 현재 위치 */
+    --danger: #f87171;
+
+    /* ── 모양: 3종 (+파생 2) ── */
+    --r-sm: 8px;                            /* 모든 컨트롤 */
+    --r-md: 12px;                           /* 카드 · 패널 · 프리뷰 */
+    --r-full: 999px;                        /* 칩 · 진행 바 */
+    --r-nested: calc(var(--r-sm) - 2px);    /* 트랙 안에 든 세그먼트 */
+    --r-swatch: calc(var(--r-sm) / 2);      /* 초소형 색칸 */
+
+    /* ── 글자 크기: 4종 ── */
+    --fs-xs: 11px;                          /* 라벨 · 캡션 · 힌트 */
+    --fs-sm: 13px;                          /* 본문 · 컨트롤 */
+    --fs-md: 15px;                          /* 패널 제목 · 수치 */
+    --fs-lg: 18px;                          /* 큰 제목 · 아이콘 글리프 */
+
+    /* ── 컨트롤 높이: 1종 (터치에서 44px, 아래 미디어쿼리) ── */
+    --h-ctl: 36px;
+    --h-ctl-sm: calc(var(--h-ctl) - 10px);  /* 세그먼트 · 보조 버튼 */
+
+    /* ── 간격 · 그림자 · 모션 ── */
+    --gap: 6px;
+    --pad-panel: 14px 16px;
+    --shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+    --t: .12s ease;
+
+    /* ── 앱 셸 치수 ── */
+    --rail-w: 64px;                         /* 세로 레일 (데스크톱) */
+    --rail-btn-h: 52px;
+    /* 하단 탭바 (모바일) = 버튼 + 상하 패딩 12px + 상단 보더 1px */
+    --rail-h: calc(var(--rail-btn-h) + 13px + var(--safe-b));
+    --top-h: 48px;
+    --act-h: 56px;
+    --panel-open: 340px;                    /* 패널이 열렸을 때의 폭 */
+    --panel-w: 0px;                         /* 닫힘 기본값 */
+    --panel-h: 0px;                         /* 모바일: 시트 높이 */
+
+    /* ── 노치 · 홈 인디케이터 ── */
+    --safe-t: env(safe-area-inset-top, 0px);
+    --safe-b: env(safe-area-inset-bottom, 0px);
+    --safe-l: env(safe-area-inset-left, 0px);
+    --safe-r: env(safe-area-inset-right, 0px);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  /* ══════════════════════════════════════════════════════════════
+     앱 셸 — 큐브가 중앙(stage)을 소유하고, 크롬은 가장자리 트랙에 붙는다.
+     패널은 큐브 위에 뜨지 않고 grid 컬럼/행을 차지해 stage 를 밀어낸다.
+     스크롤되는 요소는 #panel-body / #ui-body 둘뿐이다.
+     ══════════════════════════════════════════════════════════════ */
+  #shell {
+    position: fixed; inset: 0;
+    display: grid;
+    grid-template-columns: var(--rail-w) minmax(0, 1fr) var(--panel-w);
+    grid-template-rows: var(--top-h) minmax(0, 1fr) var(--act-h);
+    grid-template-areas:
+      "top  top   top"
+      "rail stage panel"
+      "rail act   panel";
+  }
+  #shell[data-panel="open"] { --panel-w: var(--panel-open); }
+  #shell:not([data-panel="open"]) #panel { display: none; }
+
+  /* ── stage: 3D 캔버스가 실제로 차지하는 칸 ── */
+  #stage { grid-area: stage; position: relative; overflow: hidden; }
+  #app { position: absolute; inset: 0; pointer-events: none; }
+  #app canvas { position: absolute; inset: 0; display: block; pointer-events: auto; }
+
+  /* ── 상단 바 ── */
+  #topbar {
+    grid-area: top; display: flex; align-items: center; gap: 12px;
+    padding: var(--safe-t) calc(12px + var(--safe-r)) 0 calc(12px + var(--safe-l));
+    background: var(--surface-1); border-bottom: 1px solid var(--border);
+  }
+  #app-title { font-size: var(--fs-md); font-weight: 700; margin: 0; white-space: nowrap; }
+  #stats { margin-left: auto; display: flex; gap: 14px; font-size: var(--fs-sm);
+    font-variant-numeric: tabular-nums; }
+  #stats .stat { color: var(--muted); white-space: nowrap; }
+  #stats .stat b { color: var(--text); font-weight: 700; font-size: var(--fs-md); margin-right: 2px; }
+  #topbar-end { display: flex; align-items: center; gap: 8px; }
+  #topbar .menu-select { width: auto; min-width: 80px; margin: 0; }
+
+  /* ── 모드 레일 (데스크톱 세로 / 모바일 하단 탭바) ── */
+  #rail {
+    grid-area: rail; display: flex; flex-direction: column; gap: 4px;
+    padding: 8px 6px 8px calc(6px + var(--safe-l));
+    background: var(--surface-1); border-right: 1px solid var(--border);
+  }
+  .rail-btn {
+    flex-direction: column; gap: 3px; width: 100%; min-height: var(--rail-btn-h); padding: 6px 2px;
+    font-size: var(--fs-xs); font-weight: 600;
+    color: var(--muted); background: none; border-color: transparent;
+  }
+  .rail-btn .ico { font-size: var(--fs-md); line-height: 1; }
+  .rail-btn:hover { background: var(--surface-2); border-color: transparent; color: var(--text); }
+  .rail-btn.active { background: var(--surface-2); border-color: var(--border); color: var(--accent); }
+
+  /* ── 하단 액션 바: 주 동작은 항상 같은 자리, 스크롤되지 않는다 ── */
+  #actions {
+    grid-area: act; display: flex; align-items: center; justify-content: center; gap: var(--gap);
+    padding: 0 calc(12px + var(--safe-r)) 0 calc(12px + var(--safe-l));
+    background: var(--surface-1); border-top: 1px solid var(--border);
+  }
+  .act-set {
+    display: none; flex: 1 1 auto; align-items: center; justify-content: center;
+    gap: inherit; width: 100%; height: 100%; flex-direction: inherit;
+    min-width: 0; min-height: 0;
+  }
+  #act-play { display: flex; }
+  #actions button { flex: 1 1 0; max-width: 180px; }
+  #actions .primary { flex: 1.3 1 0; max-width: 240px; }
+
+  /* ── 컨텍스트 패널 (단일 컴포넌트) ── */
+  #panel {
+    grid-area: panel; display: flex; flex-direction: column; min-height: 0; min-width: 0;
+    background: var(--surface-1); border-left: 1px solid var(--border);
+  }
+  #panel-head {
+    flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    padding: var(--pad-panel); border-bottom: 1px solid var(--border);
+  }
+  #panel-title { font-size: var(--fs-md); margin: 0; min-width: 0;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #panel-body {
+    flex: 1 1 auto; min-height: 0; overflow-y: auto; scrollbar-gutter: stable;
+    padding: var(--pad-panel);
+  }
+  #panel-foot { flex: 0 0 auto; border-top: 1px solid var(--border); }
+  #panel-foot.hidden { display: none; }
+
+  /* 패널 안의 모드별 섹션 — 하나만 보인다 */
+  #learn-picker, #tutorial, #solver, #scan { display: none; }
+  #learn-picker.open, #tutorial.open, #solver.open, #scan.open { display: block; }
+
+  /* ── 설정 팝오버 (⚙) — 세션당 한두 번 쓰는 것들만 모아둔다 ── */
+  #ui {
+    position: absolute; z-index: 40; display: none; flex-direction: column;
+    top: calc(var(--top-h) + var(--safe-t) + 8px);
+    right: calc(12px + var(--safe-r));
+    width: 300px; max-height: calc(100dvh - var(--top-h) - var(--safe-t) - 24px);
+    background: var(--glass); backdrop-filter: blur(10px);
+    border: 1px solid var(--border); border-radius: var(--r-md); box-shadow: var(--shadow);
+  }
+  #ui.open { display: flex; }
+  #ui-body { overflow-y: auto; scrollbar-gutter: stable; padding: var(--pad-panel); min-height: 0; }
+  #more-head { flex: 0 0 auto; padding: var(--pad-panel); border-bottom: 1px solid var(--border); }
+  .sheet-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 0; }
+  .sheet-head h2 { font-size: var(--fs-md); margin: 0; }
+  #ccw-hint { font-size: var(--fs-xs); color: var(--muted); margin-bottom: 4px; }
+  .hint-text { font-size: var(--fs-xs); color: var(--muted); line-height: 1.6; margin: 12px 0 0; }
+  .learn-list { display: flex; flex-direction: column; gap: var(--gap); }
+  .learn-list button { width: 100%; justify-content: flex-start; }
+
+  #lang-switch { width: max-content; }
+  #layer-mode { width: 100%; flex-wrap: wrap; }
+  #layer-mode button { flex: 1 1 30%; }
+
+  /* ── 토스트: 모든 일시적 피드백이 여기 한 곳으로 모인다 ── */
+  #toast {
+    position: absolute; z-index: 5; left: 50%; bottom: 16px; transform: translateX(-50%);
+    max-width: min(92%, 420px); padding: 8px 14px;
+    background: var(--glass); backdrop-filter: blur(8px);
+    border: 1px solid var(--border); border-radius: var(--r-full);
+    font-size: var(--fs-sm); color: var(--text); text-align: center; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis; pointer-events: none;
+    opacity: 0; visibility: hidden; transition: opacity var(--t), visibility var(--t);
+  }
+  #toast.show { opacity: 1; visibility: visible; }
+  #toast.solved { color: var(--success); font-weight: 700; }
+  #toast.err { color: var(--danger); }
+
+  /* 스마트 풀이 HUD: 컴팩트 뷰에서만 켠다. 시트를 대신해 다음 수만 띄운다. */
+  #solver-hud {
+    display: none; position: absolute; z-index: 6; left: 50%; bottom: 12px;
+    transform: translateX(-50%); width: max-content; max-width: min(92%, 420px);
+    flex-direction: column-reverse; align-items: stretch; gap: 6px;
+  }
+  #solver-hud-status {
+    min-height: var(--h-ctl-sm); padding: 0 14px; max-width: 100%; width: 100%;
+    background: var(--glass); backdrop-filter: blur(8px);
+    border: 1px solid var(--border); border-radius: var(--r-full);
+    font-size: var(--fs-sm); font-weight: 600; color: var(--text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    cursor: default;
+  }
+  #solver-hud.has-moves #solver-hud-status { cursor: pointer; }
+  #solver-hud.has-moves #solver-hud-status::after { content: ' ▾'; color: var(--muted); }
+  #solver-hud.has-moves.open #solver-hud-status::after { content: ' ▴'; }
+  #solver-hud-moves {
+    display: none; padding: 8px 12px; text-align: center;
+    background: var(--glass); backdrop-filter: blur(8px);
+    border: 1px solid var(--border); border-radius: var(--r-md);
+    font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: var(--fs-sm);
+    font-weight: 600; color: var(--warn); line-height: 1.5; word-break: break-word;
+    max-height: 72px; overflow-y: auto;
+  }
+  #solver-hud.open #solver-hud-moves { display: block; }
+
+  /* ── 스크롤바: 남은 두 개의 스크롤 영역만, 얇게 ── */
+  #panel-body, #ui-body { scrollbar-width: thin; scrollbar-color: var(--surface-3) transparent; }
+  #panel-body::-webkit-scrollbar, #ui-body::-webkit-scrollbar { width: 10px; }
+  #panel-body::-webkit-scrollbar-track, #ui-body::-webkit-scrollbar-track { background: transparent; }
+  #panel-body::-webkit-scrollbar-thumb, #ui-body::-webkit-scrollbar-thumb {
+    background: var(--surface-3); border-radius: var(--r-full);
+    border: 3px solid transparent; background-clip: content-box;
+  }
+  #panel-body::-webkit-scrollbar-thumb:hover, #ui-body::-webkit-scrollbar-thumb:hover {
+    background: var(--border-strong); background-clip: content-box;
+  }
+
+  select.menu-select {
+    display: block; width: 100%; margin: 4px 0 8px; min-height: var(--h-ctl);
+    font: inherit; font-size: var(--fs-sm); font-weight: 600;
+    color: var(--text); background: var(--inset); border: 1px solid var(--border);
+    border-radius: var(--r-sm); padding: 0 12px;
+    cursor: pointer; appearance: none;
+    transition: border-color var(--t);
+    background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%),
+      linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+    background-position: calc(100% - 16px) calc(50% - 2px), calc(100% - 11px) calc(50% - 2px);
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
+  }
+  select.menu-select:hover { border-color: var(--border-strong); }
+  select.menu-select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-color: var(--accent); }
+  select.menu-select option { background: var(--inset); color: var(--text); }
+  [data-n="2"] .n3-only,
+  [data-n="4"] .n3-only,
+  [data-n="5"] .n3-only,
+  [data-n="4"] .n23-only,
+  [data-n="5"] .n23-only { display: none !important; }
+  .n4-only { display: none !important; }
+  [data-n="4"] .n4-only,
+  [data-n="5"] .n4-only { display: block !important; }
+  .n5-only { display: none !important; }
+  [data-n="5"] .n5-only { display: block !important; }
+
+  /* ══════════════════════════════════════════════════════════════
+     버튼 — 단일 베이스 하나 + 모디파이어.
+     <button> 은 JS 로 생성되는 것까지 자동으로 이 베이스를 받는다.
+     .btn 은 버튼이 아닌 요소(label 등)를 버튼처럼 보이게 할 때 쓴다.
+     ══════════════════════════════════════════════════════════════ */
+  button, .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: var(--gap);
+    min-height: var(--h-ctl); padding: 0 12px;
+    font: inherit; font-size: var(--fs-sm); font-weight: 600; line-height: 1.2;
+    color: var(--text); background: var(--surface-2);
+    border: 1px solid var(--border); border-radius: var(--r-sm);
+    cursor: pointer;
+    transition: background var(--t), border-color var(--t), color var(--t), transform var(--t);
+  }
+  button:hover, .btn:hover { background: var(--surface-3); border-color: var(--border-strong); }
+  button:active, .btn:active { transform: translateY(1px); }
+  button:focus-visible, .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  button:disabled, .btn:disabled { opacity: .4; cursor: default; transform: none; }
+  button:disabled:hover { background: var(--surface-2); border-color: var(--border); }
+
+  /* primary — 화면당 하나의 주 동작 */
+  .primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  .primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+  .primary:disabled:hover { background: var(--accent); border-color: var(--accent); }
+
+  /* btn-sm — 본문 안에 끼는 보조 버튼 */
+  .btn-sm { min-height: var(--h-ctl-sm); padding: 0 10px; font-size: var(--fs-xs); }
+
+  /* btn-icon — 정사각 아이콘/닫기 */
+  .btn-icon {
+    width: var(--h-ctl); min-width: var(--h-ctl); padding: 0;
+    font-size: var(--fs-lg); line-height: 1;
+    background: none; border-color: transparent; color: var(--muted);
+  }
+  .btn-icon:hover { background: var(--surface-2); border-color: transparent; color: var(--text); }
+
+  /* seg — 트랙 안에 든 세그먼트 컨트롤 (언어 전환, 레이어 선택) */
+  .seg {
+    display: flex; gap: 2px; padding: 2px;
+    background: var(--inset); border: 1px solid var(--border); border-radius: var(--r-sm);
+  }
+  .seg button {
+    min-height: var(--h-ctl-sm); width: auto; padding: 0 8px;
+    font-size: var(--fs-xs); font-weight: 700; letter-spacing: .03em;
+    color: var(--muted); background: none; border: none; border-radius: var(--r-nested);
+  }
+  .seg button:hover { background: var(--surface-3); border-color: transparent; color: var(--text); }
+  .seg button.active { background: var(--accent); color: var(--on-accent); }
+
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap); margin-bottom: 8px; }
+  .row { display: flex; gap: var(--gap); margin-top: 8px; }
+  .row button, .row .btn { flex: 1; }
+
+  .label { font-size: var(--fs-xs); color: var(--muted); margin: 12px 0 4px; text-transform: uppercase; letter-spacing: .04em; }
+  .label:first-child { margin-top: 0; }
+
+  /* 튜토리얼 본문 */
+  #tut-step-no { font-size: var(--fs-xs); color: var(--accent); font-weight: 700;
+    text-transform: uppercase; letter-spacing: .05em; }
+  #tut-title { font-size: var(--fs-lg); font-weight: 700; margin: 4px 0 8px; }
+  #tut-goal { font-size: var(--fs-sm); color: var(--muted); background: var(--surface-2);
+    border-left: 3px solid var(--accent); border-radius: 0 var(--r-sm) var(--r-sm) 0;
+    padding: 8px 10px; margin-bottom: 10px; }
+  #tut-desc { font-size: var(--fs-sm); line-height: 1.65; color: var(--text); }
+  #tut-desc p { margin: 0 0 8px; }
+  #tut-desc b { color: var(--text-strong); }
+  .alg { display: flex; align-items: center; gap: 8px; margin: 8px 0;
+    background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 8px 10px; }
+  .alg .alg-info { flex: 1; min-width: 0; }
+  .alg .alg-label { font-size: var(--fs-xs); color: var(--muted); margin-bottom: 2px; }
+  .alg .alg-notation { font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: var(--fs-sm); font-weight: 600; color: var(--warn); letter-spacing: .02em; }
+  .alg button { flex: 0 0 auto; }
+  #tut-nav { display: flex; gap: 8px; padding: 12px 16px; }
+  #tut-nav button { flex: 1; }
+  #tut-progress { display: flex; gap: 4px; margin-bottom: 12px; }
+  #tut-progress .dot { flex: 1; height: 4px; border-radius: var(--r-full); background: var(--surface-3); }
+  #tut-progress .dot.done { background: var(--accent); }
+  #tut-expand { display: none; }
+  .sheet-handle {
+    display: none; flex: 0 0 auto; align-items: center; justify-content: center;
+    width: 100%; min-height: 20px; padding: 8px 0 2px;
+    background: none; border: none; border-radius: 0; cursor: pointer;
+  }
+  .sheet-handle:hover { background: none; }
+  .sheet-handle-bar {
+    width: 36px; height: 4px; border-radius: var(--r-full); background: var(--border-strong);
+  }
+
+  /* 목표 상태 다이어그램 */
+  #tut-diagram { margin: 8px 0 4px; }
+  .diag-wrap { background: var(--sunken); border-radius: var(--r-md); padding: 10px;
+    display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .diag-cap { font-size: var(--fs-xs); color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+  .diag-row { display: flex; gap: 8px; align-items: center; }
+  .diag-note { font-size: var(--fs-xs); color: var(--muted); text-align: center; line-height: 1.5; }
+
+  /* 스마트 풀이 본문 */
+  #solve-status { font-size: var(--fs-sm); font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  #solve-moves { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: var(--fs-sm);
+    color: var(--warn); line-height: 1.5; word-break: break-word; margin-bottom: 10px;
+    max-height: 64px; overflow-y: auto; }
+  .solver-note { font-size: var(--fs-xs); color: var(--muted); margin-top: 10px; line-height: 1.5; }
+
+  /* 큐브 스캔 본문 */
+  #scan-face-label { font-size: var(--fs-sm); font-weight: 700; margin-bottom: 4px; }
+  #scan-tip { font-size: var(--fs-xs); color: var(--muted); line-height: 1.45; margin-bottom: 10px; }
+  #scan-progress { display: flex; gap: 4px; margin-bottom: 10px; }
+  #scan-progress .dot {
+    flex: 1; min-height: 0; height: 8px; border-radius: var(--r-full); background: var(--surface-3);
+    border: none; padding: 0; cursor: pointer;
+  }
+  #scan-progress .dot:hover { filter: brightness(1.25); background: var(--surface-3); }
+  #scan-progress .dot.done { background: var(--accent); }
+  #scan-progress .dot.current { outline: 2px solid var(--warn); outline-offset: 1px; }
+  #scan-stage-capture, #scan-stage-check, #scan-stage-final { display: none; }
+  #scan-stage-capture.show, #scan-stage-check.show, #scan-stage-final.show { display: block; }
+  #scan-check-preview-wrap {
+    position: relative; width: 100%; aspect-ratio: 1; background: var(--sunken);
+    border-radius: var(--r-md); overflow: hidden; border: 1px solid var(--border); margin-bottom: 10px;
+  }
+  #scan-check-preview {
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  }
+  #scan-check-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap); margin-bottom: 8px;
+  }
+  #scan-check-grid button {
+    aspect-ratio: 1; min-height: 0; padding: 0;
+    border-radius: var(--r-sm); border: 1px solid var(--border-swatch);
+    font-size: var(--fs-sm); font-weight: 700;
+  }
+  #scan-check-center-hint { font-size: var(--fs-xs); color: var(--muted); margin-bottom: 8px; }
+  #scan-preview-wrap {
+    position: relative; width: 100%; aspect-ratio: 1; background: var(--sunken);
+    border-radius: var(--r-md); overflow: hidden; border: 1px solid var(--border);
+  }
+  #scan-preview, #scan-video {
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+    display: none;
+  }
+  #scan-preview.show, #scan-video.show { display: block; }
+  #scan-grid {
+    position: absolute; inset: 12%; border: 2px solid var(--guide);
+    display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);
+    pointer-events: none;
+  }
+  #scan-grid span { border: 1px solid var(--guide-weak); }
+  #scan-status, #scan-check-status, #scan-review-status {
+    font-size: var(--fs-sm); color: var(--muted); min-height: 18px; margin: 8px 0;
+  }
+  #scan-status.err, #scan-check-status.err, #scan-review-status.err { color: var(--danger); }
+  #scan-status.ok, #scan-check-status.ok, #scan-review-status.ok { color: var(--success); }
+  #scan-final-tip { font-size: var(--fs-xs); color: var(--muted); line-height: 1.45; margin-bottom: 10px; }
+  #scan-review {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+  }
+  .scan-face-card { background: var(--inset); border: 1px solid var(--border);
+    border-radius: var(--r-sm); padding: 6px; cursor: pointer; }
+  .scan-face-card .sf-name { font-size: var(--fs-xs); color: var(--muted); margin-bottom: 4px; text-align: center; }
+  .scan-mini {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
+  }
+  .scan-mini button {
+    aspect-ratio: 1; min-height: 0; padding: 0;
+    border-radius: var(--r-swatch); border: 1px solid var(--border-swatch);
+    font-size: var(--fs-xs); font-weight: 700; color: var(--on-swatch); pointer-events: none;
+  }
+
+  /* 내 단계 찾기 결과 */
+  #stage-box { margin-top: 8px; display: none; background: var(--surface-2);
+    border: 1px solid var(--border); border-left: 3px solid var(--success);
+    border-radius: 0 var(--r-sm) var(--r-sm) 0; padding: 10px 12px; }
+  #stage-box.show { display: block; }
+  #stage-box .sb-step { font-size: var(--fs-xs); color: var(--success); font-weight: 700; letter-spacing: .04em; }
+  #stage-box .sb-title { font-size: var(--fs-md); font-weight: 700; margin: 2px 0 6px; }
+  #stage-box .sb-alg { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: var(--fs-sm);
+    font-weight: 600; color: var(--warn); margin-bottom: 8px; }
+  #stage-box .sb-desc { font-size: var(--fs-sm); color: var(--muted); margin-top: 4px; }
+  #stage-box .sb-note { color: var(--muted); font-family: inherit; font-weight: 400; }
+
+  /* ══════════════════════════════════════════════════════════════
+     반응형 — 그리드 template 만 바꾼다. 모드 4개와 패널 1개라는
+     모델 자체는 모든 폭에서 동일하다.
+     ══════════════════════════════════════════════════════════════ */
+
+  /* ── 세로형 모바일 / 좁은 창: 레일이 하단 탭바로, 패널이 바텀시트로 ── */
+  @media (max-width: 900px) {
+    :root {
+      --h-ctl: 44px;              /* 터치 최소 타겟 */
+      --act-h: 60px;
+    }
+    #shell {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: var(--top-h) minmax(0, 1fr) var(--panel-h) var(--act-h) var(--rail-h);
+      grid-template-areas:
+        "top"
+        "stage"
+        "panel"
+        "act"
+        "rail";
+    }
+    /* 시트가 열리면 stage 행이 그만큼 줄어든다 → 큐브가 시트 위에서 온전히 보인다 */
+    #shell[data-panel="open"] { --panel-h: min(48dvh, 440px); }
+    /* Learn 피커는 버튼 몇 개뿐. 반 화면 시트를 쓰지 않고 내용만큼만 차지한다.
+       Find My Step 결과가 붙으면 커지되 280px에서 잘리고 본문만 스크롤. */
+    #shell[data-mode="learn"] { --panel-h: fit-content(280px); }
+    #shell[data-mode="learn"] #panel { min-height: min-content; }
+
+    #rail {
+      flex-direction: row; border-right: none; border-top: 1px solid var(--border);
+      padding: 6px calc(6px + var(--safe-r)) calc(6px + var(--safe-b)) calc(6px + var(--safe-l));
+    }
+    .rail-btn { flex: 1 1 0; min-width: 0; }
+
+    #panel { border-left: none; border-top: 1px solid var(--border); }
+    #actions { padding-bottom: 0; }
+    #actions button { max-width: none; }
+    #actions .primary { max-width: none; }
+
+    #ui {
+      top: auto; width: auto; border-radius: var(--r-md);
+      left: calc(8px + var(--safe-l)); right: calc(8px + var(--safe-r));
+      bottom: calc(var(--rail-h) + var(--act-h) + 8px);
+      max-height: min(60dvh, calc(100dvh - var(--rail-h) - var(--act-h) - var(--top-h) - 16px));
+    }
+
+    #app-title { display: none; }        /* 상단 바는 수치와 컨트롤만 */
+    #stats { margin-left: 0; }
+  }
+
+  /* ── 세로 모바일 튜토리얼: peek(목표·다이어그램) / expand(설명·공식) ── */
+  @media (max-width: 900px) and (orientation: portrait) {
+    #shell[data-mode="tutorial"] { --panel-h: fit-content(min(42dvh, 360px)); }
+    #shell[data-mode="tutorial"] #panel { min-height: min-content; }
+    #shell[data-mode="tutorial"][data-sheet="expand"] {
+      --panel-h: min(70dvh, calc(100dvh - var(--top-h) - var(--act-h) - var(--rail-h) - 88px));
+    }
+    #shell[data-mode="tutorial"][data-sheet="expand"] #panel { min-height: 0; }
+    #shell[data-mode="tutorial"] .sheet-handle { display: flex; }
+    #shell[data-mode="tutorial"] #tut-expand {
+      display: flex; width: calc(100% - 32px); margin: 8px 16px 0;
+      min-height: var(--h-ctl-sm); font-size: var(--fs-xs); color: var(--muted);
+      background: none; border-color: transparent;
+    }
+    #shell[data-mode="tutorial"] #tut-expand:hover { background: var(--surface-2); color: var(--text); }
+    #shell[data-mode="tutorial"]:not([data-sheet="expand"]) #tut-more { display: none; }
+    #shell[data-mode="tutorial"]:not([data-sheet="expand"]) #tut-goal {
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      padding: 6px 8px; margin-bottom: 6px;
+    }
+    #shell[data-mode="tutorial"]:not([data-sheet="expand"]) #tut-title { font-size: var(--fs-md); margin: 2px 0 6px; }
+    #shell[data-mode="tutorial"]:not([data-sheet="expand"]) #tut-progress { margin-bottom: 8px; }
+    #shell[data-mode="tutorial"]:not([data-sheet="expand"]) .diag-cap,
+    #shell[data-mode="tutorial"]:not([data-sheet="expand"]) .diag-note { display: none; }
+    #shell[data-mode="tutorial"]:not([data-sheet="expand"]) .diag-wrap { padding: 6px; gap: 4px; }
+    #shell[data-mode="tutorial"]:not([data-sheet="expand"]) #tut-diagram { margin: 4px 0 0; }
+    #shell[data-mode="tutorial"]:not([data-sheet="expand"]) #tut-diagram svg { max-height: 88px; width: auto; }
+    #shell[data-mode="tutorial"] #tut-nav { padding: 8px 16px 12px; }
+    #shell[data-mode="tutorial"] #panel-head { padding: 8px 12px; }
+  }
+
+  /* ── 아주 좁은 폭: 액션 라벨이 잘리지 않도록 ── */
+  @media (max-width: 380px) {
+    #actions { gap: 4px; padding: 0 8px; }
+  }
+
+  /* ── 가로형 모바일: 세로 높이가 귀하다. 레일은 왼쪽, 액션은 오른쪽 세로 스택 ── */
+  @media (max-height: 520px) and (orientation: landscape) {
+    :root { --top-h: 44px; --rail-w: 60px; --panel-open: min(300px, 38vw); }
+    #shell {
+      grid-template-columns: var(--rail-w) minmax(0, 1fr) auto var(--panel-w);
+      grid-template-rows: var(--top-h) minmax(0, 1fr);
+      grid-template-areas:
+        "rail top   top panel"
+        "rail stage act panel";
+    }
+    #rail {
+      flex-direction: column; border-right: 1px solid var(--border); border-top: none;
+      padding: 6px 6px calc(6px + var(--safe-b)) calc(6px + var(--safe-l));
+    }
+    .rail-btn { min-height: 46px; }
+    #actions {
+      flex-direction: column; justify-content: center;
+      padding: 8px calc(10px + var(--safe-r)) 8px 10px;
+      border-top: none; border-left: 1px solid var(--border);
+    }
+    #actions button, #actions .primary { flex: 0 0 auto; width: 92px; max-width: none; }
+    #panel { border-left: 1px solid var(--border); border-top: none; }
+    #app-title { display: none; }
+    #stats { margin-left: auto; }
+    #ui {
+      top: calc(var(--top-h) + 8px); bottom: auto;
+      right: calc(12px + var(--safe-r)); left: auto; width: 300px;
+      max-height: calc(100dvh - var(--top-h) - 20px);
+    }
+  }
+
+  /* ── 스마트 풀이 컴팩트: 시트를 접고 액션바·HUD만 남긴다.
+     세로 좁은 폰 + 가로 폰(큰 기기도 높이 520 이하) 둘 다. ── */
+  @media (max-width: 900px), ((max-height: 520px) and (orientation: landscape)) {
+    #shell[data-mode="solver"] { --panel-h: 0px; --panel-w: 0px; }
+    #shell[data-mode="solver"] #panel { display: none; }
+    #shell[data-mode="solver"] #act-play { display: none; }
+    #shell[data-mode="solver"] #act-solver { display: flex; }
+    #shell[data-mode="solver"] #solver-hud { display: flex; }
+    #shell[data-mode="solver"] #toast { bottom: auto; top: 12px; }
+  }
+
+  /* ── 모션 최소화 선호 ── */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+  }
+</style>
+</head>
+<body>
+<div id="shell" data-panel="closed" data-mode="play">
+
+  <header id="topbar">
+    <h1 id="app-title" data-i18n="appTitle">3×3 Cube</h1>
+    <div id="stats">
+      <span class="stat"><b class="js-timer">0.0</b><span data-i18n="unitSec">s</span></span>
+      <span class="stat"><b class="js-moves">0</b><span data-i18n="unitMoves">moves</span></span>
+    </div>
+    <div id="topbar-end">
+      <select id="size-select" class="menu-select" aria-label="Cube size">
+        <option value="2" data-i18n="size2">2×2</option>
+        <option value="3" data-i18n="size3" selected>3×3</option>
+        <option value="4" data-i18n="size4">4×4</option>
+        <option value="5" data-i18n="size5">5×5</option>
+      </select>
+      <button type="button" id="settings-btn" class="btn-icon" aria-label="Settings" aria-expanded="false">⚙</button>
+    </div>
+  </header>
+
+  <nav id="rail" aria-label="Mode">
+    <button type="button" class="rail-btn" data-mode="play">
+      <span class="ico" aria-hidden="true">🎮</span><span data-i18n="modePlay">Play</span></button>
+    <button type="button" class="rail-btn n23-only" data-mode="learn">
+      <span class="ico" aria-hidden="true">📖</span><span data-i18n="modeLearn">Learn</span></button>
+    <button type="button" class="rail-btn n3-only" data-mode="solver">
+      <span class="ico" aria-hidden="true">🧠</span><span data-i18n="modeSolve">Solve</span></button>
+    <button type="button" class="rail-btn n3-only" data-mode="scan">
+      <span class="ico" aria-hidden="true">📷</span><span data-i18n="modeScan">Scan</span></button>
+  </nav>
+
+  <main id="stage">
+    <div id="app"></div>
+    <div id="toast" role="status" aria-live="polite"></div>
+    <div id="solver-hud">
+      <button type="button" id="solver-hud-status" aria-expanded="false" aria-controls="solver-hud-moves"
+        data-i18n="analyzing">Analyzing the current cube…</button>
+      <div id="solver-hud-moves"></div>
+    </div>
+  </main>
+
+  <footer id="actions">
+    <div id="act-play" class="act-set">
+      <button type="button" id="scramble" class="primary" data-i18n="scramble">Scramble</button>
+      <button type="button" id="undo" data-i18n="undo">Undo</button>
+      <button type="button" id="reset" data-i18n="reset">Reset</button>
+    </div>
+    <div id="act-solver" class="act-set">
+      <button type="button" id="solve-next-m" class="primary" data-i18n="solveNext">▶ Next move</button>
+      <button type="button" id="solve-all-m" data-i18n="solveAll">⏭ Solve all</button>
+    </div>
+  </footer>
+
+  <aside id="panel" aria-label="Panel">
+    <button type="button" id="sheet-handle" class="sheet-handle" aria-expanded="false" aria-controls="tut-more">
+      <span class="sheet-handle-bar" aria-hidden="true"></span>
+    </button>
+    <div id="panel-head">
+      <h2 id="panel-title"></h2>
+      <button type="button" id="panel-close" class="btn-icon" aria-label="Close">✕</button>
+    </div>
+
+    <div id="panel-body">
+
+      <div id="learn-picker" class="n23-only">
+        <div class="learn-list">
+          <button type="button" id="open-tut" class="primary" data-i18n="openTut">📖 Tutorial (Beginner)</button>
+          <button type="button" id="open-cfop" class="n3-only" data-i18n="openCfop">⚡ Speed (CFOP / 4-look)</button>
+          <button type="button" id="detect-stage" class="n3-only" data-i18n="detectStage">🎯 Find My Step (Beginner)</button>
+        </div>
+        <div id="stage-box" class="n3-only"></div>
+      </div>
+
+      <div id="tutorial">
+        <div id="tut-progress"></div>
+        <div id="tut-body">
+    <div id="tut-step-no"></div>
+    <div id="tut-title"></div>
+    <div id="tut-goal"></div>
+    <div id="tut-diagram"></div>
+    <div id="tut-more">
+    <div id="tut-desc"></div>
+    <div id="tut-algs"></div>
+    </div>
+    </div>
+      </div>
+
+      <div id="solver">
+        <div id="solver-body">
+    <div id="solve-status" data-i18n="analyzing">Analyzing the current cube…</div>
+    <div id="solve-moves"></div>
+    <div class="row">
+      <button type="button" id="solve-next" class="primary" style="flex:1" data-i18n="solveNext">▶ Next move</button>
+      <button type="button" id="solve-all" style="flex:1" data-i18n="solveAll">⏭ Solve all</button>
+    </div>
+    <div class="solver-note" data-i18n="solverNote">Reads the state automatically and guides you with an optimal solution (two-phase algorithm). Turn it yourself and the next move is recalculated.</div>
+      </div>
+      </div>
+
+      <div id="scan">
+        <div id="scan-body">
+    <div id="scan-face-label"></div>
+    <div id="scan-progress"></div>
+
+    <div id="scan-stage-capture" class="show">
+      <div id="scan-tip"></div>
+      <div id="scan-preview-wrap">
+        <video id="scan-video" playsinline muted></video>
+        <img id="scan-preview" alt="">
+        <div id="scan-grid" aria-hidden="true">
+          <span></span><span></span><span></span>
+          <span></span><span></span><span></span>
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+      <div id="scan-status"></div>
+      <div class="row">
+        <label class="btn primary" style="flex:1">
+          <span id="scan-upload-label" data-i18n="scanUpload">Upload photo</span>
+          <input type="file" id="scan-file" accept="image/*" hidden>
+        </label>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <button type="button" id="scan-cam" style="flex:1" data-i18n="scanCam">Camera</button>
+        <button type="button" id="scan-snap" class="primary" style="flex:1;display:none" data-i18n="scanSnap">Capture</button>
+      </div>
+    </div>
+
+    <div id="scan-stage-check">
+      <div id="scan-check-tip" data-i18n="scanCheckTip">Check this face. Tap a sticker to fix its color, then confirm.</div>
+      <div id="scan-check-preview-wrap">
+        <img id="scan-check-preview" alt="">
+      </div>
+      <div id="scan-check-center-hint"></div>
+      <div id="scan-check-grid"></div>
+      <div id="scan-check-status"></div>
+      <div class="row" style="margin-top:8px">
+        <button type="button" id="scan-check-retake" style="flex:1" data-i18n="scanRetake">Retake photo</button>
+        <button type="button" id="scan-check-ok" class="primary" style="flex:1" data-i18n="scanConfirm">Confirm face →</button>
+      </div>
+    </div>
+
+    <div id="scan-stage-final">
+      <div id="scan-final-tip" data-i18n="scanFinalTip">All 6 faces confirmed. Apply opens Smart Solve with a solution.</div>
+      <div id="scan-review"></div>
+      <div id="scan-review-status"></div>
+      <div class="row" style="margin-top:10px">
+        <button type="button" id="scan-apply" class="primary" style="flex:1" data-i18n="scanApply">Apply & solve</button>
+      </div>
+    </div>
+      </div>
+      </div>
+
+    </div>
+
+    <div id="panel-foot" class="hidden">
+      <button type="button" id="tut-expand" aria-expanded="false">Details ▾</button>
+      <div id="tut-nav">
+        <button type="button" id="tut-prev" data-i18n="prev">← Prev</button>
+        <button type="button" id="tut-next" data-i18n="next">Next →</button>
+      </div>
+    </div>
+  </aside>
+
+  <aside id="ui" aria-label="Settings">
+    <div id="more-head" class="sheet-head">
+      <h2 data-i18n="settings">Settings</h2>
+      <button type="button" id="more-close" class="btn-icon" aria-label="Close">✕</button>
+    </div>
+    <div id="ui-body">
+      <div class="label" data-i18n="numbersLabel">Numbers</div>
+      <select id="numbers-select" class="menu-select" aria-label="Sticker numbers">
+        <option value="off" data-i18n="numbersOff">Off</option>
+        <option value="on" data-i18n="numbersOn">On</option>
+      </select>
+
+      <div class="n4-only">
+        <div class="label" data-i18n="layerMode">Layer</div>
+        <div id="layer-mode" class="seg">
+          <button type="button" data-layer="outer" class="active" data-i18n="layerOuter">Outer</button>
+          <button type="button" data-layer="inner" data-i18n="layerInner">Inner</button>
+          <button type="button" data-layer="mid" class="n5-only" data-i18n="layerMid">Mid</button>
+          <button type="button" data-layer="wide" data-i18n="layerWide">Wide</button>
+          <button type="button" data-layer="wide3" class="n5-only" data-i18n="layerWide3">3-Wide</button>
+        </div>
+      </div>
+
+      <div class="label" data-i18n="turnFace">Turn a face</div>
+      <div class="grid">
+        <button data-move="U">U</button>
+        <button data-move="D">D</button>
+        <button data-move="L">L</button>
+        <button data-move="R">R</button>
+        <button data-move="F">F</button>
+        <button data-move="B">B</button>
+      </div>
+      <div id="ccw-hint" data-i18n="ccwHint">Shift+click or key = counter-clockwise (′)</div>
+
+      <div class="label" data-i18n="langLabel">Language</div>
+      <div id="lang-switch" class="seg">
+        <button data-lang="en">EN</button>
+        <button data-lang="ko">한국어</button>
+      </div>
+
+      <p class="hint-text" data-i18n="hint">Drag a face: turn · Drag empty space: orbit · Wheel: zoom</p>
+    </div>
+  </aside>
+
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<!-- 솔버 (Kociemba 2단계) — 전역 window.Cube 정의 -->
+<script src="https://cdn.jsdelivr.net/npm/cubejs@1.3.1/lib/cube.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/cubejs@1.3.1/lib/solve.js"></script>
+<script src="cube-solver.js"></script>
+<!-- 격자 수학: classic script (file://에서도 동작. ES import는 CORS로 모듈 전체가 죽음) -->
+<script src="cube-math.js"></script>
+<script src="cube-engine.js"></script>
+<script src="cube-scan.js"></script>
+<script src="lessons.js"></script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+// ──────────────────────────────────────────────────────────
+// i18n — 영어 기본, 한국어 선택 가능 (선택은 localStorage에 저장)
+//   정적 텍스트는 data-i18n 속성으로, 동적 문자열은 t()/함수로 처리한다.
+//   회전 표기(R, U', F2 …)는 국제 표준이라 번역하지 않는다.
+// ──────────────────────────────────────────────────────────
+const I18N = {
+  en: {
+    docTitle: '3×3 Cube — Free Play',
+    appTitle: '3×3 Cube', appSub: 'Step 1 · Free play',
+    turnFace: 'Turn a face', ccwHint: "Shift+click or key = counter-clockwise (′)",
+    scramble: 'Scramble', undo: 'Undo', reset: 'Reset',
+    unitSec: 's', unitMoves: ' moves',
+    openTut: '📖 Tutorial (Beginner)', openCfop: '⚡ Speed (CFOP / 4-look)',
+    openSolver: '🧠 Smart Solve', detectStage: '🎯 Find My Step (Beginner)',
+    analyzing: 'Analyzing the current cube…',
+    solveNext: '▶ Next move', solveAll: '⏭ Solve all',
+    solverNote: 'Reads the state automatically and guides you with an optimal solution (two-phase algorithm). Turn it yourself and the next move is recalculated.',
+    prev: '← Prev', next: 'Next →',
+    hint: 'Drag a face: turn · Drag empty space: orbit · Wheel: zoom',
+    solved: '✓ Solved!', solvedN: n => `✓ Solved! (${n} moves)`,
+    alreadySolved: '✓ Already solved!',
+    solverPreparing: 'Preparing solver… (first time only, takes a few seconds)',
+    solverFailed: m => `Solver init failed: ${m}`,
+    nextMoveIs: (m, n) => `Next move: ${m}  ·  ${n} left`,
+    solverHintMobile: 'Turn the cube yourself — the next move updates.',
+    autoSolving: 'Auto-solving…',
+    solveFinished: 'Solve finished (check the state)',
+    diagGoal: 'Goal state', diagApply: 'Apply to cube',
+    diagNote: "Grey = cells you don't need to match yet",
+    diagExample: 'Example — solved',
+    diagExampleNote: 'This screen is not a solve step',
+    tutIntro: 'Intro · not a solve step',
+    tutStepOf: (i, n) => `${i} / ${n}`,
+    tutShowMore: 'Details ▾', tutShowLess: 'Hide details ▴',
+    demo: '▶ Demo',
+    trackBeginner: 'Solving the Cube — Beginner Method',
+    trackBeginner2: 'Solving the 2×2 — Beginner',
+    trackCfop: 'Speed — CFOP / 4-look LL',
+    stagePrepLabel: 'Getting started', stagePrepTitle: 'Not scrambled yet',
+    stagePrepDesc: 'Press Scramble to mix the cube, then try this again!',
+    stageDoneLabel: '✓ Solved', stageDoneTitle: 'All done! 🎉',
+    stageNext: i => `Next step · ${i} / 7`,
+    stageIntuitive: 'No algorithm to memorise — solve this one by intuition',
+    stageOpenLesson: '📖 Open this lesson',
+    uiMenu: 'Menu', uiCloseMenu: 'Close',
+    learn: 'Learn', more: 'More', learnTitle: 'Learn', assistTitle: 'Assist',
+    settings: 'Settings', langLabel: 'Language',
+    modePlay: 'Play', modeLearn: 'Learn', modeSolve: 'Solve', modeScan: 'Scan',
+    panelLearn: 'Learn', panelSolve: 'Smart Solve', panelScan: 'Scan cube',
+    needScramble: 'Scramble the cube first',
+    size2: '2×2', size3: '3×3', size4: '4×4', size5: '5×5',
+    docTitle2: '2×2 Cube — Free Play', appTitle2: '2×2 Cube',
+    docTitle4: '4×4 Cube — Free Play', appTitle4: '4×4 Cube',
+    docTitle5: '5×5 Cube — Free Play', appTitle5: '5×5 Cube',
+    layerMode: 'Layer', layerOuter: 'Outer', layerInner: 'Inner', layerMid: 'Mid',
+    layerWide: 'Wide', layerWide3: '3-Wide',
+    sizeLabel: 'Size',
+    numbersLabel: 'Numbers', numbersOff: 'Off', numbersOn: 'On',
+    openScan: '📷 Scan cube',
+    scanUpload: 'Upload photo', scanReplace: 'Replace photo',
+    scanCam: 'Camera', scanSnap: 'Capture',
+    scanRetake: 'Retake photo', scanConfirm: 'Confirm face →',
+    scanApply: 'Apply & solve',
+    scanCheckTip: 'Check this face against the photo. Tap a sticker to fix color, then confirm.',
+    scanFinalTip: 'All 6 faces confirmed. Apply opens Smart Solve with a solution.',
+    scanCenterHint: face => `Center should be ${face}`,
+    scanCenterBad: face => `Center should be ${face} — tap the middle sticker`,
+    scanFaceOk: 'Looks good — confirm to continue',
+    scanPickFace: 'Tap a progress dot to jump to that face',
+    scanFaceU: 'Face 1/6 · U (white center)',
+    scanFaceR: 'Face 2/6 · R (red center)',
+    scanFaceF: 'Face 3/6 · F (green center)',
+    scanFaceD: 'Face 4/6 · D (yellow center)',
+    scanFaceL: 'Face 5/6 · L (orange center)',
+    scanFaceB: 'Face 6/6 · B (blue center)',
+    scanTipU: 'Hold the white center toward the camera. Keep the green face at the bottom of the photo.',
+    scanTipSide: 'Hold this face toward the camera. Keep the white face at the top of the photo.',
+    scanTipD: 'Hold the yellow center toward the camera. Keep the green face at the top of the photo.',
+    scanNeed3: 'Scan works on 3×3 only. Switching to 3×3…',
+    scanCamFail: 'Camera unavailable — use Upload photo',
+    scanApplyOk: 'Scan applied — solution ready',
+    scanInvalid: 'Color counts or centers look wrong — edit a face, then apply again',
+    scanBusy: 'Wait for the cube to finish moving',
+    scanAllDone: 'All 6 faces confirmed',
+  },
+  ko: {
+    docTitle: '3×3 큐브 — 자유 조작',
+    appTitle: '3×3 큐브', appSub: '1단계 · 자유 조작',
+    turnFace: '면 돌리기', ccwHint: 'Shift+클릭 또는 키 = 반시계(′)',
+    scramble: '섞기', undo: '되돌리기', reset: '리셋',
+    unitSec: '초', unitMoves: '수',
+    openTut: '📖 튜토리얼 (초보자법)', openCfop: '⚡ 효율 (CFOP / 4-look)',
+    openSolver: '🧠 스마트 풀이', detectStage: '🎯 내 단계 찾기 (초보자법)',
+    analyzing: '현재 큐브를 분석합니다…',
+    solveNext: '▶ 다음 한 수', solveAll: '⏭ 전체 풀기',
+    solverNote: '상태를 자동 인식해 최적 수순(2단계 알고리즘)으로 안내해요. 직접 돌려도 다음 수가 다시 계산됩니다.',
+    prev: '← 이전', next: '다음 →',
+    hint: '드래그: 면 돌리기 · 빈 곳 드래그: 시점 회전 · 휠: 확대',
+    solved: '✓ 완성!', solvedN: n => `✓ 완성! (${n}수)`,
+    alreadySolved: '✓ 이미 완성된 상태예요!',
+    solverPreparing: '솔버 준비 중… (최초 1회, 몇 초 걸려요)',
+    solverFailed: m => `솔버 초기화 실패: ${m}`,
+    nextMoveIs: (m, n) => `다음 한 수: ${m}  ·  남은 ${n}수`,
+    solverHintMobile: '직접 돌려도 다음 수가 다시 계산됩니다.',
+    autoSolving: '자동 풀이 중…',
+    solveFinished: '풀이 완료 (상태를 확인하세요)',
+    diagGoal: '목표 상태', diagApply: '큐브에 적용',
+    diagNote: '회색 = 아직 맞추지 않아도 되는 칸',
+    diagExample: '완성 예시',
+    diagExampleNote: '이 화면은 맞추기 목표가 아닙니다',
+    tutIntro: '준비 · 풀이 단계 아님',
+    tutStepOf: (i, n) => `${i} / ${n}`,
+    tutShowMore: '자세히 ▾', tutShowLess: '접기 ▴',
+    demo: '▶ 시연',
+    trackBeginner: '큐브 맞추기 — 초보자법',
+    trackBeginner2: '2×2 맞추기 — 초보자법',
+    trackCfop: '효율 — CFOP / 4-look LL',
+    stagePrepLabel: '준비 중', stagePrepTitle: '아직 섞지 않았어요',
+    stagePrepDesc: '섞기 버튼을 눌러 큐브를 섞은 뒤 사용해보세요!',
+    stageDoneLabel: '✓ 완성', stageDoneTitle: '이미 다 맞췄어요! 🎉',
+    stageNext: i => `다음 할 단계 · ${i} / 7`,
+    stageIntuitive: '정해진 공식 없이 직관으로 풀어요',
+    stageOpenLesson: '📖 이 단계 레슨 열기',
+    uiMenu: '메뉴', uiCloseMenu: '닫기',
+    learn: '학습', more: '더보기', learnTitle: '학습', assistTitle: '도움',
+    settings: '설정', langLabel: '언어',
+    modePlay: '조작', modeLearn: '학습', modeSolve: '풀이', modeScan: '스캔',
+    panelLearn: '학습', panelSolve: '스마트 풀이', panelScan: '큐브 스캔',
+    needScramble: '큐브를 먼저 섞어주세요',
+    size2: '2×2', size3: '3×3', size4: '4×4', size5: '5×5',
+    docTitle2: '2×2 큐브 — 자유 조작', appTitle2: '2×2 큐브',
+    docTitle4: '4×4 큐브 — 자유 조작', appTitle4: '4×4 큐브',
+    docTitle5: '5×5 큐브 — 자유 조작', appTitle5: '5×5 큐브',
+    layerMode: '층', layerOuter: '겉면', layerInner: '안쪽', layerMid: '가운데',
+    layerWide: '와이드', layerWide3: '3와이드',
+    sizeLabel: '크기',
+    numbersLabel: '번호', numbersOff: '끄기', numbersOn: '켜기',
+    openScan: '📷 큐브 스캔',
+    scanUpload: '사진 올리기', scanReplace: '사진 바꾸기',
+    scanCam: '카메라', scanSnap: '촬영',
+    scanRetake: '사진 다시', scanConfirm: '이 면 확인 →',
+    scanApply: '적용하고 풀이',
+    scanCheckTip: '사진과 맞춰 이 면을 확인하세요. 스티커를 탭해 색을 고친 뒤 확인하세요.',
+    scanFinalTip: '6면 모두 확인됨. 적용하면 스마트 풀이가 열립니다.',
+    scanCenterHint: face => `센터는 ${face} 이어야 해요`,
+    scanCenterBad: face => `센터는 ${face} 이어야 해요 — 가운데 칸을 탭하세요`,
+    scanFaceOk: '괜찮으면 확인을 눌러 다음으로',
+    scanPickFace: '진행 바를 누르면 그 면으로 이동합니다',
+    scanFaceU: '1/6면 · U (흰 센터)',
+    scanFaceR: '2/6면 · R (빨강 센터)',
+    scanFaceF: '3/6면 · F (초록 센터)',
+    scanFaceD: '4/6면 · D (노랑 센터)',
+    scanFaceL: '5/6면 · L (주황 센터)',
+    scanFaceB: '6/6면 · B (파랑 센터)',
+    scanTipU: '흰 센터를 카메라에 향하게 하고, 사진 아래쪽이 초록(F)이 되게 잡아요.',
+    scanTipSide: '이 면을 카메라에 향하게 하고, 사진 위쪽이 흰(U)이 되게 잡아요.',
+    scanTipD: '노랑 센터를 카메라에 향하게 하고, 사진 위쪽이 초록(F)이 되게 잡아요.',
+    scanNeed3: '스캔은 3×3만 지원해요. 3×3으로 바꿉니다…',
+    scanCamFail: '카메라를 쓸 수 없어요 — 사진 올리기를 사용하세요',
+    scanApplyOk: '스캔 적용 · 풀이 준비됨',
+    scanInvalid: '색 개수나 센터가 이상해요 — 면을 고친 뒤 다시 적용하세요',
+    scanBusy: '큐브가 움직이는 동안은 기다려 주세요',
+    scanAllDone: '6면 모두 확인됨',
+  },
+};
+
+let lang = 'en';
+try {
+  const saved = localStorage.getItem('cubeLang');
+  if (saved === 'en' || saved === 'ko') lang = saved;
+} catch (e) { /* localStorage 차단 환경 — 기본값 유지 */ }
+
+let cubeN = 3;
+try {
+  const savedN = localStorage.getItem('cubeN');
+  if (savedN === '2' || savedN === '3' || savedN === '4' || savedN === '5') cubeN = Number(savedN);
+} catch (e) { /* localStorage 차단 환경 — 기본값 유지 */ }
+
+let cubeNumbers = false;
+try {
+  cubeNumbers = localStorage.getItem('cubeNumbers') === 'on';
+} catch (e) { /* localStorage 차단 환경 — 기본값 유지 */ }
+
+// 누락 키는 영어로 폴백해, 한쪽 사전에 빠진 항목이 빈칸으로 나오지 않게 한다
+const t = k => (I18N[lang][k] !== undefined ? I18N[lang][k] : I18N.en[k]);
+
+function cssHex(n) {
+  return '#' + ((n >>> 0) & 0xffffff).toString(16).padStart(6, '0');
+}
+
+const engine = globalThis.CubeEngine.create({
+  THREE, OrbitControls, RoundedBoxGeometry,
+  EffectComposer, RenderPass, UnrealBloomPass, OutputPass,
+  CubeMath: globalThis.CubeMath,
+  mount: document.getElementById('app'),
+  n: cubeN,
+});
+document.body.dataset.n = String(engine.n);
+if (cubeNumbers) engine.setShowNumbers(true);
+document.getElementById('numbers-select').value = cubeNumbers ? 'on' : 'off';
+
+function requireN3(label) {
+  if (engine.n === 3) return true;
+  console.error(`[cube] ${label} is 3×3-only (N=${engine.n})`);
+  return false;
+}
+
+function syncStatsDom() {
+  const s = engine.stats;
+  const time = (s.elapsed / 1000).toFixed(1);
+  const moves = String(s.moveCount);
+  document.querySelectorAll('.js-timer').forEach(el => { el.textContent = time; });
+  document.querySelectorAll('.js-moves').forEach(el => { el.textContent = moves; });
+}
+
+// 완성 안내는 '풀린 순간'에만 토스트로 띄운다. 상시 문구를 남기지 않는다.
+let wasSolved = true;
+function updateStatus() {
+  const solved = engine.isSolved();
+  // moveCount 가 0인 '완성'은 리셋/초기 상태다 — 축하할 일이 아니므로 띄우지 않는다
+  if (solved && !wasSolved && engine.stats.moveCount > 0) {
+    toast(t('solvedN')(engine.stats.moveCount), 'solved');
+  }
+  wasSolved = solved;
+}
+
+// 아직 섞지 않은 큐브에서는 '내 단계 찾기'가 할 일이 없다 →
+// 안내 카드를 띄우는 대신 버튼 자체를 비활성화한다.
+function syncDetectStageEnabled() {
+  const btn = document.getElementById('detect-stage');
+  if (!btn) return;
+  const st = engine.stats;
+  const untouched = st.moveCount === 0 && st.timerStart === null && !st.timerFrozen;
+  btn.disabled = untouched;
+  btn.title = untouched ? t('needScramble') : '';
+}
+
+engine.subscribe(({ solver }) => {
+  syncStatsDom();
+  updateStatus();
+  syncDetectStageEnabled();
+  if (solver) maybeRefreshSolver();
+});
+
+function reset() {
+  engine.reset();
+  solverMoves = [];
+  solverBusy = false;
+  setSolveStatus(t('alreadySolved'));
+  setSolveMoves('');
+  const sb = document.getElementById('stage-box');
+  sb.classList.remove('show');
+  sb.innerHTML = '';
+  lastStage = null;
+}
+
+let layerMode = 'outer';
+
+function moveNameForFace(face) {
+  if (engine.n < 4 || layerMode === 'outer') return face;
+  if (layerMode === 'inner') return '2' + face;
+  if (layerMode === 'mid') return '3' + face;
+  if (layerMode === 'wide3') return '3' + face + 'w';
+  return face + 'w';
+}
+
+function syncLayerModeUi() {
+  document.querySelectorAll('#layer-mode [data-layer]').forEach(b => {
+    b.classList.toggle('active', b.dataset.layer === layerMode);
+  });
+}
+
+document.querySelectorAll('[data-move]').forEach(btn => {
+  btn.addEventListener('click', e => engine.doMove(moveNameForFace(btn.dataset.move), e.shiftKey));
+});
+document.querySelectorAll('#layer-mode [data-layer]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    layerMode = btn.dataset.layer;
+    syncLayerModeUi();
+  });
+});
+document.getElementById('scramble').addEventListener('click', () => engine.scramble());
+document.getElementById('reset').addEventListener('click', reset);
+document.getElementById('undo').addEventListener('click', () => engine.undo());
+
+window.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); engine.undo(); return; }
+  const k = e.key.toUpperCase();
+  if (engine.moves[k]) engine.doMove(k, e.shiftKey);
+});
+
+// ──────────────────────────────────────────────────────────
+// 목표 상태 다이어그램 (6면 전개도 SVG)
+// ──────────────────────────────────────────────────────────
+const DC = {};
+function syncDiagPalette() {
+  DC.W = cssHex(engine.colors.U);
+  DC.Y = cssHex(engine.colors.D);
+  DC.R = cssHex(engine.colors.R);
+  DC.O = cssHex(engine.colors.L);
+  DC.G = cssHex(engine.colors.F);
+  DC.B = cssHex(engine.colors.B);
+  DC._ = cssHex(engine.colors.inner);
+}
+syncDiagPalette();
+
+function makeDiagram({ U, D, F, B, L, R }) {
+  const n = U && U.length === 4 ? 2 : 3;
+  const S = n === 2 ? 14 : 11, G = 1, SP = 3, PAD = 4;
+  const FS = S * n + G * (n - 1);
+  const FP = FS + SP;
+  const W = PAD * 2 + 4 * FP - SP;
+  const H = PAD * 2 + 3 * FP - SP;
+  const rects = [];
+  function face(cells, col, row) {
+    const ox = PAD + col * FP, oy = PAD + row * FP;
+    cells.forEach((c, i) => {
+      const r = Math.floor(i / n), cc = i % n;
+      rects.push(`<rect x="${ox+cc*(S+G)}" y="${oy+r*(S+G)}" width="${S}" height="${S}" rx="2" fill="${DC[c]||c}"/>`);
+    });
+  }
+  face(U,1,0); face(L,0,1); face(F,1,1); face(R,2,1); face(B,3,1); face(D,1,2);
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><rect width="${W}" height="${H}" rx="6" style="fill:var(--inset)"/>${rects.join('')}</svg>`;
+}
+
+// 각 단계 목표 상태 정의 (흰=U, 노랑=D 기준 / 3단계부터 큐브를 뒤집어 노랑이 위)
+function diagToHex() {
+  return {
+    W: engine.colors.U, Y: engine.colors.D, R: engine.colors.R,
+    O: engine.colors.L, G: engine.colors.F, B: engine.colors.B, _: engine.colors.inner,
+  };
+}
+
+function tracksForN(n) {
+  const L = globalThis.CubeLessons;
+  if (n === 2) {
+    return {
+      beginner: { en: L.beginner2.en, ko: L.beginner2.ko, head: 'trackBeginner2', states: L.states2 },
+    };
+  }
+  if (n !== 3) return {};
+  return {
+    beginner: { en: L.beginner3.en, ko: L.beginner3.ko, head: 'trackBeginner', states: L.states3 },
+    cfop: { en: L.cfop.en, ko: L.cfop.ko, head: 'trackCfop', states: null },
+  };
+}
+const lessonsOf = track => {
+  const pack = tracksForN(engine.n)[track];
+  return pack ? pack[lang] : [];
+};
+
+const tut = {
+  panel: document.getElementById('tutorial'),
+  head: document.getElementById('panel-title'),
+  stepNo: document.getElementById('tut-step-no'),
+  title: document.getElementById('tut-title'),
+  goal: document.getElementById('tut-goal'),
+  desc: document.getElementById('tut-desc'),
+  algs: document.getElementById('tut-algs'),
+  prev: document.getElementById('tut-prev'),
+  next: document.getElementById('tut-next'),
+  progress: document.getElementById('tut-progress'),
+  track: 'beginner',
+  i: 0,
+};
+
+const shell = document.getElementById('shell');
+const ui = document.getElementById('ui');
+const uiToggle = document.getElementById('settings-btn');
+const learnPicker = document.getElementById('learn-picker');
+const tutPanel = document.getElementById('tutorial');
+const solverPanel = document.getElementById('solver');
+const scanPanel = document.getElementById('scan');
+const panelTitleEl = document.getElementById('panel-title');
+const panelFootEl = document.getElementById('panel-foot');
+const tutExpandBtn = document.getElementById('tut-expand');
+const sheetHandle = document.getElementById('sheet-handle');
+const railBtns = Array.from(document.querySelectorAll('.rail-btn'));
+const toastEl = document.getElementById('toast');
+const solverHud = document.getElementById('solver-hud');
+const hudStatusEl = document.getElementById('solver-hud-status');
+const hudMovesEl = document.getElementById('solver-hud-moves');
+
+// 패널 모드 4종. 'learn'(트랙 선택)과 'tutorial'(레슨)은 레일에서 같은 항목이다.
+const PANEL_MODES = ['learn', 'tutorial', 'solver', 'scan'];
+const RAIL_OF  = { learn: 'learn', tutorial: 'learn', solver: 'solver', scan: 'scan' };
+const TITLE_OF = { learn: 'panelLearn', tutorial: 'panelLearn', solver: 'panelSolve', scan: 'panelScan' };
+
+let panelMode = null;      // null = Play (패널 닫힘)
+let settingsOpen = false;
+let sheetExpanded = false; // 모바일 튜토리얼 peek/expand
+
+// ──────────────────────────────────────────────────────────
+// 토스트 — 모든 일시적 피드백의 유일한 출구.
+//   영구 카드로 남기지 않는다. 2.6초 뒤 스스로 사라진다.
+// ──────────────────────────────────────────────────────────
+let toastTimer = 0;
+function toast(msg, kind) {
+  toastEl.textContent = msg || '';
+  toastEl.classList.toggle('err', kind === 'err');
+  toastEl.classList.toggle('solved', kind === 'solved');
+  toastEl.classList.toggle('show', !!msg);
+  clearTimeout(toastTimer);
+  if (msg) toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2600);
+}
+
+function syncTutExpandBtn() {
+  const key = sheetExpanded ? 'tutShowLess' : 'tutShowMore';
+  tutExpandBtn.textContent = t(key);
+  tutExpandBtn.setAttribute('aria-expanded', sheetExpanded ? 'true' : 'false');
+  sheetHandle.setAttribute('aria-expanded', sheetExpanded ? 'true' : 'false');
+  sheetHandle.setAttribute('aria-label', t(key));
+}
+function setSheetExpanded(on) {
+  sheetExpanded = !!on;
+  if (panelMode === 'tutorial') shell.dataset.sheet = sheetExpanded ? 'expand' : 'peek';
+  else delete shell.dataset.sheet;
+  syncTutExpandBtn();
+  const body = document.getElementById('panel-body');
+  if (sheetExpanded) {
+    const more = document.getElementById('tut-more');
+    if (more) more.scrollIntoView({ block: 'nearest' });
+  } else if (body) {
+    body.scrollTop = 0;
+  }
+  if (typeof engine !== 'undefined' && engine.resize) engine.resize();
+}
+// 셸 상태를 한 곳에서 동기화한다. 패널 폭이 바뀌면 stage 도 바뀌므로
+// 마지막에 엔진을 리사이즈해 큐브를 남은 영역 정중앙에 다시 맞춘다.
+function syncChrome() {
+  const railMode = panelMode ? RAIL_OF[panelMode] : 'play';
+  railBtns.forEach(b => b.classList.toggle('active', b.dataset.mode === railMode));
+  shell.dataset.mode = panelMode || 'play';
+  shell.dataset.panel = panelMode ? 'open' : 'closed';
+  if (panelMode === 'tutorial') shell.dataset.sheet = sheetExpanded ? 'expand' : 'peek';
+  else {
+    delete shell.dataset.sheet;
+    sheetExpanded = false;
+  }
+  panelTitleEl.textContent = panelMode ? t(TITLE_OF[panelMode]) : '';
+  panelFootEl.classList.toggle('hidden', panelMode !== 'tutorial');
+  ui.classList.toggle('open', settingsOpen);
+  uiToggle.setAttribute('aria-expanded', settingsOpen ? 'true' : 'false');
+  if (panelMode !== 'solver') {
+    solverHud.classList.remove('open', 'has-moves');
+    hudStatusEl.setAttribute('aria-expanded', 'false');
+  }
+  if (panelMode === 'tutorial') syncTutExpandBtn();
+  if (typeof engine !== 'undefined' && engine.resize) engine.resize();
+}
+
+// 기존 호출부와 호환되는 진입점.
+//   'more' = 설정 팝오버, null = Play(패널 닫힘), 그 외 = 패널 모드
+function openOverlay(name) {
+  if (name === 'more') { settingsOpen = true; syncChrome(); return; }
+  const next = PANEL_MODES.indexOf(name) >= 0 ? name : null;
+  if (panelMode === 'scan' && next !== 'scan' && typeof window.__scanStopCam === 'function') {
+    window.__scanStopCam();
+  }
+  settingsOpen = false;
+  panelMode = next;
+  learnPicker.classList.toggle('open', next === 'learn');
+  tutPanel.classList.toggle('open', next === 'tutorial');
+  solverPanel.classList.toggle('open', next === 'solver');
+  scanPanel.classList.toggle('open', next === 'scan');
+  syncChrome();
+}
+
+function closeSettings() { settingsOpen = false; syncChrome(); }
+
+function initChrome() {
+  railBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const m = btn.dataset.mode;
+      if (m === 'play') { openOverlay(null); return; }
+      if (m === 'learn') {
+        openOverlay(panelMode === 'learn' || panelMode === 'tutorial' ? null : 'learn');
+        return;
+      }
+      if (m === 'solver') {
+        if (panelMode === 'solver') openOverlay(null); else openSolverPane();
+        return;
+      }
+      if (m === 'scan') {
+        if (panelMode === 'scan') openOverlay(null);
+        else if (typeof window.__openScan === 'function') window.__openScan();
+      }
+    });
+  });
+
+  document.getElementById('panel-close').addEventListener('click', () => openOverlay(null));
+  uiToggle.addEventListener('click', () => {
+    if (settingsOpen) closeSettings(); else openOverlay('more');
+  });
+  document.getElementById('more-close').addEventListener('click', closeSettings);
+
+  // 설정 팝오버는 바깥을 누르면 닫힌다 (패널은 레일/닫기로만 닫는다)
+  document.addEventListener('pointerdown', e => {
+    if (!settingsOpen) return;
+    const el = e.target;
+    if (!(el instanceof Node)) return;
+    if (ui.contains(el) || uiToggle.contains(el)) return;
+    closeSettings();
+  }, true);
+
+  window.addEventListener('keydown', e => {
+    if (e.key !== 'Escape') return;
+    if (settingsOpen) closeSettings();
+    else if (panelMode === 'tutorial' && sheetExpanded) setSheetExpanded(false);
+    else if (panelMode) openOverlay(null);
+  });
+
+  tutExpandBtn.addEventListener('click', () => setSheetExpanded(!sheetExpanded));
+  sheetHandle.addEventListener('click', () => setSheetExpanded(!sheetExpanded));
+
+  syncChrome();
+}
+
+function renderLesson() {
+  const pack = tracksForN(engine.n)[tut.track];
+  if (!pack) return;
+  const L = pack[lang];
+  const l = L[tut.i];
+  if (!l) return;
+  tut.head.textContent = t(pack.head);
+  tut.head.title = t(pack.head);   // 폭이 좁으면 말줄임 → 전체 제목은 툴팁으로
+  if (l.intro) {
+    tut.stepNo.textContent = t('tutIntro');
+  } else {
+    const solveLessons = L.filter(x => !x.intro);
+    const k = solveLessons.indexOf(l) + 1;
+    tut.stepNo.textContent = t('tutStepOf')(k, solveLessons.length);
+  }
+  tut.title.textContent = l.title;
+  tut.goal.innerHTML = '🎯 ' + l.goal;
+
+  // 목표 상태 다이어그램 (초보자법 트랙만). intro는 완성 예시만, 적용 없음.
+  const diagEl = document.getElementById('tut-diagram');
+  const state = pack.states ? pack.states[tut.i] : null;
+  if (state) {
+    const svg = makeDiagram(state);
+    if (l.intro) {
+      diagEl.innerHTML = `<div class="diag-wrap">
+        <div class="diag-cap">${t('diagExample')}</div>
+        <div class="diag-row">${svg}</div>
+        <div class="diag-note">${t('diagExampleNote')}</div>
+      </div>`;
+    } else {
+      diagEl.innerHTML = `<div class="diag-wrap">
+        <div class="diag-cap">${t('diagGoal')}</div>
+        <div class="diag-row">
+          ${svg}
+          <button type="button" class="btn-sm" id="diag-apply-btn">${t('diagApply')}</button>
+        </div>
+        <div class="diag-note">${t('diagNote')}</div>
+      </div>`;
+      document.getElementById('diag-apply-btn').addEventListener('click', () => applyDiagramState(state));
+    }
+  } else {
+    diagEl.innerHTML = '';
+  }
+
+  tut.desc.innerHTML = l.desc;
+  tut.algs.innerHTML = '';
+  l.algs.forEach(a => {
+    const row = document.createElement('div');
+    row.className = 'alg';
+    row.innerHTML = `<div class="alg-info"><div class="alg-label">${a.label}</div>
+      <div class="alg-notation">${a.alg}</div></div>`;
+    const btn = document.createElement('button');
+    btn.textContent = t('demo');
+    btn.addEventListener('click', () => engine.playAlg(a.alg, false));
+    row.appendChild(btn);
+    tut.algs.appendChild(row);
+  });
+  tut.prev.disabled = tut.i === 0;
+  tut.next.disabled = tut.i === L.length - 1;
+  tut.progress.innerHTML = L
+    .map((_, idx) => `<div class="dot${idx <= tut.i ? ' done' : ''}"></div>`).join('');
+  document.getElementById('panel-body').scrollTop = 0;
+}
+
+// 목표 상태를 실제 큐브에 반영
+// 큐브 재생성 후, stateObj의 각 면 셀 색상을 해당 큐비에 직접 주입.
+// '_' 셀은 inner(검은색)으로 처리.
+function applyDiagramState(stateObj) {
+  const N = engine.n;
+  if (N !== 2 && N !== 3) return;
+  if (engine.busy) return;
+  engine.rebuild();
+
+  const OUTER = engine.outer;
+  const idxOf = v => globalThis.CubeMath.coordToIndex(N, v, 1);
+  const onLayer = (v, layer) => Math.abs(v - layer) < 1e-6;
+  const FACE_KEYS = ['R','L','U','D','F','B'];
+  const cellIdx = [
+    (x,y,z) => onLayer(x, OUTER) ? (N-1-idxOf(y))*N + (N-1-idxOf(z)) : -1,
+    (x,y,z) => onLayer(x, -OUTER) ? (N-1-idxOf(y))*N + idxOf(z) : -1,
+    (x,y,z) => onLayer(y, OUTER) ? idxOf(z)*N + idxOf(x) : -1,
+    (x,y,z) => onLayer(y, -OUTER) ? (N-1-idxOf(z))*N + idxOf(x) : -1,
+    (x,y,z) => onLayer(z, OUTER) ? (N-1-idxOf(y))*N + idxOf(x) : -1,
+    (x,y,z) => onLayer(z, -OUTER) ? (N-1-idxOf(y))*N + (N-1-idxOf(x)) : -1,
+  ];
+
+  engine.eachCubie(({ x, y, z, clearStickers, setFace }) => {
+    clearStickers();
+    for (let fi = 0; fi < 6; fi++) {
+      const ci = cellIdx[fi](x, y, z);
+      if (ci < 0) continue;
+      const code = stateObj[FACE_KEYS[fi]][ci];
+      const map = diagToHex();
+      const hex = (code && code !== '_') ? (map[code] ?? engine.colors.inner) : engine.colors.inner;
+      setFace(fi, hex);
+    }
+  });
+  syncStatsDom();
+  updateStatus();
+  maybeRefreshSolver();
+}
+
+function openTrack(name, startIndex = 0) {
+  if (!tracksForN(engine.n)[name]) return;
+  tut.track = name;
+  tut.i = startIndex;
+  sheetExpanded = false;
+  openOverlay('tutorial');
+  renderLesson();
+}
+
+document.getElementById('open-tut').addEventListener('click', () => openTrack('beginner'));
+document.getElementById('open-cfop').addEventListener('click', () => openTrack('cfop'));
+tut.prev.addEventListener('click', () => { if (tut.i > 0) { tut.i--; renderLesson(); } });
+tut.next.addEventListener('click', () => { if (tut.i < lessonsOf(tut.track).length - 1) { tut.i++; renderLesson(); } });
+
+// ──────────────────────────────────────────────────────────
+// 스마트 튜터: 현재 상태 인식 → 솔버(Kociemba)로 다음 수 / 자동 풀이
+// ──────────────────────────────────────────────────────────
+function computeSolution() {
+  if (!requireN3('computeSolution')) return '';
+  try {
+    return globalThis.CubeSolver.solve(engine.readState().facelets || '');
+  } catch (e) {
+    setSolveStatus(t('solverFailed')(e && e.message ? e.message : e));
+    return '';
+  }
+}
+
+// 솔버 초기화 (무거움) — 최초 1회, 비동기 느낌으로
+let solverReady = false;
+let solverIniting = false;
+let solverWaiters = [];
+let solverMoves = [];   // 남은 수순. Next move는 이걸 한 수씩 소모 (매 수 재계산하지 않음)
+let solverBusy = false; // Next/All 중복 클릭 방지
+function ensureSolver(onReady) {
+  if (solverReady) { onReady(); return; }
+  solverWaiters.push(onReady);
+  if (solverIniting) return;
+  solverIniting = true;
+  setSolveStatus(t('solverPreparing'));
+  setTimeout(() => {                 // 먼저 화면을 그린 뒤 무거운 초기화 실행
+    try { globalThis.CubeSolver.init(); solverReady = true; }
+    catch (e) { setSolveStatus(t('solverFailed')(e.message)); }
+    finally { solverIniting = false; }
+    const queued = solverWaiters.splice(0);
+    if (solverReady) queued.forEach(fn => { try { fn(); } catch (err) { console.error(err); } });
+  }, 50);
+}
+
+const solveStatusEl = document.getElementById('solve-status');
+const solveMovesEl = document.getElementById('solve-moves');
+const COMPACT_SOLVER_MQ = '(max-width: 900px), ((max-height: 520px) and (orientation: landscape))';
+let solverHintShown = false;
+
+function setHudMovesOpen(open) {
+  solverHud.classList.toggle('open', open);
+  hudStatusEl.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+function setSolveStatus(text) {
+  solveStatusEl.textContent = text;
+  hudStatusEl.textContent = text;
+}
+function setSolveMoves(text) {
+  solveMovesEl.textContent = text;
+  hudMovesEl.textContent = text;
+  const has = !!text;
+  solverHud.classList.toggle('has-moves', has);
+  if (!has) setHudMovesOpen(false);
+}
+
+function showSolverMoves() {
+  if (!solverMoves.length) {
+    setSolveStatus(t('alreadySolved'));
+    setSolveMoves('');
+    return;
+  }
+  setSolveStatus(t('nextMoveIs')(solverMoves[0], solverMoves.length));
+  setSolveMoves(solverMoves.join(' '));
+}
+function solverOpen() {
+  return document.getElementById('solver').classList.contains('open');
+}
+function maybeRefreshSolver() {
+  if (solverOpen()) refreshSolution();
+  else solverMoves = [];
+}
+
+function refreshSolution() {
+  ensureSolver(() => {
+    const sol = computeSolution();
+    solverMoves = globalThis.CubeSolver.parseMoves(sol);
+    showSolverMoves();
+  });
+}
+
+// 다음 한 수: 계산된 수순을 한 토큰씩 실행. U2 등 180°가 끝나기 전에
+// 상태를 다시 읽으면 같은 면을 또 제안해서 루프에 빠지므로 재계산하지 않는다.
+// 사용자가 직접 돌리면 maybeRefreshSolver()가 수순을 다시 뽑는다.
+function solveNext() {
+  ensureSolver(async () => {
+    if (solverBusy) return;
+    solverBusy = true;
+    try {
+      await engine.whenIdle();
+      if (!solverMoves.length) {
+        const sol = computeSolution();
+        if (!sol) { showSolverMoves(); return; }
+        solverMoves = globalThis.CubeSolver.parseMoves(sol);
+      }
+      const tok = solverMoves.shift();
+      if (!tok) { refreshSolution(); return; }
+      engine.highlight(/^[UDLRFB]/i.test(tok) ? tok[0].toUpperCase() : tok[0]);
+      engine.playAlg(tok, false);
+      await engine.whenIdle();
+      if (!solverMoves.length) refreshSolution();
+      else showSolverMoves();
+    } catch (e) {
+      setSolveStatus(t('solverFailed')(e && e.message ? e.message : e));
+    } finally {
+      solverBusy = false;
+    }
+  });
+}
+
+// 전체 자동 풀이
+function solveAll() {
+  ensureSolver(async () => {
+    if (solverBusy) return;
+    solverBusy = true;
+    try {
+      await engine.whenIdle();
+      const sol = computeSolution();
+      if (!sol) { refreshSolution(); return; }
+      solverMoves = [];
+      setSolveStatus(t('autoSolving'));
+      setSolveMoves(sol);
+      engine.playAlg(sol, false);
+      await engine.whenIdle();
+      setSolveStatus(engine.isSolved() ? t('solved') : t('solveFinished'));
+      setSolveMoves('');
+    } catch (e) {
+      setSolveStatus(t('solverFailed')(e && e.message ? e.message : e));
+    } finally {
+      solverBusy = false;
+    }
+  });
+}
+
+function openSolverPane() {
+  openOverlay('solver');
+  refreshSolution();
+  if (!solverHintShown && window.matchMedia(COMPACT_SOLVER_MQ).matches) {
+    solverHintShown = true;
+    toast(t('solverHintMobile'));
+  }
+}
+document.getElementById('solve-next').addEventListener('click', solveNext);
+document.getElementById('solve-all').addEventListener('click', solveAll);
+document.getElementById('solve-next-m').addEventListener('click', solveNext);
+document.getElementById('solve-all-m').addEventListener('click', solveAll);
+hudStatusEl.addEventListener('click', () => {
+  if (!solverHud.classList.contains('has-moves')) return;
+  setHudMovesOpen(!solverHud.classList.contains('open'));
+});
+
+// ──────────────────────────────────────────────────────────
+// 사진 → 큐브 스캔 (3×3, 6면 · 면마다 확인 후 다음)
+// ──────────────────────────────────────────────────────────
+(function initCubeScanUi() {
+  const CS = globalThis.CubeScan;
+  if (!CS) return;
+
+  const elFace = document.getElementById('scan-face-label');
+  const elTip = document.getElementById('scan-tip');
+  const elProg = document.getElementById('scan-progress');
+  const elStatus = document.getElementById('scan-status');
+  const elCheckStatus = document.getElementById('scan-check-status');
+  const elReviewStatus = document.getElementById('scan-review-status');
+  const elPreview = document.getElementById('scan-preview');
+  const elVideo = document.getElementById('scan-video');
+  const elCapture = document.getElementById('scan-stage-capture');
+  const elCheck = document.getElementById('scan-stage-check');
+  const elFinal = document.getElementById('scan-stage-final');
+  const elCheckPreview = document.getElementById('scan-check-preview');
+  const elCheckGrid = document.getElementById('scan-check-grid');
+  const elCheckHint = document.getElementById('scan-check-center-hint');
+  const elReviewGrid = document.getElementById('scan-review');
+  const btnSnap = document.getElementById('scan-snap');
+  const btnCheckOk = document.getElementById('scan-check-ok');
+  const fileInput = document.getElementById('scan-file');
+  const elUploadLabel = document.getElementById('scan-upload-label');
+
+  const FACE_I18N = {
+    U: 'scanFaceU', R: 'scanFaceR', F: 'scanFaceF',
+    D: 'scanFaceD', L: 'scanFaceL', B: 'scanFaceB',
+  };
+
+  let faceIdx = 0;
+  let stage = 'capture'; // capture | check | final
+  let faces = CS.emptyFaces(3);
+  let rgbsByFace = CS.emptyFaces(3);
+  let previewByFace = {};
+  let confirmed = { U: false, R: false, F: false, D: false, L: false, B: false };
+  let camStream = null;
+
+  function faceLetter() { return CS.FACE_ORDER[faceIdx]; }
+
+  function faceHasData(f) {
+    return !!(faces[f] && faces[f].every(Boolean) && previewByFace[f]);
+  }
+
+  function allConfirmed() {
+    return CS.FACE_ORDER.every(f => confirmed[f]);
+  }
+
+  function nextUnconfirmedIdx(from) {
+    for (let i = 0; i < 6; i++) {
+      const idx = (from + 1 + i) % 6;
+      if (!confirmed[CS.FACE_ORDER[idx]]) return idx;
+    }
+    return from;
+  }
+
+  function baseRefs() {
+    const c = engine.colors;
+    return { U: c.U, R: c.R, F: c.F, D: c.D, L: c.L, B: c.B };
+  }
+
+  function hexCss(face) {
+    const h = (engine.colors[face] >>> 0);
+    return '#' + h.toString(16).padStart(6, '0');
+  }
+
+  function inkFor(face) {
+    return (face === 'U' || face === 'D') ? '#111' : '#fff';
+  }
+
+  function setMsg(el, msg, kind) {
+    if (!el) return;
+    el.textContent = msg || '';
+    el.classList.toggle('err', kind === 'err');
+    el.classList.toggle('ok', kind === 'ok');
+  }
+
+  function stopCam() {
+    if (camStream) {
+      camStream.getTracks().forEach(tr => tr.stop());
+      camStream = null;
+    }
+    elVideo.srcObject = null;
+    elVideo.classList.remove('show');
+    btnSnap.style.display = 'none';
+  }
+
+  function showStage(name) {
+    stage = name;
+    elCapture.classList.toggle('show', name === 'capture');
+    elCheck.classList.toggle('show', name === 'check');
+    elFinal.classList.toggle('show', name === 'final');
+  }
+
+  function renderFaceLabel() {
+    elFace.textContent = t(FACE_I18N[faceLetter()]);
+  }
+
+  function renderProgress() {
+    elProg.innerHTML = '';
+    CS.FACE_ORDER.forEach((f, i) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'dot'
+        + (confirmed[f] ? ' done' : '')
+        + (i === faceIdx && stage !== 'final' ? ' current' : '');
+      btn.title = f;
+      btn.setAttribute('aria-label', f);
+      btn.addEventListener('click', () => jumpToFace(i));
+      elProg.appendChild(btn);
+    });
+  }
+
+  function renderCaptureChrome() {
+    renderFaceLabel();
+    const f = faceLetter();
+    if (f === 'U') elTip.textContent = t('scanTipU');
+    else if (f === 'D') elTip.textContent = t('scanTipD');
+    else elTip.textContent = t('scanTipSide');
+    renderProgress();
+    if (elUploadLabel) {
+      elUploadLabel.dataset.i18n = faceHasData(f) ? 'scanReplace' : 'scanUpload';
+      elUploadLabel.textContent = t(elUploadLabel.dataset.i18n);
+    }
+  }
+
+  function showCapturePreview() {
+    const url = previewByFace[faceLetter()];
+    if (url) {
+      elPreview.src = url;
+      elPreview.classList.add('show');
+    } else {
+      elPreview.classList.remove('show');
+      elPreview.removeAttribute('src');
+    }
+  }
+
+  function jumpToFace(i) {
+    stopCam();
+    faceIdx = Math.max(0, Math.min(5, i | 0));
+    const f = faceLetter();
+    if (faceHasData(f)) enterCheck();
+    else enterCapture();
+  }
+
+  function enterCapture() {
+    stopCam();
+    showStage('capture');
+    showCapturePreview();
+    renderCaptureChrome();
+    setMsg(elStatus, '', null);
+  }
+
+  function enterCheck() {
+    stopCam();
+    showStage('check');
+    renderFaceLabel();
+    renderProgress();
+    const f = faceLetter();
+    const url = previewByFace[f];
+    if (url) elCheckPreview.src = url;
+    else elCheckPreview.removeAttribute('src');
+    renderCheckGrid();
+  }
+
+  function enterFinal() {
+    stopCam();
+    showStage('final');
+    renderProgress();
+    renderFinalOverview();
+    validateFinal();
+  }
+
+  function clearCurrentFace() {
+    const f = faceLetter();
+    faces[f] = Array(9).fill(null);
+    rgbsByFace[f] = Array(9).fill(null);
+    delete previewByFace[f];
+    confirmed[f] = false;
+  }
+
+  function sourceToImageData(src) {
+    const max = 720;
+    const w0 = src.videoWidth || src.naturalWidth || src.width;
+    const h0 = src.videoHeight || src.naturalHeight || src.height;
+    if (!w0 || !h0) return null;
+    const scale = Math.min(1, max / Math.max(w0, h0));
+    const c = document.createElement('canvas');
+    c.width = Math.max(1, Math.round(w0 * scale));
+    c.height = Math.max(1, Math.round(h0 * scale));
+    const ctx = c.getContext('2d', { willReadFrequently: true });
+    ctx.drawImage(src, 0, 0, c.width, c.height);
+    return ctx.getImageData(0, 0, c.width, c.height);
+  }
+
+  function classifyWithCurrentRefs(samples) {
+    const centers = {};
+    CS.FACE_ORDER.forEach(f => {
+      if (rgbsByFace[f] && rgbsByFace[f][4]) centers[f] = rgbsByFace[f][4];
+    });
+    const refs = Object.keys(centers).length >= 3
+      ? CS.calibrateRefs(baseRefs(), centers)
+      : baseRefs();
+    return CS.classifyFace(samples, refs).map(x => x.color);
+  }
+
+  function acceptShot(samples, previewUrl) {
+    const f = faceLetter();
+    rgbsByFace[f] = samples;
+    faces[f] = classifyWithCurrentRefs(samples);
+    // 센터는 이 면 색으로 강제 (촬영 규칙상 가운데 = 그 면)
+    faces[f][4] = f;
+    if (previewUrl) previewByFace[f] = previewUrl;
+    confirmed[f] = false;
+    stopCam();
+    enterCheck();
+  }
+
+  function processFile(file) {
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const idata = sourceToImageData(img);
+      URL.revokeObjectURL(url);
+      if (!idata) { setMsg(elStatus, t('scanCamFail'), 'err'); return; }
+      const samples = CS.sampleFace(idata, 3);
+      const c = document.createElement('canvas');
+      c.width = idata.width; c.height = idata.height;
+      c.getContext('2d').putImageData(idata, 0, 0);
+      acceptShot(samples, c.toDataURL('image/jpeg', 0.85));
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      setMsg(elStatus, t('scanCamFail'), 'err');
+    };
+    img.src = url;
+  }
+
+  async function startCam() {
+    stopCam();
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      setMsg(elStatus, t('scanCamFail'), 'err');
+      return;
+    }
+    try {
+      camStream = await navigator.mediaDevices.getUserMedia({
+        audio: false,
+        video: { facingMode: { ideal: 'environment' }, width: { ideal: 720 }, height: { ideal: 720 } },
+      });
+      elVideo.srcObject = camStream;
+      await elVideo.play();
+      elVideo.classList.add('show');
+      elPreview.classList.remove('show');
+      btnSnap.style.display = '';
+      setMsg(elStatus, '', null);
+    } catch (e) {
+      setMsg(elStatus, t('scanCamFail'), 'err');
+    }
+  }
+
+  function snapCam() {
+    if (!camStream) return;
+    const idata = sourceToImageData(elVideo);
+    if (!idata) { setMsg(elStatus, t('scanCamFail'), 'err'); return; }
+    const samples = CS.sampleFace(idata, 3);
+    const c = document.createElement('canvas');
+    c.width = idata.width; c.height = idata.height;
+    c.getContext('2d').putImageData(idata, 0, 0);
+    acceptShot(samples, c.toDataURL('image/jpeg', 0.85));
+  }
+
+  function centerOk() {
+    const f = faceLetter();
+    return faces[f] && faces[f][4] === f;
+  }
+
+  function updateCheckStatus() {
+    const f = faceLetter();
+    elCheckHint.textContent = t('scanCenterHint')(f);
+    if (!centerOk()) {
+      setMsg(elCheckStatus, t('scanCenterBad')(f), 'err');
+      btnCheckOk.disabled = true;
+      return false;
+    }
+    setMsg(elCheckStatus, t('scanFaceOk'), 'ok');
+    btnCheckOk.disabled = false;
+    return true;
+  }
+
+  function renderCheckGrid() {
+    const f = faceLetter();
+    elCheckGrid.innerHTML = '';
+    (faces[f] || []).forEach((col, i) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.style.background = hexCss(col);
+      b.style.color = inkFor(col);
+      b.textContent = col;
+      if (i === 4) b.style.outline = '2px solid var(--warn)';
+      b.addEventListener('click', () => {
+        faces[f][i] = CS.nextColor(faces[f][i]);
+        // 센터를 다른 색으로 돌렸다가 다시 맞출 수 있게 둠
+        b.style.background = hexCss(faces[f][i]);
+        b.style.color = inkFor(faces[f][i]);
+        b.textContent = faces[f][i];
+        updateCheckStatus();
+      });
+      elCheckGrid.appendChild(b);
+    });
+    updateCheckStatus();
+  }
+
+  function confirmFace() {
+    if (!updateCheckStatus()) return;
+    const f = faceLetter();
+    confirmed[f] = true;
+    if (allConfirmed()) {
+      enterFinal();
+      return;
+    }
+    faceIdx = nextUnconfirmedIdx(faceIdx);
+    enterCapture();
+  }
+
+  function retakeFromCheck() {
+    clearCurrentFace();
+    enterCapture();
+  }
+
+  function renderFinalOverview() {
+    elReviewGrid.innerHTML = '';
+    CS.FACE_ORDER.forEach((f, fi) => {
+      const card = document.createElement('div');
+      card.className = 'scan-face-card';
+      card.title = f;
+      const name = document.createElement('div');
+      name.className = 'sf-name';
+      name.textContent = f;
+      card.appendChild(name);
+      const mini = document.createElement('div');
+      mini.className = 'scan-mini';
+      (faces[f] || []).forEach(col => {
+        const cell = document.createElement('button');
+        cell.type = 'button';
+        cell.tabIndex = -1;
+        cell.style.background = hexCss(col);
+        cell.style.color = inkFor(col);
+        cell.textContent = col;
+        mini.appendChild(cell);
+      });
+      card.appendChild(mini);
+      card.addEventListener('click', () => jumpToFace(fi));
+      elReviewGrid.appendChild(card);
+    });
+  }
+
+  function validateFinal() {
+    const v = CS.validateCube(faces, 3);
+    if (v.ok) setMsg(elReviewStatus, t('scanAllDone'), 'ok');
+    else setMsg(elReviewStatus, t('scanInvalid'), 'err');
+    return v.ok;
+  }
+
+  function resetSession() {
+    stopCam();
+    faceIdx = 0;
+    faces = CS.emptyFaces(3);
+    rgbsByFace = CS.emptyFaces(3);
+    previewByFace = {};
+    confirmed = { U: false, R: false, F: false, D: false, L: false, B: false };
+    elPreview.classList.remove('show');
+    elPreview.removeAttribute('src');
+    setMsg(elStatus, '', null);
+    setMsg(elCheckStatus, '', null);
+    setMsg(elReviewStatus, '', null);
+    enterCapture();
+  }
+
+  function openScan() {
+    const needSwitch = engine.n !== 3;
+    if (needSwitch) setCubeN(3);
+    resetSession();
+    openOverlay('scan');
+    if (needSwitch) setMsg(elStatus, t('scanNeed3'), 'ok');
+  }
+
+  function applyScan() {
+    if (engine.busy) {
+      setMsg(elReviewStatus, t('scanBusy'), 'err');
+      return;
+    }
+    if (!validateFinal()) return;
+    if (engine.n !== 3) setCubeN(3);
+    stopCam();
+    applyDiagramState(CS.toDiagramState(faces));
+    openOverlay('solver');
+    refreshSolution();
+    toast(t('scanApplyOk'), 'solved');
+  }
+
+  window.__openScan = openScan;
+  window.__scanStopCam = stopCam;
+  fileInput.addEventListener('change', () => {
+    const f = fileInput.files && fileInput.files[0];
+    fileInput.value = '';
+    processFile(f);
+  });
+  document.getElementById('scan-cam').addEventListener('click', startCam);
+  btnSnap.addEventListener('click', snapCam);
+  document.getElementById('scan-check-retake').addEventListener('click', retakeFromCheck);
+  btnCheckOk.addEventListener('click', confirmFace);
+  document.getElementById('scan-apply').addEventListener('click', applyScan);
+
+  window.__scanRefreshI18n = () => {
+    if (panelMode !== 'scan') return;
+    if (stage === 'capture') {
+      renderCaptureChrome();
+    } else if (stage === 'check') {
+      renderFaceLabel();
+      renderProgress();
+      renderCheckGrid();
+      document.getElementById('scan-check-tip').textContent = t('scanCheckTip');
+    } else {
+      renderProgress();
+      document.getElementById('scan-final-tip').textContent = t('scanFinalTip');
+      renderFinalOverview();
+      validateFinal();
+    }
+  };
+})();
+
+// 내 단계 찾기: 현재 큐브가 초보자법(LBL) 어느 단계인지 감지 → 레슨 연결
+//   센터는 고정(흰색 위). 위치+법선별 색을 검사해 단계 판정.
+// ──────────────────────────────────────────────────────────
+const faceAt = (p, n) => engine.colorAt(p, n);
+const STAGE = {
+  cross: () =>
+    faceAt([0, 1, 1], [0, 1, 0]) === 'U' && faceAt([0, 1, 1], [0, 0, 1]) === 'F' &&
+    faceAt([0, 1, -1], [0, 1, 0]) === 'U' && faceAt([0, 1, -1], [0, 0, -1]) === 'B' &&
+    faceAt([1, 1, 0], [0, 1, 0]) === 'U' && faceAt([1, 1, 0], [1, 0, 0]) === 'R' &&
+    faceAt([-1, 1, 0], [0, 1, 0]) === 'U' && faceAt([-1, 1, 0], [-1, 0, 0]) === 'L',
+  firstLayer: () => STAGE.cross() &&
+    faceAt([1, 1, 1], [0, 1, 0]) === 'U' && faceAt([1, 1, 1], [1, 0, 0]) === 'R' && faceAt([1, 1, 1], [0, 0, 1]) === 'F' &&
+    faceAt([-1, 1, 1], [0, 1, 0]) === 'U' && faceAt([-1, 1, 1], [-1, 0, 0]) === 'L' && faceAt([-1, 1, 1], [0, 0, 1]) === 'F' &&
+    faceAt([1, 1, -1], [0, 1, 0]) === 'U' && faceAt([1, 1, -1], [1, 0, 0]) === 'R' && faceAt([1, 1, -1], [0, 0, -1]) === 'B' &&
+    faceAt([-1, 1, -1], [0, 1, 0]) === 'U' && faceAt([-1, 1, -1], [-1, 0, 0]) === 'L' && faceAt([-1, 1, -1], [0, 0, -1]) === 'B',
+  f2l: () => STAGE.firstLayer() &&
+    faceAt([1, 0, 1], [1, 0, 0]) === 'R' && faceAt([1, 0, 1], [0, 0, 1]) === 'F' &&
+    faceAt([-1, 0, 1], [-1, 0, 0]) === 'L' && faceAt([-1, 0, 1], [0, 0, 1]) === 'F' &&
+    faceAt([1, 0, -1], [1, 0, 0]) === 'R' && faceAt([1, 0, -1], [0, 0, -1]) === 'B' &&
+    faceAt([-1, 0, -1], [-1, 0, 0]) === 'L' && faceAt([-1, 0, -1], [0, 0, -1]) === 'B',
+  yellowCross: () => STAGE.f2l() &&
+    faceAt([0, -1, 1], [0, -1, 0]) === 'D' && faceAt([0, -1, -1], [0, -1, 0]) === 'D' &&
+    faceAt([1, -1, 0], [0, -1, 0]) === 'D' && faceAt([-1, -1, 0], [0, -1, 0]) === 'D',
+  yellowFace: () => STAGE.yellowCross() &&
+    faceAt([1, -1, 1], [0, -1, 0]) === 'D' && faceAt([-1, -1, 1], [0, -1, 0]) === 'D' &&
+    faceAt([1, -1, -1], [0, -1, 0]) === 'D' && faceAt([-1, -1, -1], [0, -1, 0]) === 'D',
+  pllCorners: () => STAGE.yellowFace() &&
+    faceAt([1, -1, 1], [1, 0, 0]) === 'R' && faceAt([1, -1, 1], [0, 0, 1]) === 'F' &&
+    faceAt([-1, -1, 1], [-1, 0, 0]) === 'L' && faceAt([-1, -1, 1], [0, 0, 1]) === 'F' &&
+    faceAt([1, -1, -1], [1, 0, 0]) === 'R' && faceAt([1, -1, -1], [0, 0, -1]) === 'B' &&
+    faceAt([-1, -1, -1], [-1, 0, 0]) === 'L' && faceAt([-1, -1, -1], [0, 0, -1]) === 'B',
+};
+function detectStageIndex() {
+  if (!requireN3('detectStageIndex')) return null;
+  if (engine.isSolved()) return 0;
+  if (STAGE.pllCorners()) return 7;
+  if (STAGE.yellowFace()) return 6;
+  if (STAGE.yellowCross()) return 5;
+  if (STAGE.f2l()) return 4;
+  if (STAGE.firstLayer()) return 3;
+  if (STAGE.cross()) return 2;
+  return 1;
+}
+// 마지막 감지 결과를 기억해 언어를 바꿀 때 같은 내용을 다시 그린다.
+// null = 아직 감지하지 않음 (패널을 열지 않음)
+let lastStage = null;
+
+function renderStageBox() {
+  if (lastStage === null) return;
+  const box = document.getElementById('stage-box');
+  box.classList.add('show');
+  const { idx } = lastStage;
+  if (idx === 0) {
+    box.innerHTML =
+      `<div class="sb-step">${t('stageDoneLabel')}</div><div class="sb-title">${t('stageDoneTitle')}</div>`;
+    if (typeof engine !== 'undefined' && engine.resize) engine.resize();
+    return;
+  }
+  const L = lessonsOf('beginner')[idx];
+  if (!L) return;
+  // 1단계(흰 십자)는 직관 단계 → 공식 대신 안내. 2~7단계는 핵심 공식 표시.
+  const alg = idx >= 2 && L.algs && L.algs[0] ? L.algs[0].alg : '';
+  const note = idx === 1
+    ? `<div class="sb-alg sb-note">${t('stageIntuitive')}</div>`
+    : '';
+  box.innerHTML =
+    `<div class="sb-step">${t('stageNext')(idx)}</div>
+     <div class="sb-title">${L.name}</div>
+     ${alg ? `<div class="sb-alg">${alg}</div>` : ''}${note}
+     <div class="sb-link"><button type="button" id="goto-lesson" class="btn-sm">${t('stageOpenLesson')}</button></div>`;
+  document.getElementById('goto-lesson').addEventListener('click', () => openTrack('beginner', idx));
+  if (typeof engine !== 'undefined' && engine.resize) engine.resize();
+}
+
+document.getElementById('detect-stage').addEventListener('click', () => {
+  const idx = detectStageIndex();
+  if (idx == null) return;
+  // 실제로 사용자가 손을 댔는지(타이머가 돌았던 적 있는지) 구분
+  const st = engine.stats;
+  if (st.moveCount === 0 && st.timerStart === null && !st.timerFrozen) {
+    toast(t('needScramble'));
+    return;
+  }
+  lastStage = { idx };
+  renderStageBox();
+});
+
+// ──────────────────────────────────────────────────────────
+// 2×2 / 3×3 / 4×4 / 5×5 전환 — 엔진 setN + 크기별 UI
+// ──────────────────────────────────────────────────────────
+function sizeTitleKey() {
+  return ({ 2: 'appTitle2', 4: 'appTitle4', 5: 'appTitle5' })[engine.n] || 'appTitle';
+}
+function sizeDocTitleKey() {
+  return ({ 2: 'docTitle2', 4: 'docTitle4', 5: 'docTitle5' })[engine.n] || 'docTitle';
+}
+
+function syncSizeLabels() {
+  document.body.dataset.n = String(engine.n);
+  document.title = t(sizeDocTitleKey());
+  const h1 = document.getElementById('app-title');
+  if (h1) h1.textContent = t(sizeTitleKey());
+  const sizeSel = document.getElementById('size-select');
+  if (sizeSel) sizeSel.value = String(engine.n);
+}
+
+function applySizeUi() {
+  syncSizeLabels();
+  // 새 크기에서 뜻이 없는 모드는 닫는다 (레일 항목도 같이 숨겨진다)
+  if (panelMode === 'tutorial' || (engine.n !== 3 && panelMode)) openOverlay(null);
+  else syncChrome();
+  if (engine.n !== 3) {
+    const sb = document.getElementById('stage-box');
+    sb.classList.remove('show');
+    sb.innerHTML = '';
+    lastStage = null;
+    solverMoves = [];
+    solverBusy = false;
+    setSolveStatus(t('alreadySolved'));
+    setSolveMoves('');
+  }
+}
+
+function setCubeN(n) {
+  n = n | 0;
+  if (engine.busy) return;
+  if (n === engine.n) return;
+  if (!engine.setN(n)) return;
+  layerMode = 'outer';
+  syncLayerModeUi();
+  cubeN = engine.n;
+  try { localStorage.setItem('cubeN', String(cubeN)); }
+  catch (e) { /* 저장 불가 — 이 세션에서만 적용 */ }
+  applySizeUi();
+}
+
+document.getElementById('size-select').addEventListener('change', e => {
+  const prev = engine.n;
+  setCubeN(Number(e.target.value));
+  if (engine.n !== Number(e.target.value)) e.target.value = String(prev);
+});
+
+document.getElementById('numbers-select').addEventListener('change', e => {
+  const on = e.target.value === 'on';
+  cubeNumbers = on;
+  engine.setShowNumbers(on);
+  try { localStorage.setItem('cubeNumbers', on ? 'on' : 'off'); }
+  catch (err) { /* 저장 불가 — 이 세션에서만 적용 */ }
+});
+
+// ──────────────────────────────────────────────────────────
+// 언어 적용 — 정적 텍스트 교체 + 열려 있는 동적 패널 재렌더
+//   next 없이 호출하면 저장된 값으로 초기 적용만 한다.
+// ──────────────────────────────────────────────────────────
+function applyLang(next) {
+  if (next && next !== lang) {
+    lang = next;
+    try { localStorage.setItem('cubeLang', lang); }
+    catch (e) { /* 저장 불가 — 이 세션에서만 적용 */ }
+  }
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    el.textContent = t(el.dataset.i18n);
+  });
+  document.querySelectorAll('#lang-switch button').forEach(b => {
+    b.classList.toggle('active', b.dataset.lang === lang);
+  });
+
+  // JS가 그리는 부분은 따로 다시 렌더한다.
+  // syncChrome 이 패널 제목을 기본값으로 되돌리므로 renderLesson 보다 먼저 부른다.
+  updateStatus();
+  syncChrome();
+  if (panelMode === 'tutorial') { syncTutExpandBtn(); renderLesson(); }
+  renderStageBox();
+  // 솔버 패널이 열려 있으면 위 루프가 안내 문구를 초기값으로 덮었으므로 다시 계산
+  if (panelMode === 'solver') refreshSolution();
+  syncSizeLabels();
+  if (typeof window.__scanRefreshI18n === 'function') window.__scanRefreshI18n();
+  syncDetectStageEnabled();
+}
+
+document.querySelectorAll('#lang-switch button').forEach(b => {
+  b.addEventListener('click', () => applyLang(b.dataset.lang));
+});
+applyLang();
+syncStatsDom();
+initChrome();
+
+(function tickUi() {
+  requestAnimationFrame(tickUi);
+  syncStatsDom();
+})();
+
+window.addEventListener('resize', () => engine.resize());
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js');
+  });
+}
+</script>
+</body>
+</html>
