@@ -3,6 +3,31 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<script>
+(function () {
+  var root = document.documentElement;
+  function standalone() {
+    return window.navigator.standalone === true
+      || window.matchMedia('(display-mode: standalone)').matches;
+  }
+  function syncFrame() {
+    if (standalone()) {
+      root.classList.add('standalone');
+      root.style.removeProperty('--app-h');
+      return;
+    }
+    root.classList.remove('standalone');
+    var h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+    root.style.setProperty('--app-h', Math.round(h) + 'px');
+  }
+  syncFrame();
+  window.addEventListener('resize', syncFrame);
+  if (window.visualViewport) {
+    visualViewport.addEventListener('resize', syncFrame);
+    visualViewport.addEventListener('scroll', syncFrame);
+  }
+})();
+</script>
 <meta name="theme-color" content="#0f1117" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -75,8 +100,10 @@
     /* ── 앱 셸 치수 ── */
     --rail-w: 64px;                         /* 세로 레일 (데스크톱) */
     --rail-btn-h: 52px;
-    /* 하단 탭바 (모바일) = 버튼 + 상하 패딩 12px + 상단 보더 1px + 홈 인디케이터 */
-    --rail-h: calc(var(--rail-btn-h) + 13px + var(--safe-b));
+    /* 하단 탭바 (모바일) = 버튼 + 상하 패딩 12px + 상단 보더 1px + (PWA만) 홈 인디케이터.
+       사파리는 주소창이 이미 아래를 차지해서 --safe-b 를 또 넣으면 빈칸이 생긴다. */
+    --safe-b-chrome: 0px;
+    --rail-h: calc(var(--rail-btn-h) + 13px + var(--safe-b-chrome));
     /* 상단 바 = 컨트롤 높이 + 노치/상태바. padding-top 과 짝을 맞춰 잘리지 않게 한다 */
     --top-h: calc(48px + var(--safe-t));
     --act-h: 56px;
@@ -91,15 +118,28 @@
     --safe-r: env(safe-area-inset-right, 0px);
   }
   * { box-sizing: border-box; }
-  html, body { margin: 0; height: 100%; overflow: hidden; background: var(--bg); color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  html, body {
+    margin: 0; overflow: hidden; background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    height: 100%; height: 100dvh; height: var(--app-h, 100dvh);
+  }
+  /* iOS PWA: 100dvh/inset:0 이 사파리 주소창 높이만큼 짧게 잡히는 버그 → 큰 뷰포트로 채운다 */
+  @media (display-mode: standalone) {
+    :root { --safe-b-chrome: var(--safe-b); }
+    html, body { height: 100lvh; height: -webkit-fill-available; }
+  }
+  html.standalone { --safe-b-chrome: var(--safe-b); }
+  html.standalone, html.standalone body {
+    height: 100lvh; height: -webkit-fill-available;
+  }
   /* ══════════════════════════════════════════════════════════════
      앱 셸 — 큐브가 중앙(stage)을 소유하고, 크롬은 가장자리 트랙에 붙는다.
      패널은 큐브 위에 뜨지 않고 grid 컬럼/행을 차지해 stage 를 밀어낸다.
      스크롤되는 요소는 #panel-body / #ui-body 둘뿐이다.
      ══════════════════════════════════════════════════════════════ */
   #shell {
-    position: fixed; inset: 0;
+    position: fixed; top: 0; left: 0; right: 0; bottom: auto;
+    width: 100%; height: 100%; height: 100dvh; height: var(--app-h, 100dvh);
     display: grid;
     grid-template-columns: var(--rail-w) minmax(0, 1fr) var(--panel-w);
     grid-template-rows: var(--top-h) minmax(0, 1fr) var(--act-h);
@@ -108,6 +148,10 @@
       "rail stage panel"
       "rail act   panel";
   }
+  @media (display-mode: standalone) {
+    #shell { height: 100lvh; height: -webkit-fill-available; }
+  }
+  html.standalone #shell { height: 100lvh; height: -webkit-fill-available; }
   #shell[data-panel="open"] { --panel-w: var(--panel-open); }
   #shell:not([data-panel="open"]) #panel { display: none; }
 
@@ -496,7 +540,7 @@
 
     #rail {
       flex-direction: row; border-right: none; border-top: 1px solid var(--border);
-      padding: 6px calc(6px + var(--safe-r)) calc(6px + var(--safe-b)) calc(6px + var(--safe-l));
+      padding: 6px calc(6px + var(--safe-r)) calc(6px + var(--safe-b-chrome)) calc(6px + var(--safe-l));
     }
     .rail-btn { flex: 1 1 0; min-width: 0; }
 
@@ -564,7 +608,7 @@
     }
     #rail {
       flex-direction: column; border-right: 1px solid var(--border); border-top: none;
-      padding: 6px 6px calc(6px + var(--safe-b)) calc(6px + var(--safe-l));
+      padding: 6px 6px calc(6px + var(--safe-b-chrome)) calc(6px + var(--safe-l));
     }
     .rail-btn { min-height: 46px; }
     #actions {
