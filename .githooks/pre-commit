@@ -1,0 +1,35 @@
+#!/bin/sh
+# Bump the app version by 0.1 on every commit so the next push ships it.
+# Copy to .git/hooks/pre-commit (scripts/install-hooks.sh).
+
+if [ -n "$SKIP_VERSION_BUMP" ]; then
+  exit 0
+fi
+
+git_dir=$(git rev-parse --git-dir)
+if [ -d "$git_dir/rebase-merge" ] || [ -d "$git_dir/rebase-apply" ] \
+   || [ -f "$git_dir/MERGE_HEAD" ] || [ -f "$git_dir/CHERRY_PICK_HEAD" ] \
+   || [ -f "$git_dir/REVERT_HEAD" ]; then
+  exit 0
+fi
+
+# Manual bump already staged for this commit.
+if git diff --cached --name-only | grep -qx VERSION; then
+  exit 0
+fi
+
+root=$(git rev-parse --show-toplevel)
+cd "$root" || exit 1
+
+run_python() {
+  if command -v python >/dev/null 2>&1; then python "$@"; return $?; fi
+  if command -v python3 >/dev/null 2>&1; then python3 "$@"; return $?; fi
+  if command -v py >/dev/null 2>&1; then py -3 "$@"; return $?; fi
+  echo "python not found; cannot bump version" >&2
+  exit 1
+}
+
+new=$(run_python "$root/scripts/bump-version.py") || exit 1
+git add VERSION index.html sw.js
+echo "Version -> v$new" >&2
+exit 0
