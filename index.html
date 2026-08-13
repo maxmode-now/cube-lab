@@ -13,8 +13,11 @@
   function syncFrame() {
     if (standalone()) {
       root.classList.add('standalone');
-      // iOS PWA: 100dvh/innerHeight 는 노치만큼 짧다. 100vh 만 실제 화면 높이.
-      root.style.setProperty('--app-h', '100vh');
+      // screen.height 는 노치·홈 인디케이터를 포함한 실제 CSS 픽셀 높이.
+      // 100vh 도 대체로 맞지만, 기기/OS 에 따라 몇 px 짧게 남는 경우가 있다.
+      var landscape = window.matchMedia('(orientation: landscape)').matches;
+      var h = landscape ? window.screen.width : window.screen.height;
+      root.style.setProperty('--app-h', Math.round(h) + 'px');
       return;
     }
     root.classList.remove('standalone');
@@ -101,10 +104,10 @@
     /* ── 앱 셸 치수 ── */
     --rail-w: 64px;                         /* 세로 레일 (데스크톱) */
     --rail-btn-h: 52px;
-    /* 하단 탭바 (모바일) = 버튼 + 상하 패딩 12px + 상단 보더 1px + (PWA만) 홈 인디케이터.
+    /* 하단 탭바 (모바일) = 버튼 + 상단 패딩 4px + 보더 1px + (PWA만) 홈 인디케이터.
        사파리는 주소창이 이미 아래를 차지해서 --safe-b 를 또 넣으면 빈칸이 생긴다. */
     --safe-b-chrome: 0px;
-    --rail-h: calc(var(--rail-btn-h) + 13px + var(--safe-b-chrome));
+    --rail-h: calc(var(--rail-btn-h) + 5px + var(--safe-b-chrome));
     /* 상단 바 = 컨트롤 높이 + 노치/상태바. padding-top 과 짝을 맞춰 잘리지 않게 한다 */
     --top-h: calc(48px + var(--safe-t));
     --act-h: 56px;
@@ -131,6 +134,7 @@
     :root { --app-h: 100vh; --safe-b-chrome: var(--safe-b); }
   }
   html.standalone { --app-h: 100vh; --safe-b-chrome: var(--safe-b); }
+  html.standalone, html.standalone body { background: var(--surface-1); }
   /* ══════════════════════════════════════════════════════════════
      앱 셸 — 큐브가 중앙(stage)을 소유하고, 크롬은 가장자리 트랙에 붙는다.
      패널은 큐브 위에 뜨지 않고 grid 컬럼/행을 차지해 stage 를 밀어낸다.
@@ -539,7 +543,7 @@
 
     #rail {
       flex-direction: row; border-right: none; border-top: 1px solid var(--border);
-      padding: 6px calc(6px + var(--safe-r)) calc(6px + var(--safe-b-chrome)) calc(6px + var(--safe-l));
+      padding: 4px calc(6px + var(--safe-r)) var(--safe-b-chrome) calc(6px + var(--safe-l));
     }
     .rail-btn { flex: 1 1 0; min-width: 0; }
 
@@ -607,7 +611,7 @@
     }
     #rail {
       flex-direction: column; border-right: 1px solid var(--border); border-top: none;
-      padding: 6px 6px calc(6px + var(--safe-b-chrome)) calc(6px + var(--safe-l));
+      padding: 6px 6px var(--safe-b-chrome) calc(6px + var(--safe-l));
     }
     .rail-btn { min-height: 46px; }
     #actions {
@@ -659,7 +663,7 @@
         <option value="4" data-i18n="size4">4×4</option>
         <option value="5" data-i18n="size5">5×5</option>
       </select>
-      <span id="app-version" aria-label="Version">v1.2</span>
+      <span id="app-version" aria-label="Version">v1.3</span>
       <button type="button" id="settings-btn" class="btn-icon" aria-label="Settings" aria-expanded="false">⚙</button>
     </div>
   </header>
