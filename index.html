@@ -245,6 +245,15 @@
   .sheet-head h2 { font-size: var(--fs-md); margin: 0; }
   #ccw-hint { font-size: var(--fs-xs); color: var(--muted); margin-bottom: 4px; }
   .hint-text { font-size: var(--fs-xs); color: var(--muted); line-height: 1.6; margin: 12px 0 0; }
+  #about {
+    display: flex; flex-direction: column; gap: 4px;
+    margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border);
+  }
+  #about a {
+    font-size: var(--fs-xs); color: var(--muted); line-height: 1.5;
+    text-decoration: none; width: max-content;
+  }
+  #about a:hover { color: var(--accent); }
   .learn-list { display: flex; flex-direction: column; gap: var(--gap); }
   .learn-list button { width: 100%; justify-content: flex-start; }
 
@@ -663,7 +672,7 @@
         <option value="4" data-i18n="size4">4×4</option>
         <option value="5" data-i18n="size5">5×5</option>
       </select>
-      <span id="app-version" aria-label="Version">v1.3</span>
+      <span id="app-version" aria-label="Version">v1.4</span>
       <button type="button" id="settings-btn" class="btn-icon" aria-label="Settings" aria-expanded="false">⚙</button>
     </div>
   </header>
@@ -859,6 +868,10 @@
       </div>
 
       <p class="hint-text" data-i18n="hint">Drag a face: turn · Drag empty space: orbit · Wheel: zoom</p>
+      <div id="about">
+        <a href="https://maxmode-now.com/" target="_blank" rel="noopener noreferrer">maxmode-now.com</a>
+        <a href="mailto:maxmode.now@gmail.com">maxmode.now@gmail.com</a>
+      </div>
     </div>
   </aside>
 
