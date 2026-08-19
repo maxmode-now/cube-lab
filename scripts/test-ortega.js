@@ -106,4 +106,12 @@ ok(guide.includes(`<code>${L.ortegaOllAlg[25]}</code>`), 'guide L matches overri
 ok(!guide.includes("r U R' U' r'"), 'guide no 3×3 T r-alg');
 ok(!guide.includes("F' r U R'"), 'guide no 3×3 L r-alg');
 
+[27, 26, 21, 22, 23, 24, 25].forEach(id => {
+  ok(guide.includes(`learn=ortega&amp;case=${id}`), `guide OLL case link ${id}`);
+});
+['adj', 'diag', 'h', 'barA', 'barB'].forEach(id => {
+  ok(guide.includes(`learn=ortega&amp;case=${id}`), `guide PBL case link ${id}`);
+});
+ok(guide.includes('learn=ortega&amp;step=0'), 'guide full track link');
+
 console.log(process.exitCode ? 'Some checks failed' : 'All ortega checks passed');
