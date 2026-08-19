@@ -113,5 +113,15 @@ ok(!guide.includes("F' r U R'"), 'guide no 3×3 L r-alg');
   ok(guide.includes(`learn=ortega&amp;case=${id}`), `guide PBL case link ${id}`);
 });
 ok(guide.includes('learn=ortega&amp;step=0'), 'guide full track link');
+ok(guide.includes('learn=drill&amp;set=ortega'), 'guide drill CTA');
+
+const D = L.ortegaDrill;
+ok(D && D.oll.length === 7, 'drill oll 7');
+ok(D.pbl.length === 5, 'drill pbl 5');
+ok(D.all.length === 12, 'drill all 12');
+ok(D.oll.find(c => c.id === 24).alg === L.ortegaOllAlg[24], 'drill T override');
+ok(D.oll.find(c => c.id === 25).alg === L.ortegaOllAlg[25], 'drill L override');
+ok(D.pbl.every(c => c.kind === 'pbl'), 'pbl kind');
+ok(D.oll.every(c => c.kind === 'oll'), 'oll kind');
 
 console.log(process.exitCode ? 'Some checks failed' : 'All ortega checks passed');

@@ -7,6 +7,7 @@ vm.runInNewContext(fs.readFileSync('oll-cases-data.js', 'utf8'), g);
 vm.runInNewContext(fs.readFileSync('oll-cases.js', 'utf8'), g);
 vm.runInNewContext(fs.readFileSync('pll-cases-data.js', 'utf8'), g);
 vm.runInNewContext(fs.readFileSync('pll-cases.js', 'utf8'), g);
+vm.runInNewContext(fs.readFileSync('lessons.js', 'utf8'), g);
 vm.runInNewContext(fs.readFileSync('cube-drill.js', 'utf8'), g);
 
 const Cube = g.Cube;
@@ -65,6 +66,32 @@ drill.start('pll');
 ok(drill.isActive() && drill.currentSet() === 'pll', 'start pll');
 drill.close();
 ok(!drill.isActive(), 'close');
+
+const OD = g.CubeLessons.ortegaDrill;
+ok(OD.all.length === 12, 'ortega drill all');
+ok(OD.oll.length === 7 && OD.pbl.length === 5, 'ortega drill split');
+OD.all.forEach(c => roundTrip(F, c));
+
+const ortegaDrill = g.CubeDrill.create({
+  engine: fakeEngine,
+  invertAlg: s => s,
+  casesOf: set => {
+    if (set === 'ortega') return OD.all;
+    if (set === 'ortega-oll') return OD.oll;
+    if (set === 'ortega-pbl') return OD.pbl;
+    return [];
+  },
+  titleOf: c => c.title.en,
+  t: k => k,
+  toast() {},
+});
+ortegaDrill.start('bogus');
+ok(!ortegaDrill.isActive(), 'bad set no-op');
+ortegaDrill.start('ortega');
+ok(ortegaDrill.isActive() && ortegaDrill.currentSet() === 'ortega', 'start ortega');
+ortegaDrill.start('nope');
+ok(ortegaDrill.isActive() && ortegaDrill.currentSet() === 'ortega', 'bad set keeps current');
+ortegaDrill.close();
 
 if (fail) {
   console.log('failures', fail);

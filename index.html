@@ -805,7 +805,7 @@
         <option value="4" data-i18n="size4">4×4</option>
         <option value="5" data-i18n="size5">5×5</option>
       </select>
-      <span id="app-version" aria-label="Version">v2.1</span>
+      <span id="app-version" aria-label="Version">v2.2</span>
       <button type="button" id="settings-btn" class="btn-icon" aria-label="Settings" aria-expanded="false">⚙</button>
     </div>
   </header>
@@ -885,7 +885,7 @@
           <button type="button" id="open-f2l" class="n3-only" data-i18n="openF2l">🧩 F2L cases</button>
           <button type="button" id="open-oll" class="n3-only" data-i18n="openOll">🌕 OLL library</button>
           <button type="button" id="open-pll" class="n3-only" data-i18n="openPll">🔄 PLL library</button>
-          <button type="button" id="open-drill" class="n3-only" data-i18n="openDrill">🎯 Case drill</button>
+          <button type="button" id="open-drill" class="n23-only" data-i18n="openDrill">🎯 Case drill</button>
           <button type="button" id="open-roux" class="n3-only" data-i18n="openRoux">🧱 Blocks (Roux)</button>
           <button type="button" id="detect-stage" class="n3-only" data-i18n="detectStage">🎯 Find My Step (Beginner)</button>
         </div>
@@ -908,9 +908,12 @@
 
       <div id="drill">
         <div id="drill-sets" class="seg" role="tablist" aria-label="Drill set">
-          <button type="button" data-set="f2l" data-i18n="drillF2l">F2L</button>
-          <button type="button" data-set="oll" data-i18n="drillOll">OLL</button>
-          <button type="button" data-set="pll" data-i18n="drillPll">PLL</button>
+          <button type="button" class="n2-only" data-set="ortega" data-i18n="drillOrtegaAll">All</button>
+          <button type="button" class="n2-only" data-set="ortega-oll" data-i18n="drillOrtegaOll">OLL</button>
+          <button type="button" class="n2-only" data-set="ortega-pbl" data-i18n="drillOrtegaPbl">PBL</button>
+          <button type="button" class="n3-only" data-set="f2l" data-i18n="drillF2l">F2L</button>
+          <button type="button" class="n3-only" data-set="oll" data-i18n="drillOll">OLL</button>
+          <button type="button" class="n3-only" data-set="pll" data-i18n="drillPll">PLL</button>
         </div>
         <p id="drill-hint" data-i18n="drillHint">Read the case. Solve it. If the top is twisted, finish with U.</p>
       </div>
@@ -1156,6 +1159,7 @@ const I18N = {
     tutShowMore: 'Details ▾', tutShowLess: 'Hide details ▴',
     demo: '▶ Demo',
     drillF2l: 'F2L', drillOll: 'OLL', drillPll: 'PLL',
+    drillOrtegaAll: 'All', drillOrtegaOll: 'OLL', drillOrtegaPbl: 'PBL',
     drillRetry: 'Retry', drillSkip: 'Skip',
     drillHint: 'Read the case. Solve it. If the top is twisted, finish with U.',
     drillSolved: name => `${name} — next`,
@@ -1286,6 +1290,7 @@ const I18N = {
     tutShowMore: '자세히 ▾', tutShowLess: '접기 ▴',
     demo: '▶ 시연',
     drillF2l: 'F2L', drillOll: 'OLL', drillPll: 'PLL',
+    drillOrtegaAll: '전체', drillOrtegaOll: 'OLL', drillOrtegaPbl: 'PBL',
     drillRetry: '다시', drillSkip: '건너뛰기',
     drillHint: '케이스를 읽고 맞추세요. 맨 위가 비뚤면 U로 마무리하세요.',
     drillSolved: name => `${name} — 다음`,
@@ -2208,9 +2213,13 @@ function demoInverseAlg(alg) {
 }
 
 function drillCasesOf(set) {
+  const D = globalThis.CubeLessons && globalThis.CubeLessons.ortegaDrill;
   if (set === 'f2l') return (globalThis.CubeF2L && globalThis.CubeF2L.cases) || [];
   if (set === 'oll') return (globalThis.CubeOLL && globalThis.CubeOLL.cases) || [];
   if (set === 'pll') return (globalThis.CubePLL && globalThis.CubePLL.cases) || [];
+  if (set === 'ortega') return (D && D.all) || [];
+  if (set === 'ortega-oll') return (D && D.oll) || [];
+  if (set === 'ortega-pbl') return (D && D.pbl) || [];
   return [];
 }
 
@@ -2240,9 +2249,16 @@ drill = globalThis.CubeDrill.create({
 syncDrillUi();
 
 function openDrill(set) {
-  if (!requireN3('openDrill')) return;
-  openOverlay('drill');
   const name = (set || '').toLowerCase();
+  if (engine.n === 2) {
+    openOverlay('drill');
+    const ok = name === 'ortega' || name === 'ortega-oll' || name === 'ortega-pbl';
+    drill.start(ok ? name : 'ortega');
+    syncDrillUi();
+    return;
+  }
+  if (engine.n !== 3) return;
+  openOverlay('drill');
   if (name === 'f2l' || name === 'oll' || name === 'pll') drill.start(name);
   syncDrillUi();
 }
@@ -2303,8 +2319,9 @@ function applyDeepLink() {
     return;
   }
   if (learn === 'drill') {
-    if (engine.n !== 3) setCubeN(3);
-    if (engine.n !== 3) return;
+    const want = nRaw === '2' ? 2 : 3;
+    if (engine.n !== want) setCubeN(want);
+    if (engine.n !== 2 && engine.n !== 3) return;
     openDrill((q.get('set') || '').toLowerCase());
     return;
   }

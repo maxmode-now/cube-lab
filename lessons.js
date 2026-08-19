@@ -746,6 +746,27 @@ function ortegaStates() {
   ];
 }
 
+function ortegaDrillCases() {
+  const O = g.CubeOLL;
+  const oll = ORTEGA_OLL_IDS.map(id => {
+    const c = O && O.byId ? O.byId(id) : null;
+    if (!c) return null;
+    return {
+      id,
+      title: c.title,
+      alg: ORTEGA_OLL_ALG[id] || c.alg,
+      kind: 'oll',
+    };
+  }).filter(Boolean);
+  const pbl = PBL_ORTEGA.map(c => ({
+    id: c.id,
+    title: c.label,
+    alg: c.alg,
+    kind: 'pbl',
+  }));
+  return { oll, pbl, all: oll.concat(pbl) };
+}
+
 const _g = '_';
 const fN = (n, c) => Array(n * n).fill(c);
 function paintFace(a, color, idxs) {
@@ -1442,6 +1463,7 @@ function pllLessons(lang) {
     ortegaOllAlg: ORTEGA_OLL_ALG,
     statesOrtega: ortegaStates(),
     ortegaLessonStepForCase,
+    ortegaDrill: ortegaDrillCases(),
     states4: STEP_STATES_4,
     beginner4: { en: LESSONS_4_EN, ko: LESSONS_4_KO },
     states5: STEP_STATES_5,

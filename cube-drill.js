@@ -2,7 +2,7 @@
 (function (g) {
   'use strict';
 
-  var SETS = { f2l: 1, oll: 1, pll: 1 };
+  var SETS = { f2l: 1, oll: 1, pll: 1, ortega: 1, 'ortega-oll': 1, 'ortega-pbl': 1 };
   var NEXT_MS = 700;
 
   function shuffle(list) {
@@ -52,6 +52,8 @@
       function labelOf(c) {
         var title = titleOf ? titleOf(c) : '';
         var id = c && c.id != null ? String(c.id) : '';
+        if (c && c.kind === 'oll') return 'OLL ' + id + (title ? ' · ' + title : '');
+        if (c && c.kind === 'pbl') return id + (title ? ' · ' + title : '');
         if (setName === 'f2l') return '#' + id + (title ? ' · ' + title : '');
         if (setName === 'oll') return 'OLL ' + id + (title ? ' · ' + title : '');
         return id + (title ? ' · ' + title : '');
