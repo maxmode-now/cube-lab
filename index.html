@@ -587,6 +587,7 @@
     position: relative; width: 100%; aspect-ratio: 1; background: var(--sunken);
     border-radius: var(--r-md); overflow: hidden; border: 1px solid var(--border); margin-bottom: 10px;
   }
+  #scan-check-preview-wrap.hidden { display: none; }
   #scan-check-preview {
     position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
   }
@@ -603,6 +604,19 @@
   #scan[data-scan-n="4"] #scan-check-grid button,
   #scan[data-scan-n="5"] #scan-check-grid button { font-size: var(--fs-xs); }
   #scan-check-center-hint { font-size: var(--fs-xs); color: var(--muted); margin-bottom: 8px; }
+  #scan-palette {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 6px; margin: 0 0 8px;
+  }
+  #scan-palette button {
+    aspect-ratio: 1; min-height: 0; padding: 0;
+    border-radius: var(--r-sm); border: 1px solid var(--border-swatch);
+    font-size: var(--fs-sm); font-weight: 700;
+    pointer-events: auto;
+  }
+  #scan-palette button.active {
+    outline: 2px solid var(--warn); outline-offset: 1px;
+  }
   #scan-preview-wrap {
     position: relative; width: 100%; aspect-ratio: 1; background: var(--sunken);
     border-radius: var(--r-md); overflow: hidden; border: 1px solid var(--border);
@@ -805,7 +819,7 @@
         <option value="4" data-i18n="size4">4×4</option>
         <option value="5" data-i18n="size5">5×5</option>
       </select>
-      <span id="app-version" aria-label="Version">v2.2</span>
+      <span id="app-version" aria-label="Version">v2.3</span>
       <button type="button" id="settings-btn" class="btn-icon" aria-label="Settings" aria-expanded="false">⚙</button>
     </div>
   </header>
@@ -964,10 +978,21 @@
         <button type="button" id="scan-cam" style="flex:1" data-i18n="scanCam">Camera</button>
         <button type="button" id="scan-snap" class="primary" style="flex:1;display:none" data-i18n="scanSnap">Capture</button>
       </div>
+      <div class="row" style="margin-top:8px">
+        <button type="button" id="scan-paint" style="flex:1" data-i18n="scanPaint">Paint colors</button>
+      </div>
     </div>
 
     <div id="scan-stage-check">
       <div id="scan-check-tip" data-i18n="scanCheckTip">Check this face. Tap a sticker to fix its color, then confirm.</div>
+      <div id="scan-palette" style="display:none" aria-label="Paint palette">
+        <button type="button" data-paint-color="U">U</button>
+        <button type="button" data-paint-color="R">R</button>
+        <button type="button" data-paint-color="F">F</button>
+        <button type="button" data-paint-color="D">D</button>
+        <button type="button" data-paint-color="L">L</button>
+        <button type="button" data-paint-color="B">B</button>
+      </div>
       <div id="scan-check-preview-wrap">
         <img id="scan-check-preview" alt="">
       </div>
@@ -1214,7 +1239,11 @@ const I18N = {
     scanApply: 'Apply & solve',
     scanApplyBeginner: 'Guide me (beginner)',
     scanApplyFast: 'Fast solve',
+    scanPaint: 'Paint colors',
     scanCheckTip: 'Check this face against the photo. Tap a sticker to fix color, then confirm.',
+    scanPaintTip: 'Paint this face: pick a color from the palette, then tap stickers. Odd cubes have fixed centers.',
+    scanPaintReset: 'Clear face',
+    scanPaintNeedCells: 'Fill all stickers on this face first',
     scanFinalTip: 'All 6 faces confirmed. Guide me follows beginner steps; Fast solve uses a short search.',
     scanCenterHint: face => `Center should be ${face}`,
     scanCenterBad: face => `Center should be ${face} — tap the middle sticker`,
@@ -1345,7 +1374,11 @@ const I18N = {
     scanApply: '적용하고 풀이',
     scanApplyBeginner: '초보 단계로 풀기',
     scanApplyFast: '빠른 풀이',
+    scanPaint: '색 직접 입력',
     scanCheckTip: '사진과 맞춰 이 면을 확인하세요. 스티커를 탭해 색을 고친 뒤 확인하세요.',
+    scanPaintTip: '색 팔레트에서 색을 고르고, 스티커를 탭해 칠하세요. 홀수 큐브는 가운데가 고정됩니다.',
+    scanPaintReset: '면 지우기',
+    scanPaintNeedCells: '이 면의 모든 칸을 먼저 채워야 해요',
     scanFinalTip: '6면 모두 확인됨. 초보 단계로 풀기가 기본이고, 빠른 풀이는 짧은 탐색입니다.',
     scanCenterHint: face => `센터는 ${face} 이어야 해요`,
     scanCenterBad: face => `센터는 ${face} 이어야 해요 — 가운데 칸을 탭하세요`,
@@ -2308,8 +2341,10 @@ function applyDeepLink() {
   const learn = q.get('learn');
   if (learn === 'scan') {
     const want = nRaw === '2' ? 2 : nRaw === '4' ? 4 : nRaw === '5' ? 5 : 3;
+    const input = q.get('input');
     if (engine.n !== want) setCubeN(want);
     if (typeof window.__openScan === 'function') window.__openScan();
+    if (input === 'paint' && typeof window.__scanPaint === 'function') window.__scanPaint();
     return;
   }
   if (learn === 'menu') {
@@ -2981,15 +3016,20 @@ hudStatusEl.addEventListener('click', () => {
   const elCapture = document.getElementById('scan-stage-capture');
   const elCheck = document.getElementById('scan-stage-check');
   const elFinal = document.getElementById('scan-stage-final');
+  const elCheckPreviewWrap = document.getElementById('scan-check-preview-wrap');
   const elCheckPreview = document.getElementById('scan-check-preview');
   const elCheckGrid = document.getElementById('scan-check-grid');
   const elCheckHint = document.getElementById('scan-check-center-hint');
+  const elPalette = document.getElementById('scan-palette');
   const elReviewGrid = document.getElementById('scan-review');
   const elGuideGrid = document.getElementById('scan-grid');
   const btnSnap = document.getElementById('scan-snap');
+  const btnPaint = document.getElementById('scan-paint');
+  const btnCheckRetake = document.getElementById('scan-check-retake');
   const btnCheckOk = document.getElementById('scan-check-ok');
   const fileInput = document.getElementById('scan-file');
   const elUploadLabel = document.getElementById('scan-upload-label');
+  const paletteBtns = elPalette ? Array.from(elPalette.querySelectorAll('[data-paint-color]')) : [];
 
   let scanN = 3;
   let faceIdx = 0;
@@ -2997,6 +3037,7 @@ hudStatusEl.addEventListener('click', () => {
   let faces = CS.emptyFaces(3);
   let rgbsByFace = CS.emptyFaces(3);
   let previewByFace = {};
+  let paintColor = 'U';
   let confirmed = { U: false, R: false, F: false, D: false, L: false, B: false };
   let camStream = null;
 
@@ -3008,8 +3049,10 @@ hudStatusEl.addEventListener('click', () => {
   function faceLetter() { return CS.FACE_ORDER[faceIdx]; }
 
   function faceHasData(f) {
-    return !!(faces[f] && faces[f].every(Boolean) && previewByFace[f]);
+    return !!(faces[f] && faces[f].every(Boolean));
   }
+
+  function isPaintFace(f) { return !previewByFace[f]; }
 
   function allConfirmed() {
     return CS.FACE_ORDER.every(f => confirmed[f]);
@@ -3036,6 +3079,24 @@ hudStatusEl.addEventListener('click', () => {
   function inkFor(face) {
     return (face === 'U' || face === 'D') ? '#111' : '#fff';
   }
+
+  function renderPalette() {
+    if (!elPalette) return;
+    paletteBtns.forEach(btn => {
+      const c = btn.dataset.paintColor;
+      if (!c) return;
+      btn.style.background = hexCss(c);
+      btn.style.color = inkFor(c);
+      btn.classList.toggle('active', c === paintColor);
+    });
+  }
+
+  paletteBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      paintColor = btn.dataset.paintColor || 'U';
+      renderPalette();
+    });
+  });
 
   function setMsg(el, msg, kind) {
     if (!el) return;
@@ -3131,9 +3192,28 @@ hudStatusEl.addEventListener('click', () => {
     renderProgress();
     const f = faceLetter();
     const url = previewByFace[f];
+    const paint = !url;
     if (url) elCheckPreview.src = url;
     else elCheckPreview.removeAttribute('src');
+    if (elCheckPreviewWrap) elCheckPreviewWrap.style.display = url ? '' : 'none';
+    if (elPalette) elPalette.style.display = paint ? '' : 'none';
+    document.getElementById('scan-check-tip').textContent = paint ? t('scanPaintTip') : t('scanCheckTip');
+    if (btnCheckRetake) btnCheckRetake.textContent = paint ? t('scanPaintReset') : t('scanRetake');
+    if (paint) renderPalette();
     renderCheckGrid();
+  }
+
+  function enterPaint(f) {
+    const idx = CS.FACE_ORDER.indexOf(f);
+    if (idx >= 0) faceIdx = idx;
+    stopCam();
+    paintColor = 'U';
+    faces[f] = Array(cellCount()).fill(null);
+    rgbsByFace[f] = Array(cellCount()).fill(null);
+    if (!evenCube()) faces[f][midIndex()] = f;
+    delete previewByFace[f];
+    confirmed[f] = false;
+    enterCheck();
   }
 
   function enterFinal() {
@@ -3257,6 +3337,16 @@ hudStatusEl.addEventListener('click', () => {
 
   function updateCheckStatus() {
     const f = faceLetter();
+    const paint = isPaintFace(f);
+    if (paint) {
+      const complete = faces[f] && faces[f].every(Boolean);
+      if (!complete) {
+        elCheckHint.textContent = t('scanPaintNeedCells');
+        setMsg(elCheckStatus, t('scanPaintNeedCells'), 'err');
+        btnCheckOk.disabled = true;
+        return false;
+      }
+    }
     if (evenCube()) {
       elCheckHint.textContent = t('scanOrientHintEven');
       setMsg(elCheckStatus, t('scanFaceOk'), 'ok');
@@ -3277,23 +3367,45 @@ hudStatusEl.addEventListener('click', () => {
   function renderCheckGrid() {
     const f = faceLetter();
     const mid = midIndex();
+    const paint = isPaintFace(f);
     elCheckGrid.innerHTML = '';
-    (faces[f] || []).forEach((col, i) => {
+    if (!faces[f] || faces[f].length !== cellCount()) faces[f] = Array(cellCount()).fill(null);
+    const cells = faces[f];
+    const nCells = cellCount();
+    for (let i = 0; i < nCells; i++) {
+      const col = cells[i];
       const b = document.createElement('button');
       b.type = 'button';
-      b.style.background = hexCss(col);
-      b.style.color = inkFor(col);
-      b.textContent = col;
-      if (!evenCube() && i === mid) b.style.outline = '2px solid var(--warn)';
+      if (col) {
+        b.style.background = hexCss(col);
+        b.style.color = inkFor(col);
+        b.textContent = col;
+      } else {
+        b.style.background = 'var(--sunken)';
+        b.style.color = 'var(--muted)';
+        b.textContent = '';
+      }
+      if (!evenCube() && i === mid) {
+        b.style.outline = '2px solid var(--warn)';
+        if (paint) b.disabled = true;
+      }
       b.addEventListener('click', () => {
-        faces[f][i] = CS.nextColor(faces[f][i]);
-        b.style.background = hexCss(faces[f][i]);
-        b.style.color = inkFor(faces[f][i]);
-        b.textContent = faces[f][i];
+        if (paint) {
+          if (!evenCube() && i === mid) return;
+          cells[i] = paintColor;
+          b.style.background = hexCss(paintColor);
+          b.style.color = inkFor(paintColor);
+          b.textContent = paintColor;
+        } else {
+          cells[i] = CS.nextColor(cells[i]);
+          b.style.background = hexCss(cells[i]);
+          b.style.color = inkFor(cells[i]);
+          b.textContent = cells[i];
+        }
         updateCheckStatus();
       });
       elCheckGrid.appendChild(b);
-    });
+    }
     updateCheckStatus();
   }
 
@@ -3401,6 +3513,7 @@ hudStatusEl.addEventListener('click', () => {
 
   window.__openScan = openScan;
   window.__scanStopCam = stopCam;
+  window.__scanPaint = () => enterPaint(faceLetter());
   window.__scanOnSizeChange = function () {
     scanN = engine.n;
     resetSession();
@@ -3411,6 +3524,7 @@ hudStatusEl.addEventListener('click', () => {
     processFile(f);
   });
   document.getElementById('scan-cam').addEventListener('click', startCam);
+  if (btnPaint) btnPaint.addEventListener('click', () => enterPaint(faceLetter()));
   btnSnap.addEventListener('click', snapCam);
   document.getElementById('scan-check-retake').addEventListener('click', retakeFromCheck);
   btnCheckOk.addEventListener('click', confirmFace);
@@ -3425,7 +3539,11 @@ hudStatusEl.addEventListener('click', () => {
       renderFaceLabel();
       renderProgress();
       renderCheckGrid();
-      document.getElementById('scan-check-tip').textContent = t('scanCheckTip');
+      const f = faceLetter();
+      const paint = isPaintFace(f);
+      document.getElementById('scan-check-tip').textContent = paint ? t('scanPaintTip') : t('scanCheckTip');
+      if (btnCheckRetake) btnCheckRetake.textContent = paint ? t('scanPaintReset') : t('scanRetake');
+      if (paint) renderPalette();
     } else {
       renderProgress();
       document.getElementById('scan-final-tip').textContent = t('scanFinalTip');
