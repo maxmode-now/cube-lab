@@ -58,7 +58,7 @@
   a:hover { color: var(--accent-hover); text-decoration: underline; }
   .top {
     position: sticky; top: 0; z-index: 10;
-    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px;
     padding: calc(10px + var(--safe-t)) 20px 10px;
     background: rgba(15, 17, 23, 0.92); backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--border);
@@ -78,11 +78,24 @@
   nav.sizes a[aria-current="page"] {
     color: var(--text-strong); background: rgba(255, 255, 255, 0.08);
   }
+  nav.methods {
+    order: 4; flex: 1 1 100%;
+    display: flex; align-items: center; justify-content: center; gap: 2px;
+  }
+  nav.methods a {
+    display: inline-flex; align-items: center; min-height: 28px; padding: 0 12px;
+    font-size: 13px; font-weight: 600; color: var(--muted);
+    text-decoration: none; border-radius: 8px; white-space: nowrap;
+  }
+  nav.methods a:hover { color: var(--text); text-decoration: none; }
+  nav.methods a[aria-current="page"] {
+    color: var(--text-strong); background: rgba(255, 255, 255, 0.08);
+  }
   .wrap {
     display: grid; grid-template-columns: 200px minmax(0, 40rem); gap: 40px;
     max-width: 920px; margin: 0 auto; padding: 32px 20px calc(48px + var(--safe-b));
   }
-  nav.toc { position: sticky; top: 72px; align-self: start; }
+  nav.toc { position: sticky; top: 108px; align-self: start; }
   nav.toc h2 { margin: 0 0 8px; font-size: 11px; font-weight: 700; letter-spacing: .06em;
     text-transform: uppercase; color: var(--muted); }
   nav.toc ol { margin: 0; padding: 0 0 0 1.1em; font-size: 13px; line-height: 1.7; }
@@ -129,7 +142,6 @@
     font-size: 13px; color: var(--muted);
   }
   @media (max-width: 800px) {
-    .top { flex-wrap: wrap; }
     nav.sizes { order: 3; flex: 1 1 100%; }
     .wrap { grid-template-columns: 1fr; gap: 8px; padding-top: 20px; }
     nav.toc { position: static; padding-bottom: 8px; }
@@ -146,6 +158,10 @@
       <a href="../how-to-solve-3x3/index.html">3×3</a>
       <a href="../how-to-solve-4x4/index.html">4×4</a>
       <a href="../how-to-solve-5x5/index.html">5×5</a>
+    </nav>
+    <nav class="methods" aria-label="2×2 methods">
+      <a href="./index.html" aria-current="page">Beginner</a>
+      <a href="./ortega/index.html">Ortega</a>
     </nav>
   </header>
 
@@ -174,16 +190,11 @@
         <li>Keep one solved face as an <b>anchor</b>. Hold it the same way every time you run an algorithm.</li>
       </ul>
       <p class="note"><strong>Hold it the same way every time.</strong> Algorithms assume a face is Front. If you turn the cube in your hands without meaning to, the moves will look wrong.</p>
+      <p>Ready for speed? After your first solve, try <a href="./ortega/index.html">Ortega</a> — same three stages, with 7 OLL + 5 PBL algorithms.</p>
 
       <h2 id="notation">Notation</h2>
-      <p class="goal">Same letters as 3×3. Each letter is a 90° clockwise turn of that face, as if you were looking straight at it.</p>
-      <p><b>U</b> up · <b>D</b> down · <b>L</b> left · <b>R</b> right · <b>F</b> front · <b>B</b> back.</p>
-      <p>A prime (<b>'</b>) means counter-clockwise. A <b>2</b> means 180°. So <b>R'</b> is right face the other way, <b>U2</b> is a half turn of the top.</p>
-      <div class="diag" data-state="0"><span class="diag-cap">Solved cube — this is the colour map</span></div>
-      <div class="alg-box">
-        <div class="lbl">Try a short sequence</div>
-        <code>R U R' U'</code>
-      </div>
+      <p class="goal">Same letters as 3×3 — each letter is a 90° clockwise turn of that face, as if looking straight at it.</p>
+      <p>See the full <a href="../how-to-solve/notation/index.html">cube notation reference</a> for U–B, prime, wide, M-slice, and x/y/z.</p>
       <a class="cta" href="../index.html?n=2&amp;learn=beginner&amp;step=0">Watch notation in Cube Lab</a>
       <p class="goal">Opens the 2×2 lesson. The cube matches the diagram — tap ▶ Demo to play the turns.</p>
 

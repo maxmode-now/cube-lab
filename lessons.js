@@ -550,6 +550,202 @@ const LESSONS_2_KO = [
   },
 ];
 
+const PBL_ORTEGA = [
+  {
+    id: 'adj',
+    label: { en: 'Adjacent (T-perm)', ko: '인접 (T-perm)' },
+    tips: {
+      en: 'Two corners swap next to each other. Hold headlights on the back.',
+      ko: '바꿔야 할 코너가 서로 옆입니다. 헤드라이트를 뒤에 두고 잡으세요.',
+    },
+    alg: "R U R' F' R U R' U' R' F R2 U' R' U'",
+  },
+  {
+    id: 'diag',
+    label: { en: 'Diagonal (Y-perm)', ko: '대각 (Y-perm)' },
+    tips: {
+      en: 'Opposite corners swap — no headlights pair.',
+      ko: '반대편 코너를 바꿉니다. 헤드라이트 쌍이 없습니다.',
+    },
+    alg: "F R U' R' U' R U R' F' R U R' U' R' F R F'",
+  },
+  {
+    id: 'h',
+    label: { en: 'H', ko: 'H' },
+    tips: {
+      en: 'Bars / headlights on two faces.',
+      ko: '두 면에 바(헤드라이트)가 보입니다.',
+    },
+    alg: "R2 U2 R' U2 R2",
+  },
+  {
+    id: 'barA',
+    label: { en: 'Bar A (Ja-style)', ko: 'Bar A (Ja)' },
+    tips: {
+      en: 'One bar on the side. Hold it and apply the Ja-style trigger.',
+      ko: '옆면에 바가 하나입니다. 잡고 Ja 계열 트리거를 적용하세요.',
+    },
+    alg: "R U R' U' R' F R F'",
+  },
+  {
+    id: 'barB',
+    label: { en: 'Bar B (Jb-style)', ko: 'Bar B (Jb)' },
+    tips: {
+      en: 'Mirror of Bar A — one bar on the other side.',
+      ko: 'Bar A의 미러. 반대쪽 옆면에 바가 하나입니다.',
+    },
+    alg: "R' U' R U R' F' R F",
+  },
+];
+
+// Learning order: Sune / Antisune first (already in beginner), then H Pi U T L.
+const ORTEGA_OLL_IDS = [27, 26, 21, 22, 23, 24, 25];
+// 2×2 engine has no Rw — T/L use face-only Ortega algs, not 3×3 OCLL `r`.
+const ORTEGA_OLL_ALG = {
+  24: "R U R' U' R' F R F'",
+  25: "F' R U R' U' R' F R",
+};
+const ORTEGA_OLL_OVERVIEW = 2;
+const ORTEGA_OLL_CASE0 = 3;
+const ORTEGA_PBL_OVERVIEW = 10;
+const ORTEGA_PBL_CASE0 = 11;
+
+function ortegaLessonStepForCase(id) {
+  const n = Number(id);
+  if (Number.isFinite(n)) {
+    const i = ORTEGA_OLL_IDS.indexOf(n);
+    if (i >= 0) return ORTEGA_OLL_CASE0 + i;
+  }
+  const p = PBL_ORTEGA.findIndex(c => c.id === String(id));
+  if (p >= 0) return ORTEGA_PBL_CASE0 + p;
+  return 0;
+}
+
+function ortegaLessons(lang) {
+  const O = g.CubeOLL;
+  const loc = lang === 'ko' ? 'ko' : 'en';
+  const ko = loc === 'ko';
+  const ollCases = ORTEGA_OLL_IDS.map(id => O && O.byId ? O.byId(id) : null).filter(Boolean);
+  const ortegaOllAlgOf = c => ORTEGA_OLL_ALG[c.id] || c.alg;
+  const ollAlgs = ollCases.map(c => ({
+    label: '#' + c.id + ' · ' + c.title[loc],
+    alg: ortegaOllAlgOf(c),
+    setup: 'inverse',
+    caseId: c.id,
+  }));
+  const pblAlgs = PBL_ORTEGA.map(c => ({
+    label: c.label[loc],
+    alg: c.alg,
+    setup: 'inverse',
+    caseId: c.id,
+  }));
+
+  const ollCaseSteps = ollCases.map(c => ({
+    title: (ko ? 'OLL · ' : 'OLL · ') + c.title[loc],
+    goal: ko
+      ? '이 패턴이면 아래 공식 한 번으로 윗면을 노랗게 맞춥니다.'
+      : 'One algorithm for this pattern — the top becomes yellow.',
+    desc: ko
+      ? `<p>${c.tips.ko} 2×2에는 엣지가 없으니 이 7개가 <b>전체 OLL</b>입니다.</p>
+        <p>▶시연은 역셋업 후 공식을 재생합니다. 각도가 다르면 U로 맞춘 뒤 적용하세요.</p>`
+      : `<p>${c.tips.en} A 2×2 has no edges, so these seven cases are <b>all of OLL</b>.</p>
+        <p>▶ Demo inverts the case, then plays the solution. AUF with U if the angle does not match.</p>`,
+    algs: [{ label: '#' + c.id + ' · ' + c.title[loc], alg: ortegaOllAlgOf(c), setup: 'inverse', caseId: c.id }],
+  }));
+
+  const pblCaseSteps = PBL_ORTEGA.map((c, i) => ({
+    title: (ko ? 'PBL · ' : 'PBL · ') + c.label[loc],
+    goal: i === PBL_ORTEGA.length - 1
+      ? (ko ? '마지막 PBL — 적용하면 2×2가 완성됩니다.' : 'Last PBL case — apply it and the 2×2 is done.')
+      : (ko ? '이 패턴이면 아래 공식으로 코너 위치를 맞춥니다.' : 'One algorithm for this permutation pattern.'),
+    desc: ko
+      ? `<p>${c.tips.ko}</p><p>윗면은 이미 노랑이어야 합니다. ▶시연으로 인식과 공식을 확인하세요.</p>`
+      : `<p>${c.tips.en}</p><p>The top should already be yellow. ▶ Demo shows the case, then the solution.</p>`,
+    algs: [{ label: c.label[loc], alg: c.alg, setup: 'inverse', caseId: c.id }],
+  }));
+
+  if (ko) {
+    return [
+      {
+        title: 'Ortega 개요', intro: true,
+        goal: '첫 층 → OLL 7 → PBL 5. 초보자법과 같은 3단계, 공식만 더 많습니다.',
+        desc: `<p>2×2 속도법의 입문 경로예요. <b>첫 층</b>을 맞춘 뒤, 윗면을 <b>OLL 7케이스</b>로 노랗게, 마지막에 <b>PBL 5케이스</b>로 코너 위치를 맞춥니다.</p>
+          <p>초보자법은 OLL에 Sune/Antisune 두 개, 순열에 T/Y 두 개만 씁니다. Ortega는 마지막 층 케이스마다 고정 공식이 있어 타이머 연습에 적합해요.</p>
+          <p>이 트랙은 케이스를 <b>하나씩</b> 넘깁니다. 첫 완성 전이면 <b>2×2 초보자 트랙</b>부터 하세요.</p>`,
+        algs: [],
+      },
+      {
+        title: '1단계 · 첫 층', name: '첫 층',
+        goal: '흰 코너 4개를 맞춰 윗면이 하얗고, 옆면 색이 첫 층에서 서로 맞게 합니다.',
+        desc: `<p>초보자 가이드와 <b>동일</b>합니다. 흰색을 첫 면으로 고르고, 나머지 코너를 자리 아래에 두고 삽입 공식을 반복하세요.</p>
+          <p>센터가 없으니 코너 옆면 색끼리 맞추면 됩니다. 작업 코너는 <b>오른쪽 앞 아래</b>에 둡니다.</p>`,
+        algs: [{ label: '코너 삽입 (필요한 만큼 반복)', alg: "R' D' R D" }],
+      },
+      {
+        title: '2단계 · OLL 개요', name: 'OLL',
+        goal: '큐브를 뒤집어(흰 면 아래) 윗면 전체를 노랑으로 만듭니다. 다음 7스텝이 케이스입니다.',
+        desc: `<p>3×3 OCLL과 같은 <b>7케이스</b> (OLL #21–#27). 패턴을 읽고 공식 하나를 적용 → U로 맞춤(AUF).</p>
+          <p>다음 스텝 순서: <b>수네 → 안티수네 → H → 파이 → U → T → L</b>. 아래는 전체 목록이고, 이후 스텝에서 하나씩 시연합니다.</p>`,
+        algs: ollAlgs,
+      },
+      ...ollCaseSteps,
+      {
+        title: '3단계 · PBL 개요', name: 'PBL',
+        goal: '코너 위치를 맞추며 첫 층을 유지한 채 2×2를 완성합니다. 다음 5스텝이 케이스입니다.',
+        desc: `<p><b>PBL</b> — Permute Both Layers. 윗면은 이미 노랑; 코너만 제자리로 바꿉니다.</p>
+          <p>다음 스텝: <b>인접 / 대각 / H / Bar A / Bar B</b>. 아래는 전체 목록입니다.</p>`,
+        algs: pblAlgs,
+      },
+      ...pblCaseSteps,
+    ];
+  }
+
+  return [
+    {
+      title: 'Ortega overview', intro: true,
+      goal: 'First layer → 7 OLL → 5 PBL. Same three stages as beginner, more algorithms.',
+      desc: `<p>The usual 2×2 speed path: build a <b>first layer</b>, orient the top with <b>seven OLL cases</b>, then permute with <b>five PBL cases</b>.</p>
+        <p>Beginner uses only Sune/Antisune for OLL and T/Y for permutation. Ortega names every last-layer case — better for the timer.</p>
+        <p>This track walks <b>one case per step</b>. Not finished a 2×2 yet? Start the <b>2×2 beginner track</b> first.</p>`,
+      algs: [],
+    },
+    {
+      title: 'Step 1 · First layer', name: 'First layer',
+      goal: 'Four white corners on top with side colours matching around the layer.',
+      desc: `<p><b>Identical</b> to the beginner guide. Pick white, insert each remaining corner from below with the front-right insert.</p>
+        <p>There is no centre — match corner side colours to each other. Hold the working corner at <b>front-bottom-right</b>.</p>`,
+      algs: [{ label: 'Corner insert (repeat as needed)', alg: "R' D' R D" }],
+    },
+    {
+      title: 'Step 2 · OLL overview', name: 'OLL',
+      goal: 'Flip the cube (white down) and make the whole top face yellow. The next seven steps are the cases.',
+      desc: `<p>The same <b>seven OCLL cases</b> as 3×3 (OLL #21–#27). Read the pattern, apply one algorithm, AUF with U.</p>
+        <p>Next steps: <b>Sune → Antisune → H → Pi → U → T → L</b>. The list below is the full set; each following step demos one case.</p>`,
+      algs: ollAlgs,
+    },
+    ...ollCaseSteps,
+    {
+      title: 'Step 3 · PBL overview', name: 'PBL',
+      goal: 'Permute the corners while keeping the first layer solved. The next five steps are the cases.',
+      desc: `<p><b>PBL</b> — Permute Both Layers. The top is yellow; fix corner positions only.</p>
+        <p>Next steps: <b>Adjacent / Diagonal / H / Bar A / Bar B</b>. The list below is the full set.</p>`,
+      algs: pblAlgs,
+    },
+    ...pblCaseSteps,
+  ];
+}
+
+function ortegaStates() {
+  const s = STEP_STATES_2;
+  return [
+    s[0], s[1], s[2],
+    null, null, null, null, null, null, null,
+    s[2],
+    null, null, null, null,
+    s[3],
+  ];
+}
+
 const _g = '_';
 const fN = (n, c) => Array(n * n).fill(c);
 function paintFace(a, color, idxs) {
@@ -1240,6 +1436,12 @@ function pllLessons(lang) {
     pll: { en: pllLessons('en'), ko: pllLessons('ko') },
     states2: STEP_STATES_2,
     beginner2: { en: LESSONS_2_EN, ko: LESSONS_2_KO },
+    ortega2: { en: ortegaLessons('en'), ko: ortegaLessons('ko') },
+    pblOrtega: PBL_ORTEGA,
+    ortegaOllIds: ORTEGA_OLL_IDS,
+    ortegaOllAlg: ORTEGA_OLL_ALG,
+    statesOrtega: ortegaStates(),
+    ortegaLessonStepForCase,
     states4: STEP_STATES_4,
     beginner4: { en: LESSONS_4_EN, ko: LESSONS_4_KO },
     states5: STEP_STATES_5,

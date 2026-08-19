@@ -215,9 +215,11 @@
     background: var(--surface-1); border-right: 1px solid var(--border);
   }
   .rail-btn {
+    display: inline-flex; align-items: center; justify-content: center;
     flex-direction: column; gap: 3px; width: 100%; min-height: var(--rail-btn-h); padding: 6px 2px;
     font-size: var(--fs-xs); font-weight: 600;
     color: var(--muted); background: none; border-color: transparent;
+    text-decoration: none;
   }
   .rail-btn .ico { font-size: var(--fs-md); line-height: 1; }
   .rail-btn:hover { background: var(--surface-2); border-color: transparent; color: var(--text); }
@@ -268,8 +270,8 @@
   #panel-foot.hidden { display: none; }
 
   /* 패널 안의 모드별 섹션 — 하나만 보인다 */
-  #learn-picker, #tutorial, #solver, #scan, #guides, #drill { display: none; }
-  #learn-picker.open, #tutorial.open, #solver.open, #scan.open, #guides.open, #drill.open { display: block; }
+  #learn-picker, #tutorial, #solver, #scan, #drill { display: none; }
+  #learn-picker.open, #tutorial.open, #solver.open, #scan.open, #drill.open { display: block; }
   #drill-sets { width: 100%; }
   #drill-sets button { flex: 1 1 0; }
   #drill-hint { margin: 10px 0 0; font-size: var(--fs-sm); color: var(--muted); line-height: 1.55; }
@@ -306,7 +308,6 @@
   .learn-list button,
   .learn-list .btn { width: 100%; justify-content: flex-start; text-decoration: none; }
   .learn-list .btn:hover { text-decoration: none; }
-  #guides .learn-list + .learn-list { margin-top: var(--gap); }
 
   #lang-switch { width: max-content; }
   #layer-mode { width: 100%; flex-wrap: wrap; }
@@ -448,7 +449,7 @@
   [data-n="4"] .n23-only,
   [data-n="5"] .n23-only { display: none !important; }
   .n2-only { display: none !important; }
-  [data-n="2"] .n2-only { display: block !important; }
+  [data-n="2"] .n2-only { display: flex !important; }
   .n4eq-only { display: none !important; }
   [data-n="4"] .n4eq-only { display: block !important; }
   .n5eq-only { display: none !important; }
@@ -676,10 +677,8 @@
     /* Learn 피커는 버튼 몇 개뿐. 반 화면 시트를 쓰지 않고 내용만큼만 차지한다.
        Find My Step 결과가 붙으면 커지되 280px에서 잘리고 본문만 스크롤. */
     #shell[data-mode="learn"] { --panel-h: fit-content(280px); }
-    #shell[data-mode="guides"] { --panel-h: fit-content(min(360px, 48dvh)); }
     #shell[data-mode="drill"] { --panel-h: fit-content(200px); }
     #shell[data-mode="learn"] #panel { min-height: min-content; }
-    #shell[data-mode="guides"] #panel { min-height: min-content; }
     #shell[data-mode="drill"] #panel { min-height: min-content; }
 
     #rail {
@@ -806,7 +805,7 @@
         <option value="4" data-i18n="size4">4×4</option>
         <option value="5" data-i18n="size5">5×5</option>
       </select>
-      <span id="app-version" aria-label="Version">v1.9</span>
+      <span id="app-version" aria-label="Version">v2.0</span>
       <button type="button" id="settings-btn" class="btn-icon" aria-label="Settings" aria-expanded="false">⚙</button>
     </div>
   </header>
@@ -820,8 +819,8 @@
       <span class="ico" aria-hidden="true">🧠</span><span data-i18n="modeSolve">Solve</span></button>
     <button type="button" class="rail-btn" data-mode="scan">
       <span class="ico" aria-hidden="true">📷</span><span data-i18n="modeScan">Scan</span></button>
-    <button type="button" class="rail-btn" data-mode="guides">
-      <span class="ico" aria-hidden="true">📚</span><span data-i18n="modeGuides">Guide</span></button>
+    <a class="rail-btn" href="./how-to-solve/index.html">
+      <span class="ico" aria-hidden="true">📚</span><span data-i18n="modeGuides">Guide</span></a>
   </nav>
 
   <main id="stage">
@@ -881,6 +880,7 @@
       <div id="learn-picker">
         <div class="learn-list">
           <button type="button" id="open-tut" class="primary" data-i18n="openTut">📖 Tutorial (Beginner)</button>
+          <button type="button" id="open-ortega" class="n2-only" data-i18n="openOrtega">⚡ Speed (Ortega)</button>
           <button type="button" id="open-cfop" class="n3-only" data-i18n="openCfop">⚡ Speed (CFOP / 4-look)</button>
           <button type="button" id="open-f2l" class="n3-only" data-i18n="openF2l">🧩 F2L cases</button>
           <button type="button" id="open-oll" class="n3-only" data-i18n="openOll">🌕 OLL library</button>
@@ -890,32 +890,6 @@
           <button type="button" id="detect-stage" class="n3-only" data-i18n="detectStage">🎯 Find My Step (Beginner)</button>
         </div>
         <div id="stage-box" class="n3-only"></div>
-      </div>
-
-      <div id="guides">
-        <div class="learn-list">
-          <a class="btn primary" href="./how-to-solve/index.html" data-i18n="guideHub">All written guides</a>
-        </div>
-        <div class="learn-list n2-only">
-          <a class="btn" href="./how-to-solve-2x2/index.html" data-i18n="guide2x2">How to solve a 2×2 (written guide)</a>
-        </div>
-
-        <div class="learn-list n3-only">
-          <a class="btn" href="./how-to-solve-3x3/index.html" data-i18n="guide3x3">How to solve a 3×3 (written guide)</a>
-          <a class="btn" href="./how-to-solve-3x3/cfop/index.html" data-i18n="guide3x3cfop">How to solve a 3×3 with CFOP (written guide)</a>
-          <a class="btn" href="./how-to-solve-3x3/cfop/f2l/index.html" data-i18n="guide3x3f2l">F2L case library (written guide)</a>
-          <a class="btn" href="./how-to-solve-3x3/cfop/oll/index.html" data-i18n="guide3x3oll">OLL library guide (written)</a>
-          <a class="btn" href="./how-to-solve-3x3/cfop/pll/index.html" data-i18n="guide3x3pll">PLL library guide (written)</a>
-          <a class="btn" href="./how-to-solve-3x3/roux/index.html" data-i18n="guide3x3roux">How to solve a 3×3 with Roux (written guide)</a>
-        </div>
-
-        <div class="learn-list n4eq-only">
-          <a class="btn" href="./how-to-solve-4x4/index.html" data-i18n="guide4x4">How to solve a 4×4 (written guide)</a>
-        </div>
-
-        <div class="learn-list n5eq-only">
-          <a class="btn" href="./how-to-solve-5x5/index.html" data-i18n="guide5x5">How to solve a 5×5 (written guide)</a>
-        </div>
       </div>
 
       <div id="tutorial">
@@ -1144,7 +1118,7 @@ const I18N = {
     turnFace: 'Turn a face', ccwHint: "Shift+click or key = counter-clockwise (′)",
     scramble: 'Scramble', undo: 'Undo', reset: 'Reset',
     unitSec: 's', unitMoves: ' moves',
-    openTut: '📖 Tutorial (Beginner)', openCfop: '⚡ Speed (CFOP / 4-look)', openF2l: '🧩 F2L cases', openOll: '🌕 OLL library', openPll: '🔄 PLL library', openDrill: '🎯 Case drill', openRoux: '🧱 Blocks (Roux)',
+    openTut: '📖 Tutorial (Beginner)', openOrtega: '⚡ Speed (Ortega)', openCfop: '⚡ Speed (CFOP / 4-look)', openF2l: '🧩 F2L cases', openOll: '🌕 OLL library', openPll: '🔄 PLL library', openDrill: '🎯 Case drill', openRoux: '🧱 Blocks (Roux)',
     openSolver: '🧠 Smart Solve', detectStage: '🎯 Find My Step (Beginner)',
     analyzing: 'Analyzing the current cube…',
     solveNext: '▶ Next move', solveAll: '⏭ Solve all',
@@ -1159,16 +1133,6 @@ const I18N = {
     prev: '← Prev', next: 'Next →', learnBack: '← Back',
     hint: 'Drag a face: turn · Drag empty space: orbit · Wheel: zoom',
     guideLessonReady: 'This step is open. The cube shows the goal — tap ▶ Demo to watch the moves.',
-    guideHub: 'All written guides',
-    guide3x3: 'How to solve a 3×3 (written guide)',
-    guide3x3cfop: 'How to solve a 3×3 with CFOP (written guide)',
-    guide3x3f2l: 'F2L case library (written guide)',
-    guide3x3oll: 'OLL library guide (written)',
-    guide3x3pll: 'PLL library guide (written)',
-    guide3x3roux: 'How to solve a 3×3 with Roux (written guide)',
-    guide2x2: 'How to solve a 2×2 (written guide)',
-    guide4x4: 'How to solve a 4×4 (written guide)',
-    guide5x5: 'How to solve a 5×5 (written guide)',
     solved: '✓ Solved!', solvedN: n => `✓ Solved! (${n} moves)`,
     alreadySolved: '✓ Already solved!',
     solveIdle: 'Nothing to solve yet — the cube starts complete.',
@@ -1197,6 +1161,7 @@ const I18N = {
     drillSolved: name => `${name} — next`,
     trackBeginner: 'Solving the Cube — Beginner Method',
     trackBeginner2: 'Solving the 2×2 — Beginner',
+    trackOrtega: 'Speed — 2×2 Ortega',
     trackBeginner4: 'Solving the 4×4 — Beginner',
     trackBeginner5: 'Solving the 5×5 — Beginner',
     trackCfop: 'Speed — CFOP / 4-look LL',
@@ -1214,7 +1179,7 @@ const I18N = {
     learn: 'Learn', more: 'More', learnTitle: 'Learn', assistTitle: 'Assist',
     settings: 'Settings', langLabel: 'Language',
     modePlay: 'Play', modeLearn: 'Learn', modeSolve: 'Solve', modeScan: 'Scan', modeGuides: 'Guide',
-    panelLearn: 'Learn', panelSolve: 'Smart Solve', panelScan: 'Scan cube', panelGuides: 'Guide', panelDrill: 'Case drill',
+    panelLearn: 'Learn', panelSolve: 'Smart Solve', panelScan: 'Scan cube', panelDrill: 'Case drill',
     needScramble: 'Scramble the cube first',
     size2: '2×2', size3: '3×3', size4: '4×4', size5: '5×5',
     docTitle2: '2×2 Cube — Free Play', appTitle2: '2×2 Cube',
@@ -1283,7 +1248,7 @@ const I18N = {
     turnFace: '면 돌리기', ccwHint: 'Shift+클릭 또는 키 = 반시계(′)',
     scramble: '섞기', undo: '되돌리기', reset: '리셋',
     unitSec: '초', unitMoves: '수',
-    openTut: '📖 튜토리얼 (초보자법)', openCfop: '⚡ 효율 (CFOP / 4-look)', openF2l: '🧩 F2L 케이스', openOll: '🌕 OLL 라이브러리', openPll: '🔄 PLL 라이브러리', openDrill: '🎯 케이스 드릴', openRoux: '🧱 블록 (Roux)',
+    openTut: '📖 튜토리얼 (초보자법)', openOrtega: '⚡ 속도 (Ortega)', openCfop: '⚡ 효율 (CFOP / 4-look)', openF2l: '🧩 F2L 케이스', openOll: '🌕 OLL 라이브러리', openPll: '🔄 PLL 라이브러리', openDrill: '🎯 케이스 드릴', openRoux: '🧱 블록 (Roux)',
     openSolver: '🧠 스마트 풀이', detectStage: '🎯 내 단계 찾기 (초보자법)',
     analyzing: '현재 큐브를 분석합니다…',
     solveNext: '▶ 다음 한 수', solveAll: '⏭ 전체 풀기',
@@ -1298,16 +1263,6 @@ const I18N = {
     prev: '← 이전', next: '다음 →', learnBack: '← 목록',
     hint: '드래그: 면 돌리기 · 빈 곳 드래그: 시점 회전 · 휠: 확대',
     guideLessonReady: '이 단계가 열렸습니다. 큐브는 목표 상태입니다. ▶시연을 눌러 공식을 보세요.',
-    guideHub: '가이드 한눈에 보기',
-    guide3x3: '3×3 초보자 가이드 (글)',
-    guide3x3cfop: '3×3 CFOP 가이드 (글)',
-    guide3x3f2l: 'F2L 케이스 도감 (글)',
-    guide3x3oll: 'OLL 라이브러리 가이드 (글)',
-    guide3x3pll: 'PLL 라이브러리 가이드 (글)',
-    guide3x3roux: '3×3 Roux 가이드 (글)',
-    guide2x2: '2×2 초보자 가이드 (글)',
-    guide4x4: '4×4 초보자 가이드 (글)',
-    guide5x5: '5×5 초보자 가이드 (글)',
     solved: '✓ 완성!', solvedN: n => `✓ 완성! (${n}수)`,
     alreadySolved: '✓ 이미 완성된 상태예요!',
     solveIdle: '아직 풀 게 없어요. 큐브는 맞춰진 상태로 시작해요.',
@@ -1336,6 +1291,7 @@ const I18N = {
     drillSolved: name => `${name} — 다음`,
     trackBeginner: '큐브 맞추기 — 초보자법',
     trackBeginner2: '2×2 맞추기 — 초보자법',
+    trackOrtega: '속도 — 2×2 Ortega',
     trackBeginner4: '4×4 맞추기 — 초보자법',
     trackBeginner5: '5×5 맞추기 — 초보자법',
     trackCfop: '효율 — CFOP / 4-look LL',
@@ -1353,7 +1309,7 @@ const I18N = {
     learn: '학습', more: '더보기', learnTitle: '학습', assistTitle: '도움',
     settings: '설정', langLabel: '언어',
     modePlay: '조작', modeLearn: '학습', modeSolve: '풀이', modeScan: '스캔', modeGuides: '가이드',
-    panelLearn: '학습', panelSolve: '스마트 풀이', panelScan: '큐브 스캔', panelGuides: '가이드', panelDrill: '케이스 드릴',
+    panelLearn: '학습', panelSolve: '스마트 풀이', panelScan: '큐브 스캔', panelDrill: '케이스 드릴',
     needScramble: '큐브를 먼저 섞어주세요',
     size2: '2×2', size3: '3×3', size4: '4×4', size5: '5×5',
     docTitle2: '2×2 큐브 — 자유 조작', appTitle2: '2×2 큐브',
@@ -1909,6 +1865,7 @@ function tracksForN(n) {
   if (n === 2) {
     return {
       beginner: { en: L.beginner2.en, ko: L.beginner2.ko, head: 'trackBeginner2', states: L.states2 },
+      ortega: { en: L.ortega2.en, ko: L.ortega2.ko, head: 'trackOrtega', states: L.statesOrtega },
     };
   }
   if (n === 4) {
@@ -1966,7 +1923,6 @@ const learnPicker = document.getElementById('learn-picker');
 const tutPanel = document.getElementById('tutorial');
 const solverPanel = document.getElementById('solver');
 const scanPanel = document.getElementById('scan');
-const guidesPanel = document.getElementById('guides');
 const drillPanel = document.getElementById('drill');
 const panelTitleEl = document.getElementById('panel-title');
 const panelBackBtn = document.getElementById('panel-back');
@@ -1979,10 +1935,10 @@ const solverHud = document.getElementById('solver-hud');
 const hudStatusEl = document.getElementById('solver-hud-status');
 const hudMovesEl = document.getElementById('solver-hud-moves');
 
-// 패널 모드 6종. 'learn' / 'tutorial' / 'drill' 은 레일에서 같은 항목이다.
-const PANEL_MODES = ['learn', 'tutorial', 'solver', 'scan', 'guides', 'drill'];
-const RAIL_OF  = { learn: 'learn', tutorial: 'learn', drill: 'learn', solver: 'solver', scan: 'scan', guides: 'guides' };
-const TITLE_OF = { learn: 'panelLearn', tutorial: 'panelLearn', drill: 'panelDrill', solver: 'panelSolve', scan: 'panelScan', guides: 'panelGuides' };
+// 패널 모드 5종. 'learn' / 'tutorial' / 'drill' 은 레일에서 같은 항목이다.
+const PANEL_MODES = ['learn', 'tutorial', 'solver', 'scan', 'drill'];
+const RAIL_OF  = { learn: 'learn', tutorial: 'learn', drill: 'learn', solver: 'solver', scan: 'scan' };
+const TITLE_OF = { learn: 'panelLearn', tutorial: 'panelLearn', drill: 'panelDrill', solver: 'panelSolve', scan: 'panelScan' };
 
 let panelMode = null;      // null = Play (패널 닫힘)
 let settingsOpen = false;
@@ -2065,7 +2021,6 @@ function openOverlay(name) {
   tutPanel.classList.toggle('open', next === 'tutorial');
   solverPanel.classList.toggle('open', next === 'solver');
   scanPanel.classList.toggle('open', next === 'scan');
-  guidesPanel.classList.toggle('open', next === 'guides');
   drillPanel.classList.toggle('open', next === 'drill');
   syncChrome();
 }
@@ -2076,8 +2031,9 @@ function openLearnMenu() { openOverlay('learn'); }
 
 function initChrome() {
   railBtns.forEach(btn => {
+    const m = btn.dataset.mode;
+    if (!m) return;
     btn.addEventListener('click', () => {
-      const m = btn.dataset.mode;
       if (m === 'play') { openOverlay(null); return; }
       if (m === 'learn') {
         openOverlay(panelMode === 'learn' || panelMode === 'tutorial' || panelMode === 'drill' ? null : 'learn');
@@ -2090,10 +2046,6 @@ function initChrome() {
       if (m === 'scan') {
         if (panelMode === 'scan') openOverlay(null);
         else if (typeof window.__openScan === 'function') window.__openScan();
-        return;
-      }
-      if (m === 'guides') {
-        openOverlay(panelMode === 'guides' ? null : 'guides');
       }
     });
   });
@@ -2356,7 +2308,7 @@ function applyDeepLink() {
     openDrill((q.get('set') || '').toLowerCase());
     return;
   }
-  if (learn !== 'beginner' && learn !== 'cfop' && learn !== 'roux' && learn !== 'f2l' && learn !== 'oll' && learn !== 'pll') {
+  if (learn !== 'beginner' && learn !== 'ortega' && learn !== 'cfop' && learn !== 'roux' && learn !== 'f2l' && learn !== 'oll' && learn !== 'pll') {
     if (nRaw === '2' || nRaw === '3' || nRaw === '4' || nRaw === '5') {
       const want = Number(nRaw);
       if (engine.n !== want) setCubeN(want);
@@ -2364,13 +2316,28 @@ function applyDeepLink() {
     applyPractice(q.get('practice'));
     return;
   }
-  const want = (learn === 'cfop' || learn === 'roux' || learn === 'f2l' || learn === 'oll' || learn === 'pll') ? 3 : nRaw === '2' ? 2 : nRaw === '4' ? 4 : nRaw === '5' ? 5 : 3;
+  const want = (learn === 'ortega') ? 2
+    : (learn === 'cfop' || learn === 'roux' || learn === 'f2l' || learn === 'oll' || learn === 'pll') ? 3
+    : nRaw === '2' ? 2 : nRaw === '4' ? 4 : nRaw === '5' ? 5 : 3;
   if (engine.n !== want) setCubeN(want);
   if (engine.n !== want) return;
   const pack = tracksForN(engine.n)[learn];
   if (!pack) {
     openOverlay('learn');
     return;
+  }
+  if (learn === 'ortega') {
+    const caseRaw = (q.get('case') || '').trim();
+    if (caseRaw) {
+      const L = globalThis.CubeLessons;
+      const step = L && L.ortegaLessonStepForCase ? L.ortegaLessonStepForCase(caseRaw) : -1;
+      if (step > 0) {
+        const lesson = pack.en[step];
+        const demoAlg = lesson && lesson.algs && lesson.algs[0] && lesson.algs[0].alg;
+        openTrack('ortega', step, { fromGuide: true, demoAlg: demoAlg || null });
+        return;
+      }
+    }
   }
   if (learn === 'f2l') {
     const caseId = parseInt(q.get('case'), 10);
@@ -2410,6 +2377,7 @@ function applyDeepLink() {
 }
 
 document.getElementById('open-tut').addEventListener('click', () => openTrack('beginner'));
+document.getElementById('open-ortega').addEventListener('click', () => openTrack('ortega'));
 document.getElementById('open-cfop').addEventListener('click', () => openTrack('cfop'));
 document.getElementById('open-f2l').addEventListener('click', () => openTrack('f2l'));
 document.getElementById('open-oll').addEventListener('click', () => openTrack('oll'));

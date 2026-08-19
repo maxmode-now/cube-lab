@@ -14,13 +14,13 @@ English and Korean. Installable as a PWA over HTTPS.
 
 **Play** is the default. Drag a face to turn it, drag empty space to orbit, and use the wheel to zoom. Scramble, undo, and reset stay on the bottom bar. After a scramble you get a 15-second inspection, then the first turn starts the timer (hundredths, WCA +2 / DNF). ao5 / ao12 / PB and the session list live on the cube; times stay in localStorage, with no account. The cube size (2×2–5×5) and sticker numbers live in the header and settings.
 
-**Learn** (2×2 and 3×3) walks through a beginner track and, on 3×3, CFOP / 4-look last layer, an F2L case library (41 cases), and Roux (blocks, CMLL, LSE). Each step has a goal diagram, notation, and a demo. Find My Step reads the cube, opens the matching beginner lesson, and can start Beginner solve for this cube.
+**Learn** (2×2 and 3×3) walks through a beginner track and, on 2×2, an **Ortega** track (first layer, then one case per step for 7 OLL + 5 PBL). On 3×3, CFOP / 4-look last layer, an F2L case library (41 cases), and Roux (blocks, CMLL, LSE). Each step has a goal diagram, notation, and a demo. Find My Step reads the cube, opens the matching beginner lesson, and can start Beginner solve for this cube.
 
 **Solve** (2×2–5×5) reads the current state and plays a solution. On 2×2 and 3×3 you can follow **Beginner** steps (the same algorithms as the lessons) or **Fast** solve (corner search / Kociemba). 4×4/5×5 always reduce to a 3×3 first. Next move plays one turn; Solve all runs the rest. If you turn a face yourself, the remaining sequence is recomputed.
 
 **Scan** (2×2–5×5) captures all six faces from photos or the camera. Each face can be checked and edited before it is applied. Confirmed 2×2/3×3 scans open beginner steps (Fast solve is a second button). Image data stays in the browser; nothing is uploaded.
 
-**Guide** opens the written pages for the current cube size. [All guides](https://cube.maxmode-now.com/how-to-solve/) (`/how-to-solve/`) is the hub for 2×2–5×5, Beginner, CFOP, Roux, and the F2L / OLL / PLL libraries.
+**Guide** opens the [written guide hub](https://cube.maxmode-now.com/how-to-solve/) (`/how-to-solve/`) — 2×2–5×5, Beginner, CFOP, Roux, and the F2L / OLL / PLL libraries. The [2×2 Ortega guide](https://cube.maxmode-now.com/how-to-solve-2x2/ortega/) covers 7 OLL + 5 PBL for speed. The [notation reference](https://cube.maxmode-now.com/how-to-solve/notation/) covers U–B, M/E/S, wide and big-cube slices, and x/y/z.
 
 ## Controls
 
