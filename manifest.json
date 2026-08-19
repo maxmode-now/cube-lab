@@ -2,7 +2,7 @@
   "id": "./",
   "name": "Cube Lab",
   "short_name": "Cube Lab",
-  "description": "Free browser trainer for 2×2–5×5. Learn beginner and CFOP, scan a 3×3 from photos, and follow an optimal solve.",
+  "description": "Free browser trainer for 2×2–5×5. Learn beginner, CFOP, and Roux, scan a 2×2–5×5 from photos, and follow an optimal solve.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

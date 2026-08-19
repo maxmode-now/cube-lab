@@ -1,6 +1,6 @@
 # Cube Lab
 
-A browser trainer for Rubik’s cubes. Play 2×2 through 5×5, learn the beginner method and CFOP, scan a physical 3×3, and follow an optimal solve — all on one page, with no account and no build step.
+A browser trainer for Rubik’s cubes. Play 2×2 through 5×5, learn the beginner method, CFOP, and Roux, scan a physical cube, and follow an optimal solve — all on one page, with no account and no build step.
 
 **Demo:** [cube.maxmode-now.com](https://cube.maxmode-now.com/)
 
@@ -14,11 +14,11 @@ English and Korean. Installable as a PWA over HTTPS.
 
 **Play** is the default. Drag a face to turn it, drag empty space to orbit, and use the wheel to zoom. Scramble, undo, and reset stay on the bottom bar. The cube size (2×2–5×5) and sticker numbers live in the header and settings.
 
-**Learn** (2×2 and 3×3) walks through a beginner track and, on 3×3, a CFOP / 4-look last layer track. Each step has a goal diagram, notation, and a demo. Find My Step reads the cube and opens the matching beginner lesson.
+**Learn** (2×2 and 3×3) walks through a beginner track and, on 3×3, CFOP / 4-look last layer, an F2L case library (41 cases), and Roux (blocks, CMLL, LSE). Each step has a goal diagram, notation, and a demo. Find My Step reads the cube and opens the matching beginner lesson.
 
-**Solve** (3×3) reads the current state and guides an optimal two-phase (Kociemba) solution. Next move plays one turn; Solve all runs the rest. If you turn a face yourself, the remaining sequence is recomputed.
+**Solve** (2×2–5×5) reads the current state and plays a solution. 2×2 uses a short corner search, 3×3 uses Kociemba, and 4×4/5×5 reduce to a 3×3 first. Next move plays one turn; Solve all runs the rest. If you turn a face yourself, the remaining sequence is recomputed.
 
-**Scan** (3×3) captures all six faces from photos or the camera. Each face can be checked and edited before it is applied. Confirmed scans open Smart Solve. Image data stays in the browser; nothing is uploaded.
+**Scan** (2×2–5×5) captures all six faces from photos or the camera. Each face can be checked and edited before it is applied. Confirmed scans open Smart Solve. Image data stays in the browser; nothing is uploaded.
 
 ## Controls
 
@@ -57,6 +57,10 @@ cube-math.js
 cube-solver.js
 cube-scan.js
 lessons.js
+f2l-cases.js
+solver-worker.js
+vendor/cube.js
+vendor/solve.js
 icons/
 ```
 

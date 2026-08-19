@@ -690,10 +690,28 @@
       }
     }
 
+    let scrambleToks = [];
+    let scrambling = false;
+
     function recordMove(axisIndex, layerValues, dir) {
+      scrambleToks = [];
       history.push({ axisIndex, layerValues: layerValues.slice(), dir });
       moveCount++;
       if (timerStart === null && !timerFrozen) timerStart = performance.now();
+    }
+
+    function invertScrambleToks(toks) {
+      const out = [];
+      for (let i = toks.length - 1; i >= 0; i--) {
+        const t = toks[i];
+        out.push(/2$/.test(t) ? t : /'$/.test(t) ? t.slice(0, -1) : t + "'");
+      }
+      return out;
+    }
+
+    function scrambleSolution() {
+      if (!scrambleToks.length) return '';
+      return invertScrambleToks(scrambleToks).join(' ');
     }
 
     function resetStats() {
@@ -786,6 +804,18 @@
         F: { axis: 2, layers: [outer], dir: -1 },
         B: { axis: 2, layers: [-outer], dir: 1 },
       };
+      if (n === 3) {
+        // M follows L, E follows D, S follows F. Wide = outer + middle.
+        m.M = { axis: 0, layers: [0], dir: 1 };
+        m.E = { axis: 1, layers: [0], dir: 1 };
+        m.S = { axis: 2, layers: [0], dir: -1 };
+        m.Uw = { axis: 1, layers: [outer, 0], dir: -1 };
+        m.Dw = { axis: 1, layers: [-outer, 0], dir: 1 };
+        m.Rw = { axis: 0, layers: [outer, 0], dir: -1 };
+        m.Lw = { axis: 0, layers: [-outer, 0], dir: 1 };
+        m.Fw = { axis: 2, layers: [outer, 0], dir: -1 };
+        m.Bw = { axis: 2, layers: [-outer, 0], dir: 1 };
+      }
       if (n >= 4) {
         const inner = outer - 1;
         m['2U'] = { axis: 1, layers: [inner], dir: -1 };
@@ -820,14 +850,17 @@
     let MOVES = makeMoves(N, OUTER);
 
     function parseMoveToken(tok) {
-      const m = String(tok).match(/^(3|2)?(Uw|Dw|Lw|Rw|Fw|Bw|[UDLRFB]|[udlrfb])(2|')?$/i);
+      const m = String(tok).match(/^(3|2)?(Uw|Dw|Lw|Rw|Fw|Bw|[UDLRFB]|[udlrfb]|[MESmes])(2|')?$/i);
       if (!m) return null;
       const prefix = m[1] || '';
       let face = m[2];
       const suffix = m[3] || '';
       const prime = suffix === "'";
       const double = suffix === '2';
-      if (face.length === 1 && face === face.toLowerCase()) face = face.toUpperCase() + 'w';
+      if (/^[MESmes]$/.test(face)) {
+        if (prefix) return null;
+        face = face.toUpperCase();
+      } else if (face.length === 1 && face === face.toLowerCase()) face = face.toUpperCase() + 'w';
       else if (/w$/i.test(face)) face = face[0].toUpperCase() + 'w';
       else face = face.toUpperCase();
       if (prefix) {
@@ -838,34 +871,37 @@
       return { name: face, prime, double };
     }
 
-    function doMove(name, prime, record) {
+    function doMove(name, prime, record, instant) {
       if (prime == null) prime = false;
       if (record == null) record = true;
-      if (animating) { queue.push([name, prime, record]); return; }
+      if (instant == null) instant = false;
+      if (animating) { queue.push([name, prime, record, instant]); return; }
       animating = true;
       const spec = MOVES[name];
       if (!spec) { animating = false; return; }
+      scrambleToks = [];
       const dir = spec.dir * (prime ? -1 : 1);
       if (record) recordMove(spec.axis, spec.layers, dir);
-      return rotateLayers(spec.axis, spec.layers, dir).then(() => {
+      return rotateLayers(spec.axis, spec.layers, dir, instant).then(() => {
         animating = false;
         const idle = queue.length === 0;
         notify({ solver: record && idle });
         if (!idle) {
           const next = queue.shift();
-          doMove(next[0], next[1], next[2]);
+          doMove(next[0], next[1], next[2], next[3]);
         }
       });
     }
 
-    function playAlg(str, record) {
+    function playAlg(str, record, instant) {
       if (record == null) record = false;
+      if (instant == null) instant = false;
       const toks = str.trim().split(/\s+/);
       for (let i = 0; i < toks.length; i++) {
         const parsed = parseMoveToken(toks[i]);
         if (!parsed) continue;
-        doMove(parsed.name, parsed.prime, record);
-        if (parsed.double) doMove(parsed.name, parsed.prime, record);
+        doMove(parsed.name, parsed.prime, record, instant);
+        if (parsed.double) doMove(parsed.name, parsed.prime, record, instant);
       }
     }
 
@@ -889,31 +925,50 @@
       });
     }
 
+    function pickFromPool(pool, lastAxis) {
+      let name = pool[Math.floor(Math.random() * pool.length)];
+      let spec = MOVES[name];
+      for (let t = 0; t < 12 && spec && spec.axis === lastAxis; t++) {
+        name = pool[Math.floor(Math.random() * pool.length)];
+        spec = MOVES[name];
+      }
+      return name;
+    }
+
     function scramble(count) {
-      if (count == null) count = N <= 2 ? 11 : N >= 5 ? 60 : N >= 4 ? 40 : 25;
-      if (animating) return Promise.resolve();
+      if (animating || scrambling) return Promise.resolve();
       queue.length = 0;
-      const names = Object.keys(MOVES);
+      scrambleToks = [];
+      const outer = ['U', 'D', 'R', 'L', 'F', 'B'];
+      const inner = ['2U', '2D', '2R', '2L', '2F', '2B'];
+      const wide = ['Uw', 'Dw', 'Rw', 'Lw', 'Fw', 'Bw'];
+      if (count == null) count = N <= 2 ? 11 : N >= 5 ? 20 : N >= 4 ? 40 : 25;
+      const names = N >= 5 ? outer.concat(inner, wide) : Object.keys(MOVES);
+      const seq = [];
       let lastAxis = -1;
-      let p = Promise.resolve();
       for (let i = 0; i < count; i++) {
-        let name = names[Math.floor(Math.random() * names.length)];
-        let spec = MOVES[name];
-        for (let t = 0; t < 12 && spec.axis === lastAxis; t++) {
-          name = names[Math.floor(Math.random() * names.length)];
-          spec = MOVES[name];
-        }
-        lastAxis = spec.axis;
+        const name = pickFromPool(names, lastAxis);
+        lastAxis = MOVES[name].axis;
         const prime = Math.random() < 0.5;
-        p = p.then(() => doMoveAwaitable(name, prime));
+        seq.push({ name: name, prime: prime, tok: name + (prime ? "'" : '') });
+      }
+      scrambling = true;
+      let p = Promise.resolve();
+      for (let i = 0; i < seq.length; i++) {
+        const step = seq[i];
+        p = p.then(() => doMoveAwaitable(step.name, step.prime));
       }
       return p.then(() => {
+        scrambleToks = seq.map(s => s.tok);
+        scrambling = false;
         resetStats();
         notify({ solver: true });
       });
     }
 
     function resetCube() {
+      scrambleToks = [];
+      scrambling = false;
       queue.length = 0;
       animating = false;
       drag = null;
@@ -1145,21 +1200,22 @@
 
     function faceletSpec() {
       const s = [];
-      for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) s.push({ p: [c - OUTER, OUTER, r - OUTER], n: [0, 1, 0] });
-      for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) s.push({ p: [OUTER, OUTER - r, OUTER - c], n: [1, 0, 0] });
-      for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) s.push({ p: [c - OUTER, OUTER - r, OUTER], n: [0, 0, 1] });
-      for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) s.push({ p: [c - OUTER, -OUTER, OUTER - r], n: [0, -1, 0] });
-      for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) s.push({ p: [-OUTER, OUTER - r, c - OUTER], n: [-1, 0, 0] });
-      for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) s.push({ p: [OUTER - c, OUTER - r, -OUTER], n: [0, 0, -1] });
+      const n = N, O = OUTER;
+      for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) s.push({ p: [c - O, O, r - O], n: [0, 1, 0] });
+      for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) s.push({ p: [O, O - r, O - c], n: [1, 0, 0] });
+      for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) s.push({ p: [c - O, O - r, O], n: [0, 0, 1] });
+      for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) s.push({ p: [c - O, -O, O - r], n: [0, -1, 0] });
+      for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) s.push({ p: [-O, O - r, c - O], n: [-1, 0, 0] });
+      for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) s.push({ p: [O - c, O - r, -O], n: [0, 0, -1] });
       return s;
     }
-    let FACELET_SPEC = N === 3 ? faceletSpec() : null;
+    let FACELET_SPEC = faceletSpec();
 
     function applySize(next) {
       N = next;
       OUTER = outerOf(N);
       MOVES = makeMoves(N, OUTER);
-      FACELET_SPEC = N === 3 ? faceletSpec() : null;
+      FACELET_SPEC = faceletSpec();
       fitShadowPlane();
     }
 
@@ -1167,7 +1223,7 @@
       next = next | 0;
       if (next !== 2 && next !== 3 && next !== 4 && next !== 5) return false;
       if (next === N) return true;
-      if (animating || queue.length > 0 || drag) return false;
+      if (animating || scrambling || queue.length > 0 || drag) return false;
       applySize(next);
       fitCamera();
       resetCube();
@@ -1194,7 +1250,6 @@
     }
 
     function readState() {
-      if (N !== 3 || !FACELET_SPEC) return { n: N, facelets: null };
       let out = '';
       for (let i = 0; i < FACELET_SPEC.length; i++) {
         const s = FACELET_SPEC[i];
@@ -1298,7 +1353,7 @@
     function whenIdle() {
       return new Promise(resolve => {
         const tick = () => {
-          if (!animating && queue.length === 0 && !drag) resolve();
+          if (!animating && !scrambling && queue.length === 0 && !drag) resolve();
           else requestAnimationFrame(tick);
         };
         tick();
@@ -1351,7 +1406,8 @@
       get outer() { return OUTER; },
       get colors() { return COLORS; },
       get moves() { return MOVES; },
-      get busy() { return animating || queue.length > 0 || !!drag; },
+      get busy() { return animating || scrambling || queue.length > 0 || !!drag; },
+      scrambleSolution,
       get stats() {
         return {
           moveCount,

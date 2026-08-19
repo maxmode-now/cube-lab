@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>How to Solve a 2×2 Rubik’s Cube (Beginner Method) — Cube Lab</title>
+<meta name="description" content="Learn a beginner method for the 2×2: white layer, yellow orientation, then permutation. Diagrams and algorithms, with practice in Cube Lab." />
+<link rel="canonical" href="https://cube.maxmode-now.com/how-to-solve-2x2/index.html" />
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": "How to Solve a 2×2 Rubik’s Cube (Beginner Method)",
+  "description": "Beginner method for the 2×2: solve the white layer, orient the yellow face, then permute the last corners.",
+  "url": "https://cube.maxmode-now.com/how-to-solve-2x2/index.html",
+  "totalTime": "PT20M",
+  "tool": { "@type": "HowToTool", "name": "2×2 Rubik’s Cube" },
+  "step": [
+    { "@type": "HowToStep", "position": 1, "name": "White layer", "url": "https://cube.maxmode-now.com/how-to-solve-2x2/index.html#step-1" },
+    { "@type": "HowToStep", "position": 2, "name": "Yellow orientation", "url": "https://cube.maxmode-now.com/how-to-solve-2x2/index.html#step-2" },
+    { "@type": "HowToStep", "position": 3, "name": "Yellow permutation", "url": "https://cube.maxmode-now.com/how-to-solve-2x2/index.html#step-3" }
+  ]
+}
+</script>
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://cube.maxmode-now.com/how-to-solve-2x2/index.html" />
+<meta property="og:title" content="How to Solve a 2×2 Rubik’s Cube (Beginner Method) — Cube Lab" />
+<meta property="og:description" content="Learn a beginner method for the 2×2: white layer, yellow orientation, then permutation. Diagrams and algorithms, with practice in Cube Lab." />
+<meta property="og:image" content="https://cube.maxmode-now.com/docs/play.png" />
+<meta property="og:locale" content="en_US" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="icon" type="image/png" sizes="192x192" href="../icons/icon-192.png" />
+<style>
+  :root {
+    --bg: #0f1117;
+    --sunken: #0e1018;
+    --surface: #181b24;
+    --border: #272b36;
+    --text: #e6e8ee;
+    --text-strong: #fff;
+    --muted: #9aa0ad;
+    --accent: #4c8dff;
+    --accent-hover: #5d99ff;
+    --warn: #ffd60a;
+    --on-accent: #fff;
+    --r: 12px;
+    --fs: 17px;
+    --safe-t: env(safe-area-inset-top, 0px);
+    --safe-b: env(safe-area-inset-bottom, 0px);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 400 var(--fs)/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { color: var(--accent-hover); text-decoration: underline; }
+  .top {
+    position: sticky; top: 0; z-index: 10;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: calc(10px + var(--safe-t)) 20px 10px;
+    background: rgba(15, 17, 23, 0.92); backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .brand { font-weight: 700; color: var(--text-strong); text-decoration: none; flex: 0 0 auto; }
+  .brand:hover { color: var(--accent); text-decoration: none; }
+  .top-cta {
+    display: inline-flex; align-items: center; min-height: 36px; padding: 0 12px;
+    font-size: 13px; font-weight: 600; color: var(--on-accent);
+    background: var(--accent); border-radius: 8px; text-decoration: none; flex: 0 0 auto;
+  }
+  .top-cta:hover { background: var(--accent-hover); color: var(--on-accent); text-decoration: none; }
+  nav.sizes {
+    display: flex; align-items: center; justify-content: center;
+    gap: 2px; flex: 1 1 auto;
+  }
+  nav.sizes a {
+    display: inline-flex; align-items: center; min-height: 32px; padding: 0 10px;
+    font-size: 13px; font-weight: 600; color: var(--muted);
+    text-decoration: none; border-radius: 8px; white-space: nowrap;
+  }
+  nav.sizes a:hover { color: var(--text); text-decoration: none; }
+  nav.sizes a[aria-current="page"] {
+    color: var(--text-strong); background: rgba(255, 255, 255, 0.08);
+  }
+  .wrap {
+    display: grid; grid-template-columns: 200px minmax(0, 40rem); gap: 40px;
+    max-width: 920px; margin: 0 auto; padding: 32px 20px calc(48px + var(--safe-b));
+  }
+  nav.toc { position: sticky; top: 72px; align-self: start; }
+  nav.toc h2 { margin: 0 0 8px; font-size: 11px; font-weight: 700; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--muted); }
+  nav.toc ol { margin: 0; padding: 0 0 0 1.1em; font-size: 13px; line-height: 1.7; }
+  nav.toc a { color: var(--muted); }
+  nav.toc a:hover { color: var(--text); }
+  h1 { font-size: 2rem; line-height: 1.2; color: var(--text-strong); margin: 0 0 12px; }
+  .lede { font-size: 1.05rem; color: var(--muted); margin: 0 0 24px; }
+  h2 { font-size: 1.35rem; color: var(--text-strong); margin: 2.2em 0 0.6em; }
+  h3 { font-size: 1.05rem; color: var(--text-strong); margin: 1.4em 0 0.4em; }
+  p { margin: 0 0 0.9em; }
+  ul { margin: 0 0 1em; padding-left: 1.2em; }
+  li { margin: 0.25em 0; }
+  .note {
+    margin: 1em 0; padding: 10px 12px;
+    background: var(--surface); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0;
+    font-size: 0.95rem; color: var(--muted);
+  }
+  .note strong { color: var(--text); }
+  .goal { color: var(--muted); font-size: 0.95rem; margin-bottom: 0.8em; }
+  .diag {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 6px;
+    margin: 12px 0 16px; padding: 12px; background: var(--sunken); border-radius: var(--r);
+    width: max-content; max-width: 100%;
+  }
+  .diag-cap { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .alg-box {
+    margin: 12px 0 8px; padding: 10px 12px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+  }
+  .alg-box .lbl { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  .alg-box code {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 1.05rem; font-weight: 600; color: var(--warn); letter-spacing: .02em;
+    word-break: break-word;
+  }
+  .cta {
+    display: inline-flex; align-items: center; min-height: 40px; padding: 0 14px; margin: 8px 0 0;
+    font-size: 14px; font-weight: 600; color: var(--on-accent);
+    background: var(--accent); border-radius: 8px; text-decoration: none;
+  }
+  .cta:hover { background: var(--accent-hover); color: var(--on-accent); text-decoration: none; }
+  footer.page {
+    margin-top: 3em; padding-top: 1.2em; border-top: 1px solid var(--border);
+    font-size: 13px; color: var(--muted);
+  }
+  @media (max-width: 800px) {
+    .top { flex-wrap: wrap; }
+    nav.sizes { order: 3; flex: 1 1 100%; }
+    .wrap { grid-template-columns: 1fr; gap: 8px; padding-top: 20px; }
+    nav.toc { position: static; padding-bottom: 8px; }
+    nav.toc ol { display: flex; flex-wrap: wrap; gap: 0 14px; padding-left: 0; list-style: none; }
+  }
+</style>
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="../index.html">Cube Lab</a>
+    <nav class="sizes" aria-label="Written guides">
+      <a href="../how-to-solve-2x2/index.html" aria-current="page">2×2</a>
+      <a href="../how-to-solve-3x3/index.html">3×3</a>
+      <a href="../how-to-solve-4x4/index.html">4×4</a>
+      <a href="../how-to-solve-5x5/index.html">5×5</a>
+    </nav>
+    <a class="top-cta" href="../index.html?n=2&amp;learn=beginner&amp;step=1">Open the trainer</a>
+  </header>
+
+  <div class="wrap">
+    <nav class="toc" aria-label="On this page">
+      <h2>Steps</h2>
+      <ol>
+        <li><a href="#start">Before you start</a></li>
+        <li><a href="#notation">Notation</a></li>
+        <li><a href="#step-1">White layer</a></li>
+        <li><a href="#step-2">Yellow orientation</a></li>
+        <li><a href="#step-3">Yellow permutation</a></li>
+        <li><a href="#stuck">Stuck?</a></li>
+      </ol>
+    </nav>
+
+    <article>
+      <h1>How to solve a 2×2</h1>
+      <p class="lede">A beginner method for the Pocket Cube. First solve usually takes 5–20 minutes. Use a physical 2×2 if you have one — or practise each step in Cube Lab.</p>
+
+      <h2 id="start">Before you start</h2>
+      <p>A 2×2 is eight corners. There are no edges and no centres. You still solve it in layers: white first, then yellow last. The algorithms are the same family as the 3×3 beginner method — just fewer steps.</p>
+      <ul>
+        <li>Each piece has <b>three colours</b>. Opposite colours never share a piece: white opposite yellow, red opposite orange, green opposite blue.</li>
+        <li>There is no centre to aim at. Match corners <b>to each other</b> around a face.</li>
+        <li>Keep one solved face as an <b>anchor</b>. Hold it the same way every time you run an algorithm.</li>
+      </ul>
+      <p class="note"><strong>Hold it the same way every time.</strong> Algorithms assume a face is Front. If you turn the cube in your hands without meaning to, the moves will look wrong.</p>
+
+      <h2 id="notation">Notation</h2>
+      <p class="goal">Same letters as 3×3. Each letter is a 90° clockwise turn of that face, as if you were looking straight at it.</p>
+      <p><b>U</b> up · <b>D</b> down · <b>L</b> left · <b>R</b> right · <b>F</b> front · <b>B</b> back.</p>
+      <p>A prime (<b>'</b>) means counter-clockwise. A <b>2</b> means 180°. So <b>R'</b> is right face the other way, <b>U2</b> is a half turn of the top.</p>
+      <div class="diag" data-state="0"><span class="diag-cap">Solved cube — this is the colour map</span></div>
+      <div class="alg-box">
+        <div class="lbl">Try a short sequence</div>
+        <code>R U R' U'</code>
+      </div>
+      <a class="cta" href="../index.html?n=2&amp;learn=beginner&amp;step=0">Watch notation in Cube Lab</a>
+      <p class="goal">Opens the 2×2 lesson. The cube matches the diagram — tap ▶ Demo to play the turns.</p>
+
+      <h2 id="step-1">Step 1 · White layer</h2>
+      <p class="goal">Four white corners on top. The first-layer side colours must match around the cube (green next to green, and so on).</p>
+      <div class="diag" data-state="1"><span class="diag-cap">First layer done</span></div>
+      <p>Pick white as the first face. Place one white corner by intuition, then treat that corner as the anchor.</p>
+      <p>Find another white corner. Put it in the bottom layer, directly under the slot it belongs in (the three colours that should meet there). Hold that slot at the <b>front-right</b>.</p>
+      <p>Repeat the algorithm until the white sticker on that corner moves from the side onto the top. It may take 1–5 times. Then do the remaining two corners.</p>
+      <p class="note"><strong>Sides must match.</strong> A white face with mixed side colours is not finished — those corners will fight you on yellow. There is no centre; match green to green around the first layer.</p>
+      <div class="alg-box">
+        <div class="lbl">Corner insert — repeat until it drops in</div>
+        <code>R' D' R D</code>
+      </div>
+      <a class="cta" href="../index.html?n=2&amp;learn=beginner&amp;step=1">Insert white corners in Cube Lab</a>
+      <p class="goal">Opens this step with the first-layer goal on the 3D cube. Tap ▶ Demo for the insert algorithm.</p>
+
+      <h2 id="step-2">Step 2 · Yellow orientation (OLL)</h2>
+      <p class="goal">Flip the cube (white down). Make the whole top face yellow. Corners may still sit in the wrong seats.</p>
+      <p class="note"><strong>Flip the cube over.</strong> White (the layer you just finished) goes on the bottom. Yellow is now up. Keep it that way for the rest of the solve.</p>
+      <div class="diag" data-state="2"><span class="diag-cap">Top all yellow — first layer still solved underneath</span></div>
+      <p>The yellow stickers on top are usually mixed: some on top, some on the sides. Use <b>Sune</b> and <b>Antisune</b> until every top sticker is yellow.</p>
+      <p>Put a familiar case in front of you, apply one algorithm, then turn U (AUF) and look again. Repeat. You do not need to recognise every case by name — if Sune does not help, try Antisune from another angle.</p>
+      <p class="note"><strong>It will look scrambled in between.</strong> The white layer may break and then come back. That is normal. Do not stop mid-algorithm.</p>
+      <div class="alg-box">
+        <div class="lbl">Sune</div>
+        <code>R U R' U R U2 R'</code>
+      </div>
+      <div class="alg-box">
+        <div class="lbl">Antisune</div>
+        <code>R U2 R' U' R U' R'</code>
+      </div>
+      <a class="cta" href="../index.html?n=2&amp;learn=beginner&amp;step=2">Orient yellow in Cube Lab</a>
+      <p class="goal">Opens this step with the yellow face as the goal. Tap ▶ Demo for Sune / Antisune.</p>
+
+      <h2 id="step-3">Step 3 · Yellow permutation (PLL)</h2>
+      <p class="goal">Swap the last-layer corners into place. The cube is solved.</p>
+      <div class="diag" data-state="3"><span class="diag-cap">Solved</span></div>
+      <p>The top is yellow; now fix <b>where</b> the corners sit. Look at the side colours of the top layer.</p>
+      <h3>Adjacent swap</h3>
+      <p>Two corners that need to swap are next to each other. You will often see a pair of matching side colours on one face (“headlights”). Hold those headlights on the <b>back</b>, then apply T-perm.</p>
+      <div class="alg-box">
+        <div class="lbl">Adjacent swap (T-perm)</div>
+        <code>R U R' F' R U R' U' R' F R2 U' R' U'</code>
+      </div>
+      <h3>Diagonal swap</h3>
+      <p>Opposite corners need to swap — no headlights pair. Use Y-perm from any angle. A final U turn (AUF) may be needed to line the top with the sides.</p>
+      <div class="alg-box">
+        <div class="lbl">Diagonal swap (Y-perm)</div>
+        <code>F R U' R' U' R U R' F' R U R' U' R' F R F'</code>
+      </div>
+      <a class="cta" href="../index.html?n=2&amp;learn=beginner&amp;step=3">Finish permutation in Cube Lab</a>
+      <p class="goal">Opens this step with a solved 2×2 as the goal. Tap ▶ Demo for T-perm / Y-perm.</p>
+
+      <h2 id="stuck">Stuck?</h2>
+      <p>If a layer you already solved is a mess, you likely rotated the cube mid-algorithm or skipped a hold instruction. Undo to the last stage that still looks like the diagram, then retry that step in the trainer — it will play the moves on a 3D cube.</p>
+      <p>If you have a physical cube, you can <a href="../index.html?n=2&amp;learn=scan">scan all six faces</a> in Cube Lab. That opens Smart Solve, which is a different path from this beginner method.</p>
+      <p>To stay on this method, open the <a href="../index.html?n=2&amp;learn=beginner&amp;step=1">2×2 beginner lesson</a> in Cube Lab and use ▶ Demo on each step.</p>
+      <p>The 3×3 beginner method is the same idea with edges added: <a href="../how-to-solve-3x3/index.html">How to solve a 3×3</a>.</p>
+
+      <footer class="page">
+        <p><a href="../index.html">Cube Lab</a> — play, learn, scan, and solve in the browser. <a href="https://maxmode-now.com/">maxmode-now.com</a></p>
+      </footer>
+    </article>
+  </div>
+
+<script src="../lessons.js"></script>
+<script>
+(function () {
+  const HEX = { W: '#f0f0f0', Y: '#ffd60a', R: '#e8312a', O: '#ff8c2b', G: '#39c45a', B: '#2563eb', _: '#0d0e12' };
+  const states = (window.CubeLessons && window.CubeLessons.states2) || [];
+
+  function makeDiagram(state) {
+    const n = 2, S = 14, G = 1, SP = 3, PAD = 4;
+    const FS = S * n + G * (n - 1);
+    const FP = FS + SP;
+    const W = PAD * 2 + 4 * FP - SP;
+    const H = PAD * 2 + 3 * FP - SP;
+    const rects = [];
+    function face(cells, col, row) {
+      if (!cells) return;
+      const ox = PAD + col * FP, oy = PAD + row * FP;
+      cells.forEach((c, i) => {
+        const r = Math.floor(i / n), cc = i % n;
+        rects.push('<rect x="' + (ox + cc * (S + G)) + '" y="' + (oy + r * (S + G)) + '" width="' + S + '" height="' + S + '" rx="2" fill="' + (HEX[c] || c) + '"/>');
+      });
+    }
+    face(state.U, 1, 0); face(state.L, 0, 1); face(state.F, 1, 1); face(state.R, 2, 1); face(state.B, 3, 1); face(state.D, 1, 2);
+    return '<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg"><rect width="' + W + '" height="' + H + '" rx="6" fill="#12151f"/>' + rects.join('') + '</svg>';
+  }
+
+  document.querySelectorAll('.diag[data-state]').forEach(el => {
+    const i = Number(el.dataset.state);
+    const state = states[i];
+    if (!state) return;
+    el.insertAdjacentHTML('beforeend', makeDiagram(state));
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>How to Solve a 5×5 Rubik’s Cube (Reduction Method) — Cube Lab</title>
+<meta name="description" content="Learn the 5×5 reduction method: 3×3 centres, triple edge pairing, last two edges, then finish as a 3×3. Practise in Cube Lab." />
+<link rel="canonical" href="https://cube.maxmode-now.com/how-to-solve-5x5/index.html" />
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": "How to Solve a 5×5 Rubik’s Cube (Reduction Method)",
+  "description": "Beginner reduction method for the 5×5: 3×3 centres, edge pairing, last two edges, then a 3×3 solve.",
+  "url": "https://cube.maxmode-now.com/how-to-solve-5x5/index.html",
+  "totalTime": "PT2H",
+  "tool": { "@type": "HowToTool", "name": "5×5 Rubik’s Cube" },
+  "step": [
+    { "@type": "HowToStep", "position": 1, "name": "Centres", "url": "https://cube.maxmode-now.com/how-to-solve-5x5/index.html#step-1" },
+    { "@type": "HowToStep", "position": 2, "name": "Edge pairing", "url": "https://cube.maxmode-now.com/how-to-solve-5x5/index.html#step-2" },
+    { "@type": "HowToStep", "position": 3, "name": "Last two edges", "url": "https://cube.maxmode-now.com/how-to-solve-5x5/index.html#step-3" },
+    { "@type": "HowToStep", "position": 4, "name": "Solve as 3×3", "url": "https://cube.maxmode-now.com/how-to-solve-5x5/index.html#step-4" },
+    { "@type": "HowToStep", "position": 5, "name": "OLL parity", "url": "https://cube.maxmode-now.com/how-to-solve-5x5/index.html#step-5" }
+  ]
+}
+</script>
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://cube.maxmode-now.com/how-to-solve-5x5/index.html" />
+<meta property="og:title" content="How to Solve a 5×5 Rubik’s Cube (Reduction Method) — Cube Lab" />
+<meta property="og:description" content="Learn the 5×5 reduction method: 3×3 centres, triple edge pairing, last two edges, then finish as a 3×3. Practise in Cube Lab." />
+<meta property="og:image" content="https://cube.maxmode-now.com/docs/play.png" />
+<meta property="og:locale" content="en_US" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="icon" type="image/png" sizes="192x192" href="../icons/icon-192.png" />
+<style>
+  :root {
+    --bg: #0f1117;
+    --sunken: #0e1018;
+    --surface: #181b24;
+    --border: #272b36;
+    --text: #e6e8ee;
+    --text-strong: #fff;
+    --muted: #9aa0ad;
+    --accent: #4c8dff;
+    --accent-hover: #5d99ff;
+    --warn: #ffd60a;
+    --on-accent: #fff;
+    --r: 12px;
+    --fs: 17px;
+    --safe-t: env(safe-area-inset-top, 0px);
+    --safe-b: env(safe-area-inset-bottom, 0px);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 400 var(--fs)/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { color: var(--accent-hover); text-decoration: underline; }
+  .top {
+    position: sticky; top: 0; z-index: 10;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: calc(10px + var(--safe-t)) 20px 10px;
+    background: rgba(15, 17, 23, 0.92); backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .brand { font-weight: 700; color: var(--text-strong); text-decoration: none; flex: 0 0 auto; }
+  .brand:hover { color: var(--accent); text-decoration: none; }
+  .top-cta {
+    display: inline-flex; align-items: center; min-height: 36px; padding: 0 12px;
+    font-size: 13px; font-weight: 600; color: var(--on-accent);
+    background: var(--accent); border-radius: 8px; text-decoration: none; flex: 0 0 auto;
+  }
+  .top-cta:hover { background: var(--accent-hover); color: var(--on-accent); text-decoration: none; }
+  nav.sizes {
+    display: flex; align-items: center; justify-content: center;
+    gap: 2px; flex: 1 1 auto;
+  }
+  nav.sizes a {
+    display: inline-flex; align-items: center; min-height: 32px; padding: 0 10px;
+    font-size: 13px; font-weight: 600; color: var(--muted);
+    text-decoration: none; border-radius: 8px; white-space: nowrap;
+  }
+  nav.sizes a:hover { color: var(--text); text-decoration: none; }
+  nav.sizes a[aria-current="page"] {
+    color: var(--text-strong); background: rgba(255, 255, 255, 0.08);
+  }
+  .wrap {
+    display: grid; grid-template-columns: 200px minmax(0, 40rem); gap: 40px;
+    max-width: 920px; margin: 0 auto; padding: 32px 20px calc(48px + var(--safe-b));
+  }
+  nav.toc { position: sticky; top: 72px; align-self: start; }
+  nav.toc h2 { margin: 0 0 8px; font-size: 11px; font-weight: 700; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--muted); }
+  nav.toc ol { margin: 0; padding: 0 0 0 1.1em; font-size: 13px; line-height: 1.7; }
+  nav.toc a { color: var(--muted); }
+  nav.toc a:hover { color: var(--text); }
+  h1 { font-size: 2rem; line-height: 1.2; color: var(--text-strong); margin: 0 0 12px; }
+  .lede { font-size: 1.05rem; color: var(--muted); margin: 0 0 24px; }
+  h2 { font-size: 1.35rem; color: var(--text-strong); margin: 2.2em 0 0.6em; }
+  h3 { font-size: 1.05rem; color: var(--text-strong); margin: 1.4em 0 0.4em; }
+  p { margin: 0 0 0.9em; }
+  ul { margin: 0 0 1em; padding-left: 1.2em; }
+  li { margin: 0.25em 0; }
+  .note {
+    margin: 1em 0; padding: 10px 12px;
+    background: var(--surface); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0;
+    font-size: 0.95rem; color: var(--muted);
+  }
+  .note strong { color: var(--text); }
+  .goal { color: var(--muted); font-size: 0.95rem; margin-bottom: 0.8em; }
+  .diag {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 6px;
+    margin: 12px 0 16px; padding: 12px; background: var(--sunken); border-radius: var(--r);
+    width: max-content; max-width: 100%; overflow-x: auto;
+  }
+  .diag-cap { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .alg-box {
+    margin: 12px 0 8px; padding: 10px 12px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+  }
+  .alg-box .lbl { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  .alg-box code {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 1.05rem; font-weight: 600; color: var(--warn); letter-spacing: .02em;
+    word-break: break-word;
+  }
+  .cta {
+    display: inline-flex; align-items: center; min-height: 40px; padding: 0 14px; margin: 8px 0 0;
+    font-size: 14px; font-weight: 600; color: var(--on-accent);
+    background: var(--accent); border-radius: 8px; text-decoration: none;
+  }
+  .cta:hover { background: var(--accent-hover); color: var(--on-accent); text-decoration: none; }
+  footer.page {
+    margin-top: 3em; padding-top: 1.2em; border-top: 1px solid var(--border);
+    font-size: 13px; color: var(--muted);
+  }
+  @media (max-width: 800px) {
+    .top { flex-wrap: wrap; }
+    nav.sizes { order: 3; flex: 1 1 100%; }
+    .wrap { grid-template-columns: 1fr; gap: 8px; padding-top: 20px; }
+    nav.toc { position: static; padding-bottom: 8px; }
+    nav.toc ol { display: flex; flex-wrap: wrap; gap: 0 14px; padding-left: 0; list-style: none; }
+  }
+</style>
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="../index.html">Cube Lab</a>
+    <nav class="sizes" aria-label="Written guides">
+      <a href="../how-to-solve-2x2/index.html">2×2</a>
+      <a href="../how-to-solve-3x3/index.html">3×3</a>
+      <a href="../how-to-solve-4x4/index.html">4×4</a>
+      <a href="../how-to-solve-5x5/index.html" aria-current="page">5×5</a>
+    </nav>
+    <a class="top-cta" href="../index.html?n=5&amp;learn=beginner&amp;step=1">Open the trainer</a>
+  </header>
+
+  <div class="wrap">
+    <nav class="toc" aria-label="On this page">
+      <h2>Steps</h2>
+      <ol>
+        <li><a href="#start">Before you start</a></li>
+        <li><a href="#notation">Notation</a></li>
+        <li><a href="#step-1">Centres</a></li>
+        <li><a href="#step-2">Edge pairing</a></li>
+        <li><a href="#step-3">Last two edges</a></li>
+        <li><a href="#step-4">Solve as 3×3</a></li>
+        <li><a href="#step-5">OLL parity</a></li>
+        <li><a href="#stuck">Stuck?</a></li>
+      </ol>
+    </nav>
+
+    <article>
+      <h1>How to solve a 5×5</h1>
+      <p class="lede">The reduction method: make the 5×5 look like a 3×3, then solve it with the beginner method you already know. First solve often takes 1–2 hours. Practise turns on the 5×5 in Cube Lab.</p>
+
+      <h2 id="start">Before you start</h2>
+      <p>A 5×5 is an odd cube. The <b>very middle sticker</b> of each face never moves relative to the others — those six centres tell you the colour of each face, exactly like a 3×3. White is opposite yellow, red opposite orange, green opposite blue.</p>
+      <ul>
+        <li>Each face’s “centre” is a <b>3×3 block</b> around that fixed middle.</li>
+        <li>Each 3×3-style edge is <b>three pieces</b>: a middle edge (two colours) plus two wings.</li>
+        <li>Corners are the same as on a 3×3.</li>
+      </ul>
+      <p class="note"><strong>No PLL parity.</strong> Unlike a <a href="../how-to-solve-4x4/index.html">4×4</a>, you will not get two opposite edges that refuse to swap. You <em>can</em> get a single flipped edge (OLL parity) and a fiddly last-two-edges case. Both are below.</p>
+
+      <h2 id="notation">Notation</h2>
+      <p class="goal">Outer faces use the same letters as 3×3. 5×5 adds an inner slice, a mid slice, and two widths of wide turn.</p>
+      <p><b>U D L R F B</b> — outer face. <b>'</b> counter-clockwise, <b>2</b> a half turn.</p>
+      <p><b>2R</b> <b>2U</b> … — the <b>inner</b> slice next to that face (where the wings live). Settings → Layer → <b>Inner</b>.</p>
+      <p><b>3R</b> <b>3U</b> … — the <b>middle</b> slice (fixed centres and middle edges). Settings → Layer → <b>Mid</b>.</p>
+      <p><b>Rw</b> — outer + inner together. <b>3Rw</b> — those plus the mid slice. Settings → <b>Wide</b> / <b>3-Wide</b>.</p>
+      <div class="diag" data-state="0"><span class="diag-cap">Solved 5×5 — colour map</span></div>
+      <p class="note"><strong>Undo slices.</strong> Inner and wide turns move centres. Pairing uses <b>Uw</b> to bring wings together, then you undo that slice so the 3×3 centres come back.</p>
+      <a class="cta" href="../index.html?n=5&amp;learn=beginner&amp;step=0">Watch notation in Cube Lab</a>
+
+      <h2 id="step-1">Step 1 · Centres</h2>
+      <p class="goal">A 3×3 block of the same colour on every face, built around the fixed middle sticker.</p>
+      <div class="diag" data-state="1"><span class="diag-cap">White 3×3 centre — first goal</span></div>
+      <h3>White, then yellow</h3>
+      <p>Start with white. The middle white sticker is already correct — you only place the eight centre pieces around it. Make <b>1×2 or 1×3 bars</b> with inner slices, then attach them to the fixed centre. Hold finished white on the bottom while you build yellow on top.</p>
+      <div class="diag" data-state="2"><span class="diag-cap">All six 3×3 centres — edges still unpaired</span></div>
+      <h3>The last four centres</h3>
+      <p>White down, yellow up. Solve two adjacent side centres with bars, then the last two with a commutator: make a bar on the front, insert it, and the last centre fills in.</p>
+      <div class="alg-box">
+        <div class="lbl">Move a centre bar from front to left (example)</div>
+        <code>Uw' 2R Uw</code>
+      </div>
+      <p>A mid-slice turn (<b>3R</b>) moves only the middle row of a centre — useful when a bar is one piece off. Always restore centres you already solved.</p>
+      <a class="cta" href="../index.html?n=5&amp;learn=beginner&amp;step=1">Build centres in Cube Lab</a>
+
+      <h2 id="step-2">Step 2 · Edge pairing</h2>
+      <p class="goal">36 edge pieces become 12 “tredges” — each slot holds a matching middle edge plus two wings.</p>
+      <div class="diag" data-state="3"><span class="diag-cap">One white–green triple sitting in the front-top slot</span></div>
+      <p>Find a <b>middle edge</b> (the piece with two colours, like a 3×3 edge). Put it at <b>front-top</b> (UF). Find the two wings that share those colours. A wide U brings a wing next to the middle; store the growing pair, then undo the slice.</p>
+      <ol>
+        <li>Turn <b>Uw</b> until a matching wing sits beside the middle edge at UF.</li>
+        <li>Replace that slot with any still-unpaired edge so the next slice does not rip it apart — often <b>R U R'</b>.</li>
+        <li>Undo the slice: <b>Uw'</b>.</li>
+        <li>Repeat for the second wing of the same edge, then move on.</li>
+      </ol>
+      <div class="alg-box">
+        <div class="lbl">Attach a wing at UF, store, restore centres</div>
+        <code>Uw R U R' Uw'</code>
+      </div>
+      <p>Do this until <b>ten</b> of the twelve edges are fully paired. The last two need their own step — a normal store would unpair one to finish the other.</p>
+      <a class="cta" href="../index.html?n=5&amp;learn=beginner&amp;step=2">Pair edges in Cube Lab</a>
+
+      <h2 id="step-3">Step 3 · Last two edges</h2>
+      <p class="goal">The two leftover edges. Hold them at front-top and back-top (or front-top and front-right).</p>
+      <div class="diag" data-state="4"><span class="diag-cap">Two unsolved edges left — the rest are paired</span></div>
+      <p>Put the two messy edges at <b>UF</b> and <b>UB</b>. The algorithm below cycles wings onto the middle edges without destroying the centres you already built. You may need it once, or once plus a <b>U2</b> and a second pass, depending on how the wings sit.</p>
+      <div class="alg-box">
+        <div class="lbl">Last two edges — hold the unsolved pair at UF and UB</div>
+        <code>Rw U2 Rw U2 F2 Rw F2 3Rw' U2 Rw U2 Rw' U2 F2 Rw' F2 3Rw</code>
+      </div>
+      <p>In Cube Lab: <b>Wide</b> for <b>Rw</b>, <b>3-Wide</b> for <b>3Rw</b>, <b>Outer</b> for U and F. After this, every edge slot should be a matched triple.</p>
+      <p class="note"><strong>If one triple still looks flipped</strong> (side colours on top, yellow on the side), that is OLL parity — skip ahead to step 5 after you start the 3×3 last layer, or apply it now with the flipped edge in front.</p>
+      <a class="cta" href="../index.html?n=5&amp;learn=beginner&amp;step=3">Finish last two edges in Cube Lab</a>
+
+      <h2 id="step-4">Step 4 · Solve as a 3×3</h2>
+      <p class="goal">Outer turns only. Each 3×3 centre is a 3×3 centre. Each triple edge is a 3×3 edge.</p>
+      <div class="diag" data-state="5"><span class="diag-cap">White cross on a reduced 5×5 — same idea as 3×3</span></div>
+      <p>Switch Layer back to <b>Outer</b>. Follow the <a href="../how-to-solve-3x3/index.html">3×3 beginner method</a>: white cross, white corners, middle edges, yellow cross, yellow face, then last-layer permutation.</p>
+      <p>If you already know CFOP, you can use that instead. The extra 5×5 work is already done.</p>
+      <a class="cta" href="../index.html?n=5&amp;learn=beginner&amp;step=4">Solve as a 3×3 in Cube Lab</a>
+
+      <h2 id="step-5">Step 5 · OLL parity</h2>
+      <p class="goal">One whole edge looks flipped. This can happen after reduction, same family as 4×4 OLL parity.</p>
+      <div class="diag" data-state="6"><span class="diag-cap">Yellow face with one flipped front edge</span></div>
+      <p>Hold the flipped triple at the <b>front</b>. Use the inner-slice algorithm (wings only — not the mid slice). Then continue yellow cross / Sune / PLL as on 3×3.</p>
+      <div class="alg-box">
+        <div class="lbl">OLL parity — flip the front edge</div>
+        <code>2R' U2 2L F2 2L' F2 2R2 U2 2R U2 2R' U2 F2 2R2 F2</code>
+      </div>
+      <p>Layer → <b>Inner</b> for <b>2R</b> / <b>2L</b>, <b>Outer</b> for U and F. You will not need the 4×4 PLL-parity algorithm on a 5×5.</p>
+      <a class="cta" href="../index.html?n=5&amp;learn=beginner&amp;step=5">Watch OLL parity in Cube Lab</a>
+
+      <h2 id="stuck">Stuck?</h2>
+      <p>Centres wrong after pairing: you did not undo a <b>Uw</b>. Restore with the inverse slice, then store the pair again.</p>
+      <p>A centre 3×3 that is the right colour is solved — the fixed middle cannot be rotated into a wrong colour. If the eight pieces around it are mixed, that centre is not done yet.</p>
+      <p>If last-layer algorithms from 3×3 scramble the centres, you used an inner, mid, or wide turn by accident. Stay on <b>Outer</b> until you hit last-two-edges or OLL parity.</p>
+      <p>If you have a physical cube, you can <a href="../index.html?n=5&amp;learn=scan">scan all six faces</a> in Cube Lab. That opens Smart Solve, which is a different path from this beginner method.</p>
+      <p>The even-cube cousin is <a href="../how-to-solve-4x4/index.html">How to solve a 4×4</a> (2×2 centres, two-piece edges, plus PLL parity). Need the 3×3 steps? <a href="../how-to-solve-3x3/index.html">How to solve a 3×3</a>.</p>
+
+      <footer class="page">
+        <p><a href="../index.html">Cube Lab</a> — play, learn, scan, and solve in the browser. <a href="https://maxmode-now.com/">maxmode-now.com</a></p>
+      </footer>
+    </article>
+  </div>
+
+<script src="../lessons.js"></script>
+<script>
+(function () {
+  const HEX = { W: '#f0f0f0', Y: '#ffd60a', R: '#e8312a', O: '#ff8c2b', G: '#39c45a', B: '#2563eb', _: '#0d0e12' };
+  const states = (window.CubeLessons && window.CubeLessons.states5) || [];
+
+  function makeDiagram(state) {
+    const n = 5, S = 6, G = 1, SP = 3, PAD = 4;
+    const FS = S * n + G * (n - 1);
+    const FP = FS + SP;
+    const W = PAD * 2 + 4 * FP - SP;
+    const H = PAD * 2 + 3 * FP - SP;
+    const rects = [];
+    function face(cells, col, row) {
+      if (!cells) return;
+      const ox = PAD + col * FP, oy = PAD + row * FP;
+      cells.forEach((c, i) => {
+        const r = Math.floor(i / n), cc = i % n;
+        rects.push('<rect x="' + (ox + cc * (S + G)) + '" y="' + (oy + r * (S + G)) + '" width="' + S + '" height="' + S + '" rx="1" fill="' + (HEX[c] || c) + '"/>');
+      });
+    }
+    face(state.U, 1, 0); face(state.L, 0, 1); face(state.F, 1, 1); face(state.R, 2, 1); face(state.B, 3, 1); face(state.D, 1, 2);
+    return '<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg"><rect width="' + W + '" height="' + H + '" rx="6" fill="#12151f"/>' + rects.join('') + '</svg>';
+  }
+
+  document.querySelectorAll('.diag[data-state]').forEach(el => {
+    const i = Number(el.dataset.state);
+    const state = states[i];
+    if (!state) return;
+    el.insertAdjacentHTML('beforeend', makeDiagram(state));
+  });
+})();
+</script>
+</body>
+</html>

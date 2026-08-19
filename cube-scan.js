@@ -1,6 +1,7 @@
 // 큐브 얼굴 사진 → 색 샘플링 / 분류 / 검증. DOM·Three 없음.
-// 면 순서: U R F D L B. 각 면 9칸은 사진 상단→하단, 좌→우 (row-major).
-// 촬영 규칙: 해당 면 센터가 가운데, U면은 F(녹)가 사진 아래, 그 외 면은 U(흰)가 사진 위.
+// 면 순서: U R F D L B. 각 면 N×N칸은 사진 상단→하단, 좌→우 (row-major).
+// 홀수(3×3·5×5): 해당 면 센터가 가운데. U면은 F가 사진 아래, 그 외는 U가 사진 위.
+// 짝수(2×2·4×4): 고정 센터가 없으므로 같은 위/앞 방향을 유지한 채 큐브 전체만 돌려 6면을 찍는다.
 (function (g) {
   'use strict';
 
@@ -55,7 +56,7 @@
     const data = imageData.data;
     const g = gridRect(w, h, margin);
     const cell = g.side / n;
-    const inset = cell * 0.28;
+    const inset = cell * (n >= 5 ? 0.18 : n >= 4 ? 0.22 : 0.28);
     const out = [];
     for (let row = 0; row < n; row++) {
       for (let col = 0; col < n; col++) {
@@ -135,12 +136,51 @@
       }
     }
 
-    const uniq = new Set(centers.filter(Boolean));
-    if (centers.length === 6 && uniq.size !== 6) {
-      errors.push({ code: 'centers', centers: centers.slice() });
+    // 홀수 N만 고정 센터. 짝수는 가운데 칸이 없거나(2) 센터 조각이 움직인다(4).
+    if (hasFixedCenter(n)) {
+      const uniq = new Set(centers.filter(Boolean));
+      if (centers.length === 6 && uniq.size !== 6) {
+        errors.push({ code: 'centers', centers: centers.slice() });
+      }
     }
 
     return { ok: errors.length === 0, errors, counts };
+  }
+
+  function averageRgb(list) {
+    let r = 0, g = 0, b = 0;
+    const n = list.length || 1;
+    for (let i = 0; i < list.length; i++) {
+      r += list[i].r; g += list[i].g; b += list[i].b;
+    }
+    return { r: r / n, g: g / n, b: b / n };
+  }
+
+  function hasFixedCenter(n) {
+    return (n % 2) === 1;
+  }
+
+  function centerIndex(n) {
+    return (n * n) >> 1;
+  }
+
+  /** 이미 분류된 스티커 RGB를 색(U/R/F/…)별로 평균 — 짝수 큐브 조명 보정용 */
+  function observedColorRgbs(faces, rgbsByFace) {
+    const buckets = { U: [], R: [], F: [], D: [], L: [], B: [] };
+    for (const face of FACE_ORDER) {
+      const cols = faces[face];
+      const rgbs = rgbsByFace[face];
+      if (!cols || !rgbs) continue;
+      for (let i = 0; i < cols.length; i++) {
+        const c = cols[i];
+        if (c && buckets[c] && rgbs[i]) buckets[c].push(rgbs[i]);
+      }
+    }
+    const out = {};
+    for (const face of COLOR_CYCLE) {
+      if (buckets[face].length) out[face] = averageRgb(buckets[face]);
+    }
+    return out;
   }
 
   /** applyDiagramState용 { U:[W..], ... } — 키는 면, 값은 다이어그램 색 코드 */
@@ -185,6 +225,9 @@
     classifyRgb,
     calibrateRefs,
     validateCube,
+    hasFixedCenter,
+    centerIndex,
+    observedColorRgbs,
     toDiagramState,
     toFacelets,
     emptyFaces,

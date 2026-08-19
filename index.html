@@ -33,17 +33,17 @@
 })();
 </script>
 <meta name="theme-color" content="#0f1117" />
-<meta name="description" content="Free browser trainer for 2×2–5×5. Learn beginner and CFOP, scan a 3×3 from photos, and follow an optimal solve. No account." />
+<meta name="description" content="Free browser trainer for 2×2–5×5. Learn beginner, CFOP, and Roux, scan a 2×2–5×5 from photos, and follow an optimal solve. No account." />
 <link rel="canonical" href="https://cube.maxmode-now.com/" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://cube.maxmode-now.com/" />
 <meta property="og:title" content="Cube Lab — Play, Learn, Scan &amp; Solve Rubik's Cubes" />
-<meta property="og:description" content="Free browser trainer for 2×2–5×5. Learn beginner and CFOP, scan a 3×3 from photos, and follow an optimal solve. No account." />
+<meta property="og:description" content="Free browser trainer for 2×2–5×5. Learn beginner, CFOP, and Roux, scan a 2×2–5×5 from photos, and follow an optimal solve. No account." />
 <meta property="og:image" content="https://cube.maxmode-now.com/docs/play.png" />
 <meta property="og:locale" content="en_US" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Cube Lab — Play, Learn, Scan &amp; Solve Rubik's Cubes" />
-<meta name="twitter:description" content="Free browser trainer for 2×2–5×5. Learn beginner and CFOP, scan a 3×3 from photos, and follow an optimal solve. No account." />
+<meta name="twitter:description" content="Free browser trainer for 2×2–5×5. Learn beginner, CFOP, and Roux, scan a 2×2–5×5 from photos, and follow an optimal solve. No account." />
 <meta name="twitter:image" content="https://cube.maxmode-now.com/docs/play.png" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -59,7 +59,7 @@
   "@type": "WebApplication",
   "name": "Cube Lab",
   "url": "https://cube.maxmode-now.com/",
-  "description": "Free browser trainer for 2×2–5×5. Learn beginner and CFOP, scan a 3×3 from photos, and follow an optimal solve. No account.",
+  "description": "Free browser trainer for 2×2–5×5. Learn beginner, CFOP, and Roux, scan a 2×2–5×5 from photos, and follow an optimal solve. No account.",
   "applicationCategory": "GameApplication",
   "operatingSystem": "Any",
   "browserRequirements": "Requires JavaScript. HTML5.",
@@ -234,9 +234,17 @@
     gap: inherit; width: 100%; height: 100%; flex-direction: inherit;
     min-width: 0; min-height: 0;
   }
-  #act-play { display: flex; }
+  #act-play { display: flex; max-width: min(560px, 100%); margin: 0 auto; }
   #actions button { flex: 1 1 0; max-width: 180px; }
   #actions .primary { flex: 1.3 1 0; max-width: 240px; }
+  #act-play button {
+    flex: 1 1 0; max-width: 180px;
+    min-width: 0;
+    background: var(--accent); border-color: var(--accent); color: var(--on-accent);
+  }
+  #act-play .primary { flex: 1 1 0; max-width: 180px; }
+  #act-play button:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+  #act-play button:disabled:hover { background: var(--accent); border-color: var(--accent); }
 
   /* ── 컨텍스트 패널 (단일 컴포넌트) ── */
   #panel {
@@ -257,8 +265,8 @@
   #panel-foot.hidden { display: none; }
 
   /* 패널 안의 모드별 섹션 — 하나만 보인다 */
-  #learn-picker, #tutorial, #solver, #scan { display: none; }
-  #learn-picker.open, #tutorial.open, #solver.open, #scan.open { display: block; }
+  #learn-picker, #tutorial, #solver, #scan, #guides { display: none; }
+  #learn-picker.open, #tutorial.open, #solver.open, #scan.open, #guides.open { display: block; }
 
   /* ── 설정 팝오버 (⚙) — 세션당 한두 번 쓰는 것들만 모아둔다 ── */
   #ui {
@@ -276,6 +284,8 @@
   .sheet-head h2 { font-size: var(--fs-md); margin: 0; }
   #ccw-hint { font-size: var(--fs-xs); color: var(--muted); margin-bottom: 4px; }
   .hint-text { font-size: var(--fs-xs); color: var(--muted); line-height: 1.6; margin: 12px 0 0; }
+  .hint-text a { color: var(--accent); text-decoration: none; }
+  .hint-text a:hover { text-decoration: underline; }
   #about {
     display: flex; flex-direction: column; gap: 4px;
     margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border);
@@ -287,11 +297,16 @@
   #about a:hover { color: var(--accent); }
   #about-blurb { margin: 0 0 8px; font-size: var(--fs-xs); color: var(--muted); line-height: 1.6; }
   .learn-list { display: flex; flex-direction: column; gap: var(--gap); }
-  .learn-list button { width: 100%; justify-content: flex-start; }
+  .learn-list button,
+  .learn-list .btn { width: 100%; justify-content: flex-start; text-decoration: none; }
+  .learn-list .btn:hover { text-decoration: none; }
 
   #lang-switch { width: max-content; }
   #layer-mode { width: 100%; flex-wrap: wrap; }
   #layer-mode button { flex: 1 1 30%; }
+  #layer-mode.guide-focus {
+    outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 10px;
+  }
 
   /* ── 토스트: 모든 일시적 피드백이 여기 한 곳으로 모인다 ── */
   #toast {
@@ -303,6 +318,7 @@
     overflow: hidden; text-overflow: ellipsis; pointer-events: none;
     opacity: 0; visibility: hidden; transition: opacity var(--t), visibility var(--t);
   }
+  #toast.hint { white-space: normal; text-overflow: unset; overflow: visible; border-radius: var(--r); }
   #toast.show { opacity: 1; visibility: visible; }
   #toast.solved { color: var(--success); font-weight: 700; }
   #toast.err { color: var(--danger); }
@@ -367,6 +383,12 @@
   [data-n="5"] .n3-only,
   [data-n="4"] .n23-only,
   [data-n="5"] .n23-only { display: none !important; }
+  .n2-only { display: none !important; }
+  [data-n="2"] .n2-only { display: block !important; }
+  .n4eq-only { display: none !important; }
+  [data-n="4"] .n4eq-only { display: block !important; }
+  .n5eq-only { display: none !important; }
+  [data-n="5"] .n5eq-only { display: block !important; }
   .n4-only { display: none !important; }
   [data-n="4"] .n4-only,
   [data-n="5"] .n4-only { display: block !important; }
@@ -478,6 +500,7 @@
   .solver-note { font-size: var(--fs-xs); color: var(--muted); margin-top: 10px; line-height: 1.5; }
 
   /* 큐브 스캔 본문 */
+  #scan { --scan-n: 3; }
   #scan-face-label { font-size: var(--fs-sm); font-weight: 700; margin-bottom: 4px; }
   #scan-tip { font-size: var(--fs-xs); color: var(--muted); line-height: 1.45; margin-bottom: 10px; }
   #scan-progress { display: flex; gap: 4px; margin-bottom: 10px; }
@@ -498,13 +521,17 @@
     position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
   }
   #scan-check-grid {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap); margin-bottom: 8px;
+    display: grid; grid-template-columns: repeat(var(--scan-n), 1fr); gap: var(--gap); margin-bottom: 8px;
   }
   #scan-check-grid button {
     aspect-ratio: 1; min-height: 0; padding: 0;
     border-radius: var(--r-sm); border: 1px solid var(--border-swatch);
     font-size: var(--fs-sm); font-weight: 700;
   }
+  #scan[data-scan-n="4"] #scan-check-grid,
+  #scan[data-scan-n="5"] #scan-check-grid { gap: 3px; }
+  #scan[data-scan-n="4"] #scan-check-grid button,
+  #scan[data-scan-n="5"] #scan-check-grid button { font-size: var(--fs-xs); }
   #scan-check-center-hint { font-size: var(--fs-xs); color: var(--muted); margin-bottom: 8px; }
   #scan-preview-wrap {
     position: relative; width: 100%; aspect-ratio: 1; background: var(--sunken);
@@ -517,7 +544,7 @@
   #scan-preview.show, #scan-video.show { display: block; }
   #scan-grid {
     position: absolute; inset: 12%; border: 2px solid var(--guide);
-    display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);
+    display: grid; grid-template-columns: repeat(var(--scan-n), 1fr); grid-template-rows: repeat(var(--scan-n), 1fr);
     pointer-events: none;
   }
   #scan-grid span { border: 1px solid var(--guide-weak); }
@@ -534,7 +561,7 @@
     border-radius: var(--r-sm); padding: 6px; cursor: pointer; }
   .scan-face-card .sf-name { font-size: var(--fs-xs); color: var(--muted); margin-bottom: 4px; text-align: center; }
   .scan-mini {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
+    display: grid; grid-template-columns: repeat(var(--scan-n), 1fr); gap: 2px;
   }
   .scan-mini button {
     aspect-ratio: 1; min-height: 0; padding: 0;
@@ -580,7 +607,9 @@
     /* Learn 피커는 버튼 몇 개뿐. 반 화면 시트를 쓰지 않고 내용만큼만 차지한다.
        Find My Step 결과가 붙으면 커지되 280px에서 잘리고 본문만 스크롤. */
     #shell[data-mode="learn"] { --panel-h: fit-content(280px); }
+    #shell[data-mode="guides"] { --panel-h: fit-content(min(360px, 48dvh)); }
     #shell[data-mode="learn"] #panel { min-height: min-content; }
+    #shell[data-mode="guides"] #panel { min-height: min-content; }
 
     #rail {
       flex-direction: row; border-right: none; border-top: 1px solid var(--border);
@@ -638,6 +667,7 @@
   /* ── 아주 좁은 폭: 액션 라벨이 잘리지 않도록 ── */
   @media (max-width: 380px) {
     #actions { gap: 4px; padding: 0 calc(8px + var(--safe-r)) 0 calc(8px + var(--safe-l)); }
+    #act-play button { padding: 0 8px; font-size: var(--fs-xs); }
   }
 
   /* ── 가로형 모바일: 세로 높이가 귀하다. 레일은 왼쪽, 액션은 오른쪽 세로 스택 ── */
@@ -661,6 +691,7 @@
       border-top: none; border-left: 1px solid var(--border);
     }
     #actions button, #actions .primary { flex: 0 0 auto; width: 92px; max-width: none; }
+    #act-play button, #act-play .primary { width: 104px; }
     #panel { border-left: 1px solid var(--border); border-top: none; }
     #app-title { display: none; }
     #stats { margin-left: auto; }
@@ -704,7 +735,7 @@
         <option value="4" data-i18n="size4">4×4</option>
         <option value="5" data-i18n="size5">5×5</option>
       </select>
-      <span id="app-version" aria-label="Version">v1.5</span>
+      <span id="app-version" aria-label="Version">v1.6</span>
       <button type="button" id="settings-btn" class="btn-icon" aria-label="Settings" aria-expanded="false">⚙</button>
     </div>
   </header>
@@ -712,12 +743,14 @@
   <nav id="rail" aria-label="Mode">
     <button type="button" class="rail-btn" data-mode="play">
       <span class="ico" aria-hidden="true">🎮</span><span data-i18n="modePlay">Play</span></button>
-    <button type="button" class="rail-btn n23-only" data-mode="learn">
+    <button type="button" class="rail-btn" data-mode="learn">
       <span class="ico" aria-hidden="true">📖</span><span data-i18n="modeLearn">Learn</span></button>
-    <button type="button" class="rail-btn n3-only" data-mode="solver">
+    <button type="button" class="rail-btn" data-mode="solver">
       <span class="ico" aria-hidden="true">🧠</span><span data-i18n="modeSolve">Solve</span></button>
-    <button type="button" class="rail-btn n3-only" data-mode="scan">
+    <button type="button" class="rail-btn" data-mode="scan">
       <span class="ico" aria-hidden="true">📷</span><span data-i18n="modeScan">Scan</span></button>
+    <button type="button" class="rail-btn" data-mode="guides">
+      <span class="ico" aria-hidden="true">📚</span><span data-i18n="modeGuides">Guide</span></button>
   </nav>
 
   <main id="stage">
@@ -753,13 +786,40 @@
 
     <div id="panel-body">
 
-      <div id="learn-picker" class="n23-only">
+      <div id="learn-picker">
         <div class="learn-list">
           <button type="button" id="open-tut" class="primary" data-i18n="openTut">📖 Tutorial (Beginner)</button>
           <button type="button" id="open-cfop" class="n3-only" data-i18n="openCfop">⚡ Speed (CFOP / 4-look)</button>
+          <button type="button" id="open-f2l" class="n3-only" data-i18n="openF2l">🧩 F2L cases</button>
+          <button type="button" id="open-oll" class="n3-only" data-i18n="openOll">🌕 OLL library</button>
+          <button type="button" id="open-pll" class="n3-only" data-i18n="openPll">🔄 PLL library</button>
+          <button type="button" id="open-roux" class="n3-only" data-i18n="openRoux">🧱 Blocks (Roux)</button>
           <button type="button" id="detect-stage" class="n3-only" data-i18n="detectStage">🎯 Find My Step (Beginner)</button>
         </div>
         <div id="stage-box" class="n3-only"></div>
+      </div>
+
+      <div id="guides">
+        <div class="learn-list n2-only">
+          <a class="btn" href="./how-to-solve-2x2/index.html" data-i18n="guide2x2">How to solve a 2×2 (written guide)</a>
+        </div>
+
+        <div class="learn-list n3-only">
+          <a class="btn" href="./how-to-solve-3x3/index.html" data-i18n="guide3x3">How to solve a 3×3 (written guide)</a>
+          <a class="btn" href="./how-to-solve-3x3/cfop/index.html" data-i18n="guide3x3cfop">How to solve a 3×3 with CFOP (written guide)</a>
+          <a class="btn" href="./how-to-solve-3x3/cfop/f2l/index.html" data-i18n="guide3x3f2l">F2L case library (written guide)</a>
+          <a class="btn" href="./how-to-solve-3x3/cfop/oll/index.html" data-i18n="guide3x3oll">OLL library guide (written)</a>
+          <a class="btn" href="./how-to-solve-3x3/cfop/pll/index.html" data-i18n="guide3x3pll">PLL library guide (written)</a>
+          <a class="btn" href="./how-to-solve-3x3/roux/index.html" data-i18n="guide3x3roux">How to solve a 3×3 with Roux (written guide)</a>
+        </div>
+
+        <div class="learn-list n4eq-only">
+          <a class="btn" href="./how-to-solve-4x4/index.html" data-i18n="guide4x4">How to solve a 4×4 (written guide)</a>
+        </div>
+
+        <div class="learn-list n5eq-only">
+          <a class="btn" href="./how-to-solve-5x5/index.html" data-i18n="guide5x5">How to solve a 5×5 (written guide)</a>
+        </div>
       </div>
 
       <div id="tutorial">
@@ -890,6 +950,7 @@
         <button data-move="R">R</button>
         <button data-move="F">F</button>
         <button data-move="B">B</button>
+        <button data-move="M" class="n3-only">M</button>
       </div>
       <div id="ccw-hint" data-i18n="ccwHint">Shift+click or key = counter-clockwise (′)</div>
 
@@ -901,7 +962,7 @@
 
       <p class="hint-text" data-i18n="hint">Drag a face: turn · Drag empty space: orbit · Wheel: zoom</p>
       <div id="about">
-        <p id="about-blurb">Cube Lab is a free browser trainer for Rubik’s cubes. Play 2×2 through 5×5, learn the beginner method and CFOP, scan a physical 3×3, and follow an optimal solve — no account required.</p>
+        <p id="about-blurb">Cube Lab is a free browser trainer for Rubik’s cubes. Play 2×2 through 5×5, learn the beginner method, CFOP, and Roux, scan a physical cube, and follow an optimal solve — no account required.</p>
         <a href="https://maxmode-now.com/" target="_blank" rel="noopener noreferrer">maxmode-now.com</a>
         <a href="mailto:maxmode.now@gmail.com">maxmode.now@gmail.com</a>
       </div>
@@ -911,7 +972,7 @@
 </div>
 
 <noscript>
-  <p>Cube Lab is a free browser trainer for Rubik’s cubes. Play 2×2 through 5×5, learn the beginner method and CFOP, scan a physical 3×3, and follow an optimal solve — no account required.</p>
+  <p>Cube Lab is a free browser trainer for Rubik’s cubes. Play 2×2 through 5×5, learn the beginner method, CFOP, and Roux, scan a physical cube, and follow an optimal solve — no account required.</p>
 </noscript>
 
 <script type="importmap">
@@ -931,6 +992,11 @@
 <script src="cube-math.js"></script>
 <script src="cube-engine.js"></script>
 <script src="cube-scan.js"></script>
+<script src="f2l-cases.js"></script>
+<script src="oll-cases-data.js"></script>
+<script src="oll-cases.js"></script>
+<script src="pll-cases-data.js"></script>
+<script src="pll-cases.js"></script>
 <script src="lessons.js"></script>
 
 <script type="module">
@@ -956,17 +1022,32 @@ const I18N = {
     turnFace: 'Turn a face', ccwHint: "Shift+click or key = counter-clockwise (′)",
     scramble: 'Scramble', undo: 'Undo', reset: 'Reset',
     unitSec: 's', unitMoves: ' moves',
-    openTut: '📖 Tutorial (Beginner)', openCfop: '⚡ Speed (CFOP / 4-look)',
+    openTut: '📖 Tutorial (Beginner)', openCfop: '⚡ Speed (CFOP / 4-look)', openF2l: '🧩 F2L cases', openOll: '🌕 OLL library', openPll: '🔄 PLL library', openRoux: '🧱 Blocks (Roux)',
     openSolver: '🧠 Smart Solve', detectStage: '🎯 Find My Step (Beginner)',
     analyzing: 'Analyzing the current cube…',
     solveNext: '▶ Next move', solveAll: '⏭ Solve all',
-    solverNote: 'Reads the state automatically and guides you with an optimal solution (two-phase algorithm). Turn it yourself and the next move is recalculated.',
+    solverNote: 'Reads the current cube and plays a solution. 2×2 and 3×3 are short searches (Kociemba on 3×3). 4×4 and 5×5 reduce to a 3×3 first. Turn it yourself and the next move is recalculated.',
     prev: '← Prev', next: 'Next →',
     hint: 'Drag a face: turn · Drag empty space: orbit · Wheel: zoom',
+    guideLessonReady: 'This step is open. The cube shows the goal — tap ▶ Demo to watch the moves.',
+    guide3x3: 'How to solve a 3×3 (written guide)',
+    guide3x3cfop: 'How to solve a 3×3 with CFOP (written guide)',
+    guide3x3f2l: 'F2L case library (written guide)',
+    guide3x3oll: 'OLL library guide (written)',
+    guide3x3pll: 'PLL library guide (written)',
+    guide3x3roux: 'How to solve a 3×3 with Roux (written guide)',
+    guide2x2: 'How to solve a 2×2 (written guide)',
+    guide4x4: 'How to solve a 4×4 (written guide)',
+    guide5x5: 'How to solve a 5×5 (written guide)',
     solved: '✓ Solved!', solvedN: n => `✓ Solved! (${n} moves)`,
     alreadySolved: '✓ Already solved!',
     solverPreparing: 'Preparing solver… (first time only, takes a few seconds)',
+    solverComputing: 'Finding a solution… (can take up to a minute)',
+    solverComputingSec: s => `Finding a solution… ${s}s`,
+    solverWillPlay: 'Got it — will play the first move when ready.',
     solverFailed: m => `Solver init failed: ${m}`,
+    solverError: m => `Could not solve: ${m}`,
+    solverTimeout: '5×5 search timed out. Reset, scramble again, and retry — or use a shorter scramble.',
     nextMoveIs: (m, n) => `Next move: ${m}  ·  ${n} left`,
     solverHintMobile: 'Turn the cube yourself — the next move updates.',
     autoSolving: 'Auto-solving…',
@@ -981,7 +1062,13 @@ const I18N = {
     demo: '▶ Demo',
     trackBeginner: 'Solving the Cube — Beginner Method',
     trackBeginner2: 'Solving the 2×2 — Beginner',
+    trackBeginner4: 'Solving the 4×4 — Beginner',
+    trackBeginner5: 'Solving the 5×5 — Beginner',
     trackCfop: 'Speed — CFOP / 4-look LL',
+    trackF2l: 'F2L cases — first two layers',
+    trackOll: 'OLL — 2-Look + full 57 cases',
+    trackPll: 'PLL — 2-Look + full 21 cases',
+    trackRoux: 'Blocks — Roux',
     stagePrepLabel: 'Getting started', stagePrepTitle: 'Not scrambled yet',
     stagePrepDesc: 'Press Scramble to mix the cube, then try this again!',
     stageDoneLabel: '✓ Solved', stageDoneTitle: 'All done! 🎉',
@@ -991,8 +1078,8 @@ const I18N = {
     uiMenu: 'Menu', uiCloseMenu: 'Close',
     learn: 'Learn', more: 'More', learnTitle: 'Learn', assistTitle: 'Assist',
     settings: 'Settings', langLabel: 'Language',
-    modePlay: 'Play', modeLearn: 'Learn', modeSolve: 'Solve', modeScan: 'Scan',
-    panelLearn: 'Learn', panelSolve: 'Smart Solve', panelScan: 'Scan cube',
+    modePlay: 'Play', modeLearn: 'Learn', modeSolve: 'Solve', modeScan: 'Scan', modeGuides: 'Guide',
+    panelLearn: 'Learn', panelSolve: 'Smart Solve', panelScan: 'Scan cube', panelGuides: 'Guide',
     needScramble: 'Scramble the cube first',
     size2: '2×2', size3: '3×3', size4: '4×4', size5: '5×5',
     docTitle2: '2×2 Cube — Free Play', appTitle2: '2×2 Cube',
@@ -1000,6 +1087,13 @@ const I18N = {
     docTitle5: '5×5 Cube — Free Play', appTitle5: '5×5 Cube',
     layerMode: 'Layer', layerOuter: 'Outer', layerInner: 'Inner', layerMid: 'Mid',
     layerWide: 'Wide', layerWide3: '3-Wide',
+    practiceTurns: 'Inner slice is moving. Switch Outer / Inner / Wide, then tap U R F.',
+    practiceTurns5: 'Inner slice is moving. Also try Mid and 3-Wide, then tap U R F.',
+    practiceCenters: 'White-centre goal is on the cube. Drag to look around.',
+    practiceCenters5: 'White 3×3 centre goal is on the cube. Drag to look around.',
+    practiceEdges: 'Centres are done. Watch the Uw pairing demo.',
+    practiceL2E: 'Two edges left. Watch the last-two-edges demo.',
+    practiceParity: 'Flipped front edge. Watch the 2R / 2L parity demo.',
     sizeLabel: 'Size',
     numbersLabel: 'Numbers', numbersOff: 'Off', numbersOn: 'On',
     themeLabel: 'Theme', themeClassic: 'Classic', themeLego: 'LEGO',
@@ -1020,13 +1114,23 @@ const I18N = {
     scanFaceD: 'Face 4/6 · D (yellow center)',
     scanFaceL: 'Face 5/6 · L (orange center)',
     scanFaceB: 'Face 6/6 · B (blue center)',
+    scanFaceU2: 'Face 1/6 · U (top)',
+    scanFaceR2: 'Face 2/6 · R (right)',
+    scanFaceF2: 'Face 3/6 · F (front)',
+    scanFaceD2: 'Face 4/6 · D (bottom)',
+    scanFaceL2: 'Face 5/6 · L (left)',
+    scanFaceB2: 'Face 6/6 · B (back)',
     scanTipU: 'Hold the white center toward the camera. Keep the green face at the bottom of the photo.',
     scanTipSide: 'Hold this face toward the camera. Keep the white face at the top of the photo.',
     scanTipD: 'Hold the yellow center toward the camera. Keep the green face at the top of the photo.',
-    scanNeed3: 'Scan works on 3×3 only. Switching to 3×3…',
+    scanTipU2: 'Hold the top face toward the camera. Keep the front face at the bottom of the photo. Do not twist faces between shots — only turn the whole cube.',
+    scanTipSide2: 'Turn the whole cube so this face is toward the camera. Keep the top face at the top of the photo.',
+    scanTipD2: 'Hold the bottom face toward the camera. Keep the front face at the top of the photo.',
+    scanOrientHintEven: 'No fixed centers. Keep the same top and front for every face.',
     scanCamFail: 'Camera unavailable — use Upload photo',
     scanApplyOk: 'Scan applied — solution ready',
     scanInvalid: 'Color counts or centers look wrong — edit a face, then apply again',
+    scanInvalidEven: n => `Each color should appear ${n * n} times — edit a face, then apply again`,
     scanBusy: 'Wait for the cube to finish moving',
     scanAllDone: 'All 6 faces confirmed',
   },
@@ -1036,17 +1140,32 @@ const I18N = {
     turnFace: '면 돌리기', ccwHint: 'Shift+클릭 또는 키 = 반시계(′)',
     scramble: '섞기', undo: '되돌리기', reset: '리셋',
     unitSec: '초', unitMoves: '수',
-    openTut: '📖 튜토리얼 (초보자법)', openCfop: '⚡ 효율 (CFOP / 4-look)',
+    openTut: '📖 튜토리얼 (초보자법)', openCfop: '⚡ 효율 (CFOP / 4-look)', openF2l: '🧩 F2L 케이스', openOll: '🌕 OLL 라이브러리', openPll: '🔄 PLL 라이브러리', openRoux: '🧱 블록 (Roux)',
     openSolver: '🧠 스마트 풀이', detectStage: '🎯 내 단계 찾기 (초보자법)',
     analyzing: '현재 큐브를 분석합니다…',
     solveNext: '▶ 다음 한 수', solveAll: '⏭ 전체 풀기',
-    solverNote: '상태를 자동 인식해 최적 수순(2단계 알고리즘)으로 안내해요. 직접 돌려도 다음 수가 다시 계산됩니다.',
+    solverNote: '지금 큐브를 읽고 수순을 안내합니다. 2×2·3×3은 짧은 탐색(3×3은 Kociemba), 4×4·5×5는 3×3으로 줄인 뒤 풉니다. 직접 돌려도 다음 수가 다시 계산됩니다.',
     prev: '← 이전', next: '다음 →',
     hint: '드래그: 면 돌리기 · 빈 곳 드래그: 시점 회전 · 휠: 확대',
+    guideLessonReady: '이 단계가 열렸습니다. 큐브는 목표 상태입니다. ▶시연을 눌러 공식을 보세요.',
+    guide3x3: '3×3 초보자 가이드 (글)',
+    guide3x3cfop: '3×3 CFOP 가이드 (글)',
+    guide3x3f2l: 'F2L 케이스 도감 (글)',
+    guide3x3oll: 'OLL 라이브러리 가이드 (글)',
+    guide3x3pll: 'PLL 라이브러리 가이드 (글)',
+    guide3x3roux: '3×3 Roux 가이드 (글)',
+    guide2x2: '2×2 초보자 가이드 (글)',
+    guide4x4: '4×4 초보자 가이드 (글)',
+    guide5x5: '5×5 초보자 가이드 (글)',
     solved: '✓ 완성!', solvedN: n => `✓ 완성! (${n}수)`,
     alreadySolved: '✓ 이미 완성된 상태예요!',
     solverPreparing: '솔버 준비 중… (최초 1회, 몇 초 걸려요)',
+    solverComputing: '수순을 찾는 중… (최대 1분 걸릴 수 있어요)',
+    solverComputingSec: s => `수순을 찾는 중… ${s}초`,
+    solverWillPlay: '확인 — 계산이 끝나면 한 수를 둘게요.',
     solverFailed: m => `솔버 초기화 실패: ${m}`,
+    solverError: m => `풀 수 없습니다: ${m}`,
+    solverTimeout: '5×5 계산이 너무 오래 걸려 중단했어요. 리셋 후 다시 섞고 시도해 보세요.',
     nextMoveIs: (m, n) => `다음 한 수: ${m}  ·  남은 ${n}수`,
     solverHintMobile: '직접 돌려도 다음 수가 다시 계산됩니다.',
     autoSolving: '자동 풀이 중…',
@@ -1061,7 +1180,13 @@ const I18N = {
     demo: '▶ 시연',
     trackBeginner: '큐브 맞추기 — 초보자법',
     trackBeginner2: '2×2 맞추기 — 초보자법',
+    trackBeginner4: '4×4 맞추기 — 초보자법',
+    trackBeginner5: '5×5 맞추기 — 초보자법',
     trackCfop: '효율 — CFOP / 4-look LL',
+    trackF2l: 'F2L 케이스 — 첫 두 층',
+    trackOll: 'OLL — 2-Look + 전체 57케이스',
+    trackPll: 'PLL — 2-Look + 전체 21케이스',
+    trackRoux: '블록 — Roux',
     stagePrepLabel: '준비 중', stagePrepTitle: '아직 섞지 않았어요',
     stagePrepDesc: '섞기 버튼을 눌러 큐브를 섞은 뒤 사용해보세요!',
     stageDoneLabel: '✓ 완성', stageDoneTitle: '이미 다 맞췄어요! 🎉',
@@ -1071,8 +1196,8 @@ const I18N = {
     uiMenu: '메뉴', uiCloseMenu: '닫기',
     learn: '학습', more: '더보기', learnTitle: '학습', assistTitle: '도움',
     settings: '설정', langLabel: '언어',
-    modePlay: '조작', modeLearn: '학습', modeSolve: '풀이', modeScan: '스캔',
-    panelLearn: '학습', panelSolve: '스마트 풀이', panelScan: '큐브 스캔',
+    modePlay: '조작', modeLearn: '학습', modeSolve: '풀이', modeScan: '스캔', modeGuides: '가이드',
+    panelLearn: '학습', panelSolve: '스마트 풀이', panelScan: '큐브 스캔', panelGuides: '가이드',
     needScramble: '큐브를 먼저 섞어주세요',
     size2: '2×2', size3: '3×3', size4: '4×4', size5: '5×5',
     docTitle2: '2×2 큐브 — 자유 조작', appTitle2: '2×2 큐브',
@@ -1080,6 +1205,13 @@ const I18N = {
     docTitle5: '5×5 큐브 — 자유 조작', appTitle5: '5×5 큐브',
     layerMode: '층', layerOuter: '겉면', layerInner: '안쪽', layerMid: '가운데',
     layerWide: '와이드', layerWide3: '3와이드',
+    practiceTurns: '안쪽 층이 돌아갑니다. 겉면/안쪽/와이드를 바꾼 뒤 U R F를 누르세요.',
+    practiceTurns5: '안쪽 층이 돌아갑니다. 가운데/3와이드도 바꾼 뒤 U R F를 누르세요.',
+    practiceCenters: '흰 센터 목표가 큐브에 있습니다. 드래그해서 둘러보세요.',
+    practiceCenters5: '흰 3×3 센터 목표가 큐브에 있습니다. 드래그해서 둘러보세요.',
+    practiceEdges: '센터는 맞춰 둔 상태입니다. Uw 페어링 시연을 보세요.',
+    practiceL2E: '엣지 두 개가 남았습니다. 마지막 두 엣지 시연을 보세요.',
+    practiceParity: '앞 엣지가 뒤집혀 있습니다. 2R / 2L 패리티 시연을 보세요.',
     sizeLabel: '크기',
     numbersLabel: '번호', numbersOff: '끄기', numbersOn: '켜기',
     themeLabel: '테마', themeClassic: '기본', themeLego: '레고',
@@ -1100,13 +1232,23 @@ const I18N = {
     scanFaceD: '4/6면 · D (노랑 센터)',
     scanFaceL: '5/6면 · L (주황 센터)',
     scanFaceB: '6/6면 · B (파랑 센터)',
+    scanFaceU2: '1/6면 · U (위)',
+    scanFaceR2: '2/6면 · R (오른쪽)',
+    scanFaceF2: '3/6면 · F (앞)',
+    scanFaceD2: '4/6면 · D (아래)',
+    scanFaceL2: '5/6면 · L (왼쪽)',
+    scanFaceB2: '6/6면 · B (뒤)',
     scanTipU: '흰 센터를 카메라에 향하게 하고, 사진 아래쪽이 초록(F)이 되게 잡아요.',
     scanTipSide: '이 면을 카메라에 향하게 하고, 사진 위쪽이 흰(U)이 되게 잡아요.',
     scanTipD: '노랑 센터를 카메라에 향하게 하고, 사진 위쪽이 초록(F)이 되게 잡아요.',
-    scanNeed3: '스캔은 3×3만 지원해요. 3×3으로 바꿉니다…',
+    scanTipU2: '윗면을 카메라에 향하게 하고, 사진 아래쪽이 앞면이 되게 잡아요. 면은 돌리지 말고 큐브 전체만 돌려 가며 찍어요.',
+    scanTipSide2: '큐브 전체를 돌려 이 면이 카메라를 향하게 하고, 사진 위쪽이 윗면이 되게 잡아요.',
+    scanTipD2: '아랫면을 카메라에 향하게 하고, 사진 위쪽이 앞면이 되게 잡아요.',
+    scanOrientHintEven: '고정 센터가 없어요. 처음 정한 위/앞 방향을 6면 모두 유지하세요.',
     scanCamFail: '카메라를 쓸 수 없어요 — 사진 올리기를 사용하세요',
     scanApplyOk: '스캔 적용 · 풀이 준비됨',
     scanInvalid: '색 개수나 센터가 이상해요 — 면을 고친 뒤 다시 적용하세요',
+    scanInvalidEven: n => `각 색이 ${n * n}장이어야 해요 — 면을 고친 뒤 다시 적용하세요`,
     scanBusy: '큐브가 움직이는 동안은 기다려 주세요',
     scanAllDone: '6면 모두 확인됨',
   },
@@ -1200,8 +1342,13 @@ engine.subscribe(({ solver }) => {
 });
 
 function reset() {
+  playAfterSolve = false;
+  solveAllAfter = false;
+  stopComputeUi();
+  solverHost.abort();
   engine.reset();
   solverMoves = [];
+  solverInFlight = null;
   solverBusy = false;
   setSolveStatus(t('alreadySolved'));
   setSolveMoves('');
@@ -1225,6 +1372,64 @@ function syncLayerModeUi() {
   document.querySelectorAll('#layer-mode [data-layer]').forEach(b => {
     b.classList.toggle('active', b.dataset.layer === layerMode);
   });
+}
+
+function setLayerMode(mode) {
+  if (engine.n < 4) return;
+  const ok = { outer: 1, inner: 1, wide: 1 };
+  if (engine.n >= 5) { ok.mid = 1; ok.wide3 = 1; }
+  if (!ok[mode]) return;
+  layerMode = mode;
+  syncLayerModeUi();
+}
+
+function applyPractice(kind) {
+  if (!kind || engine.n < 4) return;
+  const L = globalThis.CubeLessons;
+  const states = engine.n === 5 ? (L && L.states5) : (L && L.states4);
+  const play = alg => setTimeout(() => { if (!engine.busy) engine.playAlg(alg, false); }, 500);
+  const layerEl = document.getElementById('layer-mode');
+
+  if (kind === 'turns') {
+    reset();
+    setLayerMode('inner');
+    openOverlay('more');
+    if (layerEl) {
+      layerEl.classList.add('guide-focus');
+      layerEl.scrollIntoView({ block: 'nearest' });
+      setTimeout(() => layerEl.classList.remove('guide-focus'), 4000);
+    }
+    toast(t(engine.n >= 5 ? 'practiceTurns5' : 'practiceTurns'), 'hint');
+    play("2R U 2R' U'");
+    return;
+  }
+  if (kind === 'centers') {
+    if (states && states[1]) applyDiagramState(states[1]);
+    setLayerMode('inner');
+    toast(t(engine.n >= 5 ? 'practiceCenters5' : 'practiceCenters'), 'hint');
+    return;
+  }
+  if (kind === 'edges') {
+    if (states && states[2]) applyDiagramState(states[2]);
+    setLayerMode('wide');
+    toast(t('practiceEdges'), 'hint');
+    play("Uw R U R' Uw'");
+    return;
+  }
+  if (kind === 'l2e') {
+    if (states && states[4]) applyDiagramState(states[4]);
+    setLayerMode('wide');
+    toast(t('practiceL2E'), 'hint');
+    play("Rw U2 Rw U2 F2 Rw F2 3Rw' U2 Rw U2 Rw' U2 F2 Rw' F2 3Rw");
+    return;
+  }
+  if (kind === 'parity') {
+    const i = engine.n === 5 ? 6 : 5;
+    if (states && states[i]) applyDiagramState(states[i]);
+    setLayerMode('inner');
+    toast(t('practiceParity'), 'hint');
+    play("2R' U2 2L F2 2L' F2 2R2 U2 2R U2 2R' U2 F2 2R2 F2");
+  }
 }
 
 document.querySelectorAll('[data-move]').forEach(btn => {
@@ -1262,8 +1467,8 @@ function syncDiagPalette() {
 syncDiagPalette();
 
 function makeDiagram({ U, D, F, B, L, R }) {
-  const n = U && U.length === 4 ? 2 : 3;
-  const S = n === 2 ? 14 : 11, G = 1, SP = 3, PAD = 4;
+  const n = !U ? 3 : U.length === 4 ? 2 : U.length === 16 ? 4 : U.length === 25 ? 5 : 3;
+  const S = n === 2 ? 14 : n === 4 ? 8 : n === 5 ? 6 : 11, G = 1, SP = 3, PAD = 4;
   const FS = S * n + G * (n - 1);
   const FP = FS + SP;
   const W = PAD * 2 + 4 * FP - SP;
@@ -1295,10 +1500,32 @@ function tracksForN(n) {
       beginner: { en: L.beginner2.en, ko: L.beginner2.ko, head: 'trackBeginner2', states: L.states2 },
     };
   }
+  if (n === 4) {
+    const s = L.states4;
+    return {
+      beginner: {
+        en: L.beginner4.en, ko: L.beginner4.ko, head: 'trackBeginner4',
+        states: [s[0], s[2], s[3], s[4], s[5], s[6]],
+      },
+    };
+  }
+  if (n === 5) {
+    const s = L.states5;
+    return {
+      beginner: {
+        en: L.beginner5.en, ko: L.beginner5.ko, head: 'trackBeginner5',
+        states: [s[0], s[2], s[3], s[4], s[5], s[6]],
+      },
+    };
+  }
   if (n !== 3) return {};
   return {
     beginner: { en: L.beginner3.en, ko: L.beginner3.ko, head: 'trackBeginner', states: L.states3 },
     cfop: { en: L.cfop.en, ko: L.cfop.ko, head: 'trackCfop', states: null },
+    f2l: L.f2l ? { en: L.f2l.en, ko: L.f2l.ko, head: 'trackF2l', states: null } : null,
+    oll: L.oll ? { en: L.oll.en, ko: L.oll.ko, head: 'trackOll', states: null } : null,
+    pll: L.pll ? { en: L.pll.en, ko: L.pll.ko, head: 'trackPll', states: null } : null,
+    roux: { en: L.roux.en, ko: L.roux.ko, head: 'trackRoux', states: L.statesRoux },
   };
 }
 const lessonsOf = track => {
@@ -1328,6 +1555,7 @@ const learnPicker = document.getElementById('learn-picker');
 const tutPanel = document.getElementById('tutorial');
 const solverPanel = document.getElementById('solver');
 const scanPanel = document.getElementById('scan');
+const guidesPanel = document.getElementById('guides');
 const panelTitleEl = document.getElementById('panel-title');
 const panelFootEl = document.getElementById('panel-foot');
 const tutExpandBtn = document.getElementById('tut-expand');
@@ -1338,10 +1566,10 @@ const solverHud = document.getElementById('solver-hud');
 const hudStatusEl = document.getElementById('solver-hud-status');
 const hudMovesEl = document.getElementById('solver-hud-moves');
 
-// 패널 모드 4종. 'learn'(트랙 선택)과 'tutorial'(레슨)은 레일에서 같은 항목이다.
-const PANEL_MODES = ['learn', 'tutorial', 'solver', 'scan'];
-const RAIL_OF  = { learn: 'learn', tutorial: 'learn', solver: 'solver', scan: 'scan' };
-const TITLE_OF = { learn: 'panelLearn', tutorial: 'panelLearn', solver: 'panelSolve', scan: 'panelScan' };
+// 패널 모드 5종. 'learn'(트랙 선택)과 'tutorial'(레슨)은 레일에서 같은 항목이다.
+const PANEL_MODES = ['learn', 'tutorial', 'solver', 'scan', 'guides'];
+const RAIL_OF  = { learn: 'learn', tutorial: 'learn', solver: 'solver', scan: 'scan', guides: 'guides' };
+const TITLE_OF = { learn: 'panelLearn', tutorial: 'panelLearn', solver: 'panelSolve', scan: 'panelScan', guides: 'panelGuides' };
 
 let panelMode = null;      // null = Play (패널 닫힘)
 let settingsOpen = false;
@@ -1352,13 +1580,14 @@ let sheetExpanded = false; // 모바일 튜토리얼 peek/expand
 //   영구 카드로 남기지 않는다. 2.6초 뒤 스스로 사라진다.
 // ──────────────────────────────────────────────────────────
 let toastTimer = 0;
-function toast(msg, kind) {
+function toast(msg, kind, ms) {
   toastEl.textContent = msg || '';
   toastEl.classList.toggle('err', kind === 'err');
   toastEl.classList.toggle('solved', kind === 'solved');
+  toastEl.classList.toggle('hint', kind === 'hint');
   toastEl.classList.toggle('show', !!msg);
   clearTimeout(toastTimer);
-  if (msg) toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2600);
+  if (msg) toastTimer = setTimeout(() => toastEl.classList.remove('show'), ms || (kind === 'hint' ? 5600 : 2600));
 }
 
 function syncTutExpandBtn() {
@@ -1420,6 +1649,7 @@ function openOverlay(name) {
   tutPanel.classList.toggle('open', next === 'tutorial');
   solverPanel.classList.toggle('open', next === 'solver');
   scanPanel.classList.toggle('open', next === 'scan');
+  guidesPanel.classList.toggle('open', next === 'guides');
   syncChrome();
 }
 
@@ -1441,6 +1671,10 @@ function initChrome() {
       if (m === 'scan') {
         if (panelMode === 'scan') openOverlay(null);
         else if (typeof window.__openScan === 'function') window.__openScan();
+        return;
+      }
+      if (m === 'guides') {
+        openOverlay(panelMode === 'guides' ? null : 'guides');
       }
     });
   });
@@ -1526,7 +1760,10 @@ function renderLesson() {
       <div class="alg-notation">${a.alg}</div></div>`;
     const btn = document.createElement('button');
     btn.textContent = t('demo');
-    btn.addEventListener('click', () => engine.playAlg(a.alg, false));
+    btn.addEventListener('click', () => {
+      if (a.setup === 'inverse') demoInverseAlg(a.alg);
+      else engine.playAlg(a.alg, false);
+    });
     row.appendChild(btn);
     tut.algs.appendChild(row);
   });
@@ -1542,7 +1779,7 @@ function renderLesson() {
 // '_' 셀은 inner(검은색)으로 처리.
 function applyDiagramState(stateObj) {
   const N = engine.n;
-  if (N !== 2 && N !== 3) return;
+  if (N < 2 || N > 5) return;
   if (engine.busy) return;
   engine.rebuild();
 
@@ -1550,6 +1787,7 @@ function applyDiagramState(stateObj) {
   const idxOf = v => globalThis.CubeMath.coordToIndex(N, v, 1);
   const onLayer = (v, layer) => Math.abs(v - layer) < 1e-6;
   const FACE_KEYS = ['R','L','U','D','F','B'];
+  const need = N * N;
   const cellIdx = [
     (x,y,z) => onLayer(x, OUTER) ? (N-1-idxOf(y))*N + (N-1-idxOf(z)) : -1,
     (x,y,z) => onLayer(x, -OUTER) ? (N-1-idxOf(y))*N + idxOf(z) : -1,
@@ -1564,7 +1802,9 @@ function applyDiagramState(stateObj) {
     for (let fi = 0; fi < 6; fi++) {
       const ci = cellIdx[fi](x, y, z);
       if (ci < 0) continue;
-      const code = stateObj[FACE_KEYS[fi]][ci];
+      const face = stateObj[FACE_KEYS[fi]];
+      if (!face || face.length !== need) continue;
+      const code = face[ci];
       const map = diagToHex();
       const hex = (code && code !== '_') ? (map[code] ?? engine.colors.inner) : engine.colors.inner;
       setFace(fi, hex);
@@ -1575,30 +1815,280 @@ function applyDiagramState(stateObj) {
   maybeRefreshSolver();
 }
 
-function openTrack(name, startIndex = 0) {
+function invertAlgString(str) {
+  const F = globalThis.CubeF2L;
+  if (F && typeof F.invertAlg === 'function') return F.invertAlg(str);
+  return String(str).trim().split(/\s+/).filter(Boolean).reverse().map(tok => {
+    if (tok.endsWith('2')) return tok;
+    if (tok.endsWith("'")) return tok.slice(0, -1);
+    return tok + "'";
+  }).join(' ');
+}
+
+function demoInverseAlg(alg) {
+  if (!alg || engine.busy) return;
+  engine.reset();
+  engine.playAlg(invertAlgString(alg), false, true);
+  engine.whenIdle().then(() => {
+    if (!engine.busy) engine.playAlg(alg, false);
+  });
+}
+
+function openTrack(name, startIndex = 0, opts) {
   if (!tracksForN(engine.n)[name]) return;
   tut.track = name;
   tut.i = startIndex;
-  sheetExpanded = false;
   openOverlay('tutorial');
+  setSheetExpanded(!!(opts && opts.fromGuide));
   renderLesson();
+  if (!(opts && opts.fromGuide)) return;
+  const pack = tracksForN(engine.n)[name];
+  const state = pack && pack.states && pack.states[startIndex];
+  if (state) applyDiagramState(state);
+  toast(t('guideLessonReady'), 'hint');
+  const demoAlg = opts.demoAlg || opts.f2lAlg || null;
+  if (demoAlg) {
+    setTimeout(() => { if (!engine.busy) demoInverseAlg(demoAlg); }, 400);
+    return;
+  }
+  const lesson = pack && pack[lang] && pack[lang][startIndex];
+  const first = lesson && lesson.intro && lesson.algs && lesson.algs[0];
+  if (!first || !first.alg) return;
+  setTimeout(() => {
+    if (first.setup === 'inverse') demoInverseAlg(first.alg);
+    else if (!engine.busy) engine.playAlg(first.alg, false);
+  }, 500);
+}
+
+function applyDeepLink() {
+  let q;
+  try { q = new URLSearchParams(location.search); }
+  catch (e) { return; }
+  const nRaw = q.get('n');
+  const learn = q.get('learn');
+  if (learn === 'scan') {
+    const want = nRaw === '2' ? 2 : nRaw === '4' ? 4 : nRaw === '5' ? 5 : 3;
+    if (engine.n !== want) setCubeN(want);
+    if (typeof window.__openScan === 'function') window.__openScan();
+    return;
+  }
+  if (learn === 'menu') {
+    const want = nRaw === '2' ? 2 : nRaw === '4' ? 4 : nRaw === '5' ? 5 : 3;
+    if (engine.n !== want) setCubeN(want);
+    openOverlay('learn');
+    return;
+  }
+  if (learn !== 'beginner' && learn !== 'cfop' && learn !== 'roux' && learn !== 'f2l' && learn !== 'oll' && learn !== 'pll') {
+    if (nRaw === '2' || nRaw === '3' || nRaw === '4' || nRaw === '5') {
+      const want = Number(nRaw);
+      if (engine.n !== want) setCubeN(want);
+    }
+    applyPractice(q.get('practice'));
+    return;
+  }
+  const want = (learn === 'cfop' || learn === 'roux' || learn === 'f2l' || learn === 'oll' || learn === 'pll') ? 3 : nRaw === '2' ? 2 : nRaw === '4' ? 4 : nRaw === '5' ? 5 : 3;
+  if (engine.n !== want) setCubeN(want);
+  if (engine.n !== want) return;
+  const pack = tracksForN(engine.n)[learn];
+  if (!pack) {
+    openOverlay('learn');
+    return;
+  }
+  if (learn === 'f2l') {
+    const caseId = parseInt(q.get('case'), 10);
+    const F = globalThis.CubeF2L;
+    const c = Number.isFinite(caseId) && F ? F.byId(caseId) : null;
+    if (c) {
+      const step = F.catStep[c.cat] != null ? F.catStep[c.cat] : 0;
+      openTrack('f2l', step, { fromGuide: true, f2lAlg: c.alg });
+      return;
+    }
+  }
+  if (learn === 'oll') {
+    const caseId = parseInt(q.get('case'), 10);
+    const O = globalThis.CubeOLL;
+    const c = Number.isFinite(caseId) && O ? O.byId(caseId) : null;
+    if (c) {
+      const step = O.lessonStepForCase ? O.lessonStepForCase(caseId) : 0;
+      openTrack('oll', step, { fromGuide: true, demoAlg: c.alg });
+      return;
+    }
+  }
+  if (learn === 'pll') {
+    const caseId = (q.get('case') || '').trim();
+    const P = globalThis.CubePLL;
+    const c = caseId && P ? P.byId(caseId) : null;
+    if (c) {
+      const step = P.lessonStepForCase ? P.lessonStepForCase(c.id) : 0;
+      openTrack('pll', step, { fromGuide: true, demoAlg: c.alg });
+      return;
+    }
+  }
+  const raw = q.get('step');
+  const parsed = raw == null || raw === '' ? 0 : parseInt(raw, 10);
+  const max = pack.en.length - 1;
+  const i = Number.isFinite(parsed) ? Math.max(0, Math.min(max, parsed)) : 0;
+  openTrack(learn, i, { fromGuide: true });
 }
 
 document.getElementById('open-tut').addEventListener('click', () => openTrack('beginner'));
 document.getElementById('open-cfop').addEventListener('click', () => openTrack('cfop'));
+document.getElementById('open-f2l').addEventListener('click', () => openTrack('f2l'));
+document.getElementById('open-oll').addEventListener('click', () => openTrack('oll'));
+document.getElementById('open-pll').addEventListener('click', () => openTrack('pll'));
+document.getElementById('open-roux').addEventListener('click', () => openTrack('roux'));
 tut.prev.addEventListener('click', () => { if (tut.i > 0) { tut.i--; renderLesson(); } });
 tut.next.addEventListener('click', () => { if (tut.i < lessonsOf(tut.track).length - 1) { tut.i++; renderLesson(); } });
 
 // ──────────────────────────────────────────────────────────
 // 스마트 튜터: 현재 상태 인식 → 솔버(Kociemba)로 다음 수 / 자동 풀이
 // ──────────────────────────────────────────────────────────
-function computeSolution() {
-  if (!requireN3('computeSolution')) return '';
+function solveOnMain(facelets, n) {
+  return Promise.resolve(globalThis.CubeSolver.solve(facelets, n)).then(sol => sol || '');
+}
+
+const FILE_PAGE = location.protocol === 'file:';
+
+function localUrl(path) {
+  return new URL(path, location.href).href;
+}
+
+function waitWorkerReady(w, job) {
+  return new Promise((resolve, reject) => {
+    const onMsg = (e) => {
+      const data = e.data || {};
+      if (data.type !== 'ready' || data.job !== job) return;
+      cleanup();
+      if (data.ok) resolve();
+      else reject(new Error(data.error || 'worker init failed'));
+    };
+    const onErr = (ev) => {
+      cleanup();
+      reject(new Error((ev && ev.message) || 'worker error'));
+    };
+    function cleanup() {
+      w.removeEventListener('message', onMsg);
+      w.removeEventListener('error', onErr);
+    }
+    w.addEventListener('message', onMsg);
+    w.addEventListener('error', onErr);
+    w.postMessage({ type: 'init', job: job });
+  });
+}
+
+const solverHost = {
+  worker: null,
+  ready: false,
+  initing: null,
+  initReject: null,
+  job: 0,
+  epoch: 0,
+  pending: null,
+
+  abort() {
+    this.epoch++;
+    this.job++;
+    if (this.pending) {
+      const p = this.pending;
+      this.pending = null;
+      p.reject(Object.assign(new Error('cancelled'), { cancelled: true }));
+    }
+    if (this.initReject) {
+      const rej = this.initReject;
+      this.initReject = null;
+      rej(Object.assign(new Error('cancelled'), { cancelled: true }));
+    }
+    if (this.worker) {
+      this.worker.terminate();
+      this.worker = null;
+    }
+    this.ready = false;
+    this.initing = null;
+  },
+
+  _finish(data) {
+    if (!this.pending || data.job !== this.pending.job) return;
+    const p = this.pending;
+    this.pending = null;
+    if (data.ok) p.resolve(data.sol || '');
+    else p.reject(new Error(data.error || 'solve failed'));
+  },
+
+  _bind(w) {
+    w.addEventListener('message', (e) => {
+      const data = e.data || {};
+      if (data.type === 'done') this._finish(data);
+    });
+    w.addEventListener('error', (ev) => {
+      if (this.pending) {
+        this._finish({ job: this.pending.job, ok: false, error: (ev && ev.message) || 'worker error' });
+      }
+    });
+  },
+
+  ensure() {
+    if (this.ready) return Promise.resolve();
+    if (this.initing) return this.initing;
+    const epoch = this.epoch;
+    this.initing = (async () => {
+      const w = new Worker(localUrl('solver-worker.js'));
+      if (this.epoch !== epoch) {
+        w.terminate();
+        throw Object.assign(new Error('cancelled'), { cancelled: true });
+      }
+      this.worker = w;
+      this._bind(w);
+      const job = ++this.job;
+      await new Promise((resolve, reject) => {
+        this.initReject = reject;
+        waitWorkerReady(w, job).then(resolve, reject);
+      });
+      if (this.epoch !== epoch) {
+        throw Object.assign(new Error('cancelled'), { cancelled: true });
+      }
+      this.ready = true;
+    })().finally(() => {
+      this.initing = null;
+      this.initReject = null;
+    });
+    return this.initing;
+  },
+
+  solve(facelets, n) {
+    if (this.pending) this.abort();
+    return this.ensure().then(() => new Promise((resolve, reject) => {
+      if (!this.worker) {
+        reject(new Error('worker missing'));
+        return;
+      }
+      const job = ++this.job;
+      this.pending = { job: job, resolve: resolve, reject: reject };
+      this.worker.postMessage({ type: 'solve', job: job, facelets: facelets, n: n });
+    }));
+  },
+};
+
+async function computeSolution() {
+  await engine.whenIdle();
+  const inv = engine.scrambleSolution && engine.scrambleSolution();
+  if (inv) return inv;
+  const st = engine.readState();
+  if (!st || !st.facelets || st.facelets.indexOf('?') >= 0) return '';
   try {
-    return globalThis.CubeSolver.solve(engine.readState().facelets || '');
+    if (st.n < 4) return await solveOnMain(st.facelets, st.n);
+    if (!FILE_PAGE) return await solverHost.solve(st.facelets, st.n);
+    const CS = globalThis.CubeSolver;
+    CS.setYield(() => new Promise(r => setTimeout(r, 0)), 45000);
+    try { return await solveOnMain(st.facelets, st.n); }
+    finally { CS.setYield(null); }
   } catch (e) {
-    setSolveStatus(t('solverFailed')(e && e.message ? e.message : e));
-    return '';
+    if (e && e.cancelled) throw e;
+    if (e && e.message === 'timeout') {
+      setSolveStatus(t('solverTimeout'));
+      throw e;
+    }
+    setSolveStatus(t('solverError')(e && e.message ? e.message : e));
+    throw e;
   }
 }
 
@@ -1607,9 +2097,46 @@ let solverReady = false;
 let solverIniting = false;
 let solverWaiters = [];
 let solverMoves = [];   // 남은 수순. Next move는 이걸 한 수씩 소모 (매 수 재계산하지 않음)
-let solverBusy = false; // Next/All 중복 클릭 방지
+let solverBusy = false;
+let solverInFlight = null;
+let playAfterSolve = false;
+let solveAllAfter = false;
+let computeTick = 0;
+let computeStartedAt = 0;
+
+function startComputeUi() {
+  computeStartedAt = Date.now();
+  setSolveStatus(t('solverComputingSec')(0));
+  clearInterval(computeTick);
+  computeTick = setInterval(() => {
+    const s = Math.max(0, Math.round((Date.now() - computeStartedAt) / 1000));
+    setSolveStatus(t('solverComputingSec')(s));
+  }, 500);
+}
+function stopComputeUi() {
+  clearInterval(computeTick);
+  computeTick = 0;
+}
+
 function ensureSolver(onReady) {
-  if (solverReady) { onReady(); return; }
+  if (engine.n >= 4) {
+    if (FILE_PAGE) {
+      setSolveStatus(t('solverPreparing'));
+      setTimeout(() => {
+        try { globalThis.CubeSolver.init(); onReady(); }
+        catch (e) { setSolveStatus(t('solverFailed')(e.message)); }
+      }, 50);
+      return;
+    }
+    if (!solverHost.ready) setSolveStatus(t('solverPreparing'));
+    solverHost.ensure().then(() => onReady()).catch(e => {
+      if (e && e.cancelled) return;
+      setSolveStatus(t('solverFailed')(e && e.message ? e.message : e));
+    });
+    return;
+  }
+  const needTables = engine.n !== 2;
+  if (!needTables || solverReady) { onReady(); return; }
   solverWaiters.push(onReady);
   if (solverIniting) return;
   solverIniting = true;
@@ -1621,6 +2148,27 @@ function ensureSolver(onReady) {
     const queued = solverWaiters.splice(0);
     if (solverReady) queued.forEach(fn => { try { fn(); } catch (err) { console.error(err); } });
   }, 50);
+}
+
+function hasScrambleSolution() {
+  return !!(engine.scrambleSolution && engine.scrambleSolution());
+}
+
+function loadMoves() {
+  if (solverMoves.length) return Promise.resolve(solverMoves);
+  if (solverInFlight) return solverInFlight;
+  if (engine.n >= 4 && !hasScrambleSolution()) startComputeUi();
+  const job = (async () => {
+    const sol = await computeSolution();
+    solverMoves = globalThis.CubeSolver.parseMoves(sol);
+    return solverMoves;
+  })();
+  solverInFlight = job;
+  job.finally(() => {
+    if (solverInFlight === job) solverInFlight = null;
+    stopComputeUi();
+  });
+  return job;
 }
 
 const solveStatusEl = document.getElementById('solve-status');
@@ -1657,69 +2205,135 @@ function solverOpen() {
   return document.getElementById('solver').classList.contains('open');
 }
 function maybeRefreshSolver() {
+  playAfterSolve = false;
+  solveAllAfter = false;
+  stopComputeUi();
+  solverHost.abort();
+  solverMoves = [];
+  solverInFlight = null;
+  solverBusy = false;
   if (solverOpen()) refreshSolution();
-  else solverMoves = [];
 }
 
-function refreshSolution() {
-  ensureSolver(() => {
-    const sol = computeSolution();
-    solverMoves = globalThis.CubeSolver.parseMoves(sol);
+function playOneSolverMove() {
+  const tok = solverMoves.shift();
+  if (!tok) {
     showSolverMoves();
-  });
+    return false;
+  }
+  const hm = String(tok).match(/^(3|2)?(Uw|Dw|Lw|Rw|Fw|Bw|[UDLRFB])/i);
+  if (hm) {
+    const pre = hm[1] || '';
+    const face = /w$/i.test(hm[2]) ? hm[2][0].toUpperCase() + 'w' : hm[2].toUpperCase();
+    engine.highlight(pre + face);
+  }
+  engine.playAlg(tok, false);
+  showSolverMoves();
+  return true;
+}
+
+let refreshGen = 0;
+function refreshSolution() {
+  const gen = ++refreshGen;
+  const run = async () => {
+    try {
+      await loadMoves();
+      if (gen !== refreshGen) return;
+      if (solveAllAfter) {
+        solveAllAfter = false;
+        playAfterSolve = false;
+        const sol = solverMoves.join(' ');
+        solverMoves = [];
+        if (!sol) { showSolverMoves(); return; }
+        setSolveStatus(t('autoSolving'));
+        setSolveMoves(sol);
+        engine.playAlg(sol, false);
+        await engine.whenIdle();
+        setSolveStatus(engine.isSolved() ? t('solved') : t('solveFinished'));
+        setSolveMoves('');
+        return;
+      }
+      if (playAfterSolve) {
+        playAfterSolve = false;
+        await engine.whenIdle();
+        playOneSolverMove();
+        return;
+      }
+      showSolverMoves();
+    } catch (e) {
+      if (e && e.cancelled) return;
+      if (e && e.message === 'timeout') {
+        setSolveStatus(t('solverTimeout'));
+        return;
+      }
+      setSolveStatus(t('solverError')(e && e.message ? e.message : e));
+    }
+  };
+  if (hasScrambleSolution()) run();
+  else ensureSolver(run);
 }
 
 // 다음 한 수: 계산된 수순을 한 토큰씩 실행. U2 등 180°가 끝나기 전에
 // 상태를 다시 읽으면 같은 면을 또 제안해서 루프에 빠지므로 재계산하지 않는다.
 // 사용자가 직접 돌리면 maybeRefreshSolver()가 수순을 다시 뽑는다.
 function solveNext() {
-  ensureSolver(async () => {
-    if (solverBusy) return;
-    solverBusy = true;
+  if (!solverMoves.length) {
+    playAfterSolve = true;
+    if (engine.n >= 4 && !hasScrambleSolution()) {
+      if (!solverInFlight) startComputeUi();
+      toast(t('solverWillPlay'), 'hint', 4000);
+    }
+    refreshSolution();
+    return;
+  }
+  if (solverBusy) return;
+  solverBusy = true;
+  (async () => {
     try {
       await engine.whenIdle();
-      if (!solverMoves.length) {
-        const sol = computeSolution();
-        if (!sol) { showSolverMoves(); return; }
-        solverMoves = globalThis.CubeSolver.parseMoves(sol);
-      }
-      const tok = solverMoves.shift();
-      if (!tok) { refreshSolution(); return; }
-      engine.highlight(/^[UDLRFB]/i.test(tok) ? tok[0].toUpperCase() : tok[0]);
-      engine.playAlg(tok, false);
+      playOneSolverMove();
       await engine.whenIdle();
-      if (!solverMoves.length) refreshSolution();
-      else showSolverMoves();
     } catch (e) {
-      setSolveStatus(t('solverFailed')(e && e.message ? e.message : e));
+      if (e && e.cancelled) return;
+      setSolveStatus(t('solverError')(e && e.message ? e.message : e));
     } finally {
       solverBusy = false;
     }
-  });
+  })();
 }
 
 // 전체 자동 풀이
 function solveAll() {
-  ensureSolver(async () => {
-    if (solverBusy) return;
-    solverBusy = true;
-    try {
-      await engine.whenIdle();
-      const sol = computeSolution();
-      if (!sol) { refreshSolution(); return; }
-      solverMoves = [];
-      setSolveStatus(t('autoSolving'));
-      setSolveMoves(sol);
-      engine.playAlg(sol, false);
-      await engine.whenIdle();
-      setSolveStatus(engine.isSolved() ? t('solved') : t('solveFinished'));
-      setSolveMoves('');
-    } catch (e) {
-      setSolveStatus(t('solverFailed')(e && e.message ? e.message : e));
-    } finally {
-      solverBusy = false;
-    }
-  });
+  solveAllAfter = true;
+  playAfterSolve = false;
+  if (engine.n >= 4 && !solverMoves.length && !hasScrambleSolution()) {
+    if (!solverInFlight) startComputeUi();
+    toast(t('solverComputing'), 'hint', 4000);
+  }
+  if (solverMoves.length) {
+    const sol = solverMoves.join(' ');
+    solverMoves = [];
+    (async () => {
+      if (solverBusy) return;
+      solverBusy = true;
+      try {
+        await engine.whenIdle();
+        setSolveStatus(t('autoSolving'));
+        setSolveMoves(sol);
+        engine.playAlg(sol, false);
+        await engine.whenIdle();
+        setSolveStatus(engine.isSolved() ? t('solved') : t('solveFinished'));
+        setSolveMoves('');
+      } catch (e) {
+        if (e && e.cancelled) return;
+        setSolveStatus(t('solverError')(e && e.message ? e.message : e));
+      } finally {
+        solverBusy = false;
+      }
+    })();
+    return;
+  }
+  refreshSolution();
 }
 
 function openSolverPane() {
@@ -1740,12 +2354,13 @@ hudStatusEl.addEventListener('click', () => {
 });
 
 // ──────────────────────────────────────────────────────────
-// 사진 → 큐브 스캔 (3×3, 6면 · 면마다 확인 후 다음)
+// 사진 → 큐브 스캔 (2×2–5×5, 6면 · 면마다 확인 후 다음)
 // ──────────────────────────────────────────────────────────
 (function initCubeScanUi() {
   const CS = globalThis.CubeScan;
   if (!CS) return;
 
+  const elScan = document.getElementById('scan');
   const elFace = document.getElementById('scan-face-label');
   const elTip = document.getElementById('scan-tip');
   const elProg = document.getElementById('scan-progress');
@@ -1761,16 +2376,13 @@ hudStatusEl.addEventListener('click', () => {
   const elCheckGrid = document.getElementById('scan-check-grid');
   const elCheckHint = document.getElementById('scan-check-center-hint');
   const elReviewGrid = document.getElementById('scan-review');
+  const elGuideGrid = document.getElementById('scan-grid');
   const btnSnap = document.getElementById('scan-snap');
   const btnCheckOk = document.getElementById('scan-check-ok');
   const fileInput = document.getElementById('scan-file');
   const elUploadLabel = document.getElementById('scan-upload-label');
 
-  const FACE_I18N = {
-    U: 'scanFaceU', R: 'scanFaceR', F: 'scanFaceF',
-    D: 'scanFaceD', L: 'scanFaceL', B: 'scanFaceB',
-  };
-
+  let scanN = 3;
   let faceIdx = 0;
   let stage = 'capture'; // capture | check | final
   let faces = CS.emptyFaces(3);
@@ -1778,6 +2390,11 @@ hudStatusEl.addEventListener('click', () => {
   let previewByFace = {};
   let confirmed = { U: false, R: false, F: false, D: false, L: false, B: false };
   let camStream = null;
+
+  function cellCount() { return scanN * scanN; }
+  function evenCube() { return (scanN % 2) === 0; }
+  function midIndex() { return CS.centerIndex(scanN); }
+  function faceLabelKey(f) { return evenCube() ? ('scanFace' + f + '2') : ('scanFace' + f); }
 
   function faceLetter() { return CS.FACE_ORDER[faceIdx]; }
 
@@ -1836,7 +2453,7 @@ hudStatusEl.addEventListener('click', () => {
   }
 
   function renderFaceLabel() {
-    elFace.textContent = t(FACE_I18N[faceLetter()]);
+    elFace.textContent = t(faceLabelKey(faceLetter()));
   }
 
   function renderProgress() {
@@ -1857,7 +2474,11 @@ hudStatusEl.addEventListener('click', () => {
   function renderCaptureChrome() {
     renderFaceLabel();
     const f = faceLetter();
-    if (f === 'U') elTip.textContent = t('scanTipU');
+    if (evenCube()) {
+      if (f === 'U') elTip.textContent = t('scanTipU2');
+      else if (f === 'D') elTip.textContent = t('scanTipD2');
+      else elTip.textContent = t('scanTipSide2');
+    } else if (f === 'U') elTip.textContent = t('scanTipU');
     else if (f === 'D') elTip.textContent = t('scanTipD');
     else elTip.textContent = t('scanTipSide');
     renderProgress();
@@ -1916,8 +2537,8 @@ hudStatusEl.addEventListener('click', () => {
 
   function clearCurrentFace() {
     const f = faceLetter();
-    faces[f] = Array(9).fill(null);
-    rgbsByFace[f] = Array(9).fill(null);
+    faces[f] = Array(cellCount()).fill(null);
+    rgbsByFace[f] = Array(cellCount()).fill(null);
     delete previewByFace[f];
     confirmed[f] = false;
   }
@@ -1937,12 +2558,18 @@ hudStatusEl.addEventListener('click', () => {
   }
 
   function classifyWithCurrentRefs(samples) {
-    const centers = {};
-    CS.FACE_ORDER.forEach(f => {
-      if (rgbsByFace[f] && rgbsByFace[f][4]) centers[f] = rgbsByFace[f][4];
-    });
-    const refs = Object.keys(centers).length >= 3
-      ? CS.calibrateRefs(baseRefs(), centers)
+    let colorRgbs;
+    if (!evenCube()) {
+      const mid = midIndex();
+      colorRgbs = {};
+      CS.FACE_ORDER.forEach(f => {
+        if (rgbsByFace[f] && rgbsByFace[f][mid]) colorRgbs[f] = rgbsByFace[f][mid];
+      });
+    } else {
+      colorRgbs = CS.observedColorRgbs(faces, rgbsByFace);
+    }
+    const refs = Object.keys(colorRgbs).length >= 3
+      ? CS.calibrateRefs(baseRefs(), colorRgbs)
       : baseRefs();
     return CS.classifyFace(samples, refs).map(x => x.color);
   }
@@ -1951,8 +2578,8 @@ hudStatusEl.addEventListener('click', () => {
     const f = faceLetter();
     rgbsByFace[f] = samples;
     faces[f] = classifyWithCurrentRefs(samples);
-    // 센터는 이 면 색으로 강제 (촬영 규칙상 가운데 = 그 면)
-    faces[f][4] = f;
+    // 홀수: 촬영 규칙상 가운데 = 그 면 색. 짝수는 고정 센터가 없다.
+    if (!evenCube()) faces[f][midIndex()] = f;
     if (previewUrl) previewByFace[f] = previewUrl;
     confirmed[f] = false;
     stopCam();
@@ -1967,7 +2594,7 @@ hudStatusEl.addEventListener('click', () => {
       const idata = sourceToImageData(img);
       URL.revokeObjectURL(url);
       if (!idata) { setMsg(elStatus, t('scanCamFail'), 'err'); return; }
-      const samples = CS.sampleFace(idata, 3);
+      const samples = CS.sampleFace(idata, scanN);
       const c = document.createElement('canvas');
       c.width = idata.width; c.height = idata.height;
       c.getContext('2d').putImageData(idata, 0, 0);
@@ -2006,7 +2633,7 @@ hudStatusEl.addEventListener('click', () => {
     if (!camStream) return;
     const idata = sourceToImageData(elVideo);
     if (!idata) { setMsg(elStatus, t('scanCamFail'), 'err'); return; }
-    const samples = CS.sampleFace(idata, 3);
+    const samples = CS.sampleFace(idata, scanN);
     const c = document.createElement('canvas');
     c.width = idata.width; c.height = idata.height;
     c.getContext('2d').putImageData(idata, 0, 0);
@@ -2014,12 +2641,19 @@ hudStatusEl.addEventListener('click', () => {
   }
 
   function centerOk() {
+    if (evenCube()) return true;
     const f = faceLetter();
-    return faces[f] && faces[f][4] === f;
+    return faces[f] && faces[f][midIndex()] === f;
   }
 
   function updateCheckStatus() {
     const f = faceLetter();
+    if (evenCube()) {
+      elCheckHint.textContent = t('scanOrientHintEven');
+      setMsg(elCheckStatus, t('scanFaceOk'), 'ok');
+      btnCheckOk.disabled = false;
+      return true;
+    }
     elCheckHint.textContent = t('scanCenterHint')(f);
     if (!centerOk()) {
       setMsg(elCheckStatus, t('scanCenterBad')(f), 'err');
@@ -2033,6 +2667,7 @@ hudStatusEl.addEventListener('click', () => {
 
   function renderCheckGrid() {
     const f = faceLetter();
+    const mid = midIndex();
     elCheckGrid.innerHTML = '';
     (faces[f] || []).forEach((col, i) => {
       const b = document.createElement('button');
@@ -2040,10 +2675,9 @@ hudStatusEl.addEventListener('click', () => {
       b.style.background = hexCss(col);
       b.style.color = inkFor(col);
       b.textContent = col;
-      if (i === 4) b.style.outline = '2px solid var(--warn)';
+      if (!evenCube() && i === mid) b.style.outline = '2px solid var(--warn)';
       b.addEventListener('click', () => {
         faces[f][i] = CS.nextColor(faces[f][i]);
-        // 센터를 다른 색으로 돌렸다가 다시 맞출 수 있게 둠
         b.style.background = hexCss(faces[f][i]);
         b.style.color = inkFor(faces[f][i]);
         b.textContent = faces[f][i];
@@ -2089,7 +2723,7 @@ hudStatusEl.addEventListener('click', () => {
         cell.tabIndex = -1;
         cell.style.background = hexCss(col);
         cell.style.color = inkFor(col);
-        cell.textContent = col;
+        cell.textContent = scanN <= 3 ? col : '';
         mini.appendChild(cell);
       });
       card.appendChild(mini);
@@ -2099,17 +2733,29 @@ hudStatusEl.addEventListener('click', () => {
   }
 
   function validateFinal() {
-    const v = CS.validateCube(faces, 3);
+    const v = CS.validateCube(faces, scanN);
     if (v.ok) setMsg(elReviewStatus, t('scanAllDone'), 'ok');
-    else setMsg(elReviewStatus, t('scanInvalid'), 'err');
+    else setMsg(elReviewStatus, evenCube() ? t('scanInvalidEven')(scanN) : t('scanInvalid'), 'err');
     return v.ok;
+  }
+
+  function syncScanGrid() {
+    if (elScan) {
+      elScan.style.setProperty('--scan-n', String(scanN));
+      elScan.dataset.scanN = String(scanN);
+    }
+    if (elGuideGrid) {
+      elGuideGrid.innerHTML = '';
+      const n = cellCount();
+      for (let i = 0; i < n; i++) elGuideGrid.appendChild(document.createElement('span'));
+    }
   }
 
   function resetSession() {
     stopCam();
     faceIdx = 0;
-    faces = CS.emptyFaces(3);
-    rgbsByFace = CS.emptyFaces(3);
+    faces = CS.emptyFaces(scanN);
+    rgbsByFace = CS.emptyFaces(scanN);
     previewByFace = {};
     confirmed = { U: false, R: false, F: false, D: false, L: false, B: false };
     elPreview.classList.remove('show');
@@ -2117,15 +2763,14 @@ hudStatusEl.addEventListener('click', () => {
     setMsg(elStatus, '', null);
     setMsg(elCheckStatus, '', null);
     setMsg(elReviewStatus, '', null);
+    syncScanGrid();
     enterCapture();
   }
 
   function openScan() {
-    const needSwitch = engine.n !== 3;
-    if (needSwitch) setCubeN(3);
+    scanN = engine.n;
     resetSession();
     openOverlay('scan');
-    if (needSwitch) setMsg(elStatus, t('scanNeed3'), 'ok');
   }
 
   function applyScan() {
@@ -2134,7 +2779,7 @@ hudStatusEl.addEventListener('click', () => {
       return;
     }
     if (!validateFinal()) return;
-    if (engine.n !== 3) setCubeN(3);
+    if (engine.n !== scanN) setCubeN(scanN);
     stopCam();
     applyDiagramState(CS.toDiagramState(faces));
     openOverlay('solver');
@@ -2144,6 +2789,10 @@ hudStatusEl.addEventListener('click', () => {
 
   window.__openScan = openScan;
   window.__scanStopCam = stopCam;
+  window.__scanOnSizeChange = function () {
+    scanN = engine.n;
+    resetSession();
+  };
   fileInput.addEventListener('change', () => {
     const f = fileInput.files && fileInput.files[0];
     fileInput.value = '';
@@ -2277,18 +2926,26 @@ function syncSizeLabels() {
 
 function applySizeUi() {
   syncSizeLabels();
-  // 새 크기에서 뜻이 없는 모드는 닫는다 (레일 항목도 같이 숨겨진다)
-  if (panelMode === 'tutorial' || (engine.n !== 3 && panelMode)) openOverlay(null);
+  if (panelMode === 'scan') {
+    if (typeof window.__scanOnSizeChange === 'function') window.__scanOnSizeChange();
+    syncChrome();
+  } else if (panelMode === 'tutorial') openOverlay(null);
   else syncChrome();
   if (engine.n !== 3) {
     const sb = document.getElementById('stage-box');
     sb.classList.remove('show');
     sb.innerHTML = '';
     lastStage = null;
+  }
+  if (panelMode === 'solver') {
+    playAfterSolve = false;
+    solveAllAfter = false;
+    stopComputeUi();
+    solverHost.abort();
     solverMoves = [];
+    solverInFlight = null;
     solverBusy = false;
-    setSolveStatus(t('alreadySolved'));
-    setSolveMoves('');
+    refreshSolution();
   }
 }
 
@@ -2378,6 +3035,7 @@ document.querySelectorAll('#lang-switch button').forEach(b => {
 applyLang();
 syncStatsDom();
 initChrome();
+applyDeepLink();
 
 (function tickUi() {
   requestAnimationFrame(tickUi);
