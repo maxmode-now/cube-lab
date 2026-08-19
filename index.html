@@ -33,17 +33,17 @@
 })();
 </script>
 <meta name="theme-color" content="#0f1117" />
-<meta name="description" content="Free browser trainer for 2×2–5×5. Learn beginner, CFOP, and Roux, scan a 2×2–5×5 from photos, and follow an optimal solve. No account." />
+<meta name="description" content="Free browser trainer for 2×2–5×5. Learn beginner, CFOP, and Roux, scan a 2×2–5×5 from photos, and follow beginner steps or a fast solve. No account." />
 <link rel="canonical" href="https://cube.maxmode-now.com/" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://cube.maxmode-now.com/" />
 <meta property="og:title" content="Cube Lab — Play, Learn, Scan &amp; Solve Rubik's Cubes" />
-<meta property="og:description" content="Free browser trainer for 2×2–5×5. Learn beginner, CFOP, and Roux, scan a 2×2–5×5 from photos, and follow an optimal solve. No account." />
+<meta property="og:description" content="Free browser trainer for 2×2–5×5. Learn beginner, CFOP, and Roux, scan a 2×2–5×5 from photos, and follow beginner steps or a fast solve. No account." />
 <meta property="og:image" content="https://cube.maxmode-now.com/docs/play.png" />
 <meta property="og:locale" content="en_US" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Cube Lab — Play, Learn, Scan &amp; Solve Rubik's Cubes" />
-<meta name="twitter:description" content="Free browser trainer for 2×2–5×5. Learn beginner, CFOP, and Roux, scan a 2×2–5×5 from photos, and follow an optimal solve. No account." />
+<meta name="twitter:description" content="Free browser trainer for 2×2–5×5. Learn beginner, CFOP, and Roux, scan a 2×2–5×5 from photos, and follow beginner steps or a fast solve. No account." />
 <meta name="twitter:image" content="https://cube.maxmode-now.com/docs/play.png" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -59,7 +59,7 @@
   "@type": "WebApplication",
   "name": "Cube Lab",
   "url": "https://cube.maxmode-now.com/",
-  "description": "Free browser trainer for 2×2–5×5. Learn beginner, CFOP, and Roux, scan a 2×2–5×5 from photos, and follow an optimal solve. No account.",
+  "description": "Free browser trainer for 2×2–5×5. Learn beginner, CFOP, and Roux, scan a 2×2–5×5 from photos, and follow beginner steps or a fast solve. No account.",
   "applicationCategory": "GameApplication",
   "operatingSystem": "Any",
   "browserRequirements": "Requires JavaScript. HTML5.",
@@ -235,6 +235,8 @@
     min-width: 0; min-height: 0;
   }
   #act-play { display: flex; max-width: min(560px, 100%); margin: 0 auto; }
+  #shell[data-mode="drill"] #act-play { display: none; }
+  #shell[data-mode="drill"] #act-drill { display: flex; max-width: min(560px, 100%); margin: 0 auto; }
   #actions button { flex: 1 1 0; max-width: 180px; }
   #actions .primary { flex: 1.3 1 0; max-width: 240px; }
   #act-play button {
@@ -255,7 +257,8 @@
     flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 8px;
     padding: var(--pad-panel); border-bottom: 1px solid var(--border);
   }
-  #panel-title { font-size: var(--fs-md); margin: 0; min-width: 0;
+  #panel-back.hidden { display: none; }
+  #panel-title { font-size: var(--fs-md); margin: 0; min-width: 0; flex: 1 1 auto;
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   #panel-body {
     flex: 1 1 auto; min-height: 0; overflow-y: auto; scrollbar-gutter: stable;
@@ -265,8 +268,11 @@
   #panel-foot.hidden { display: none; }
 
   /* 패널 안의 모드별 섹션 — 하나만 보인다 */
-  #learn-picker, #tutorial, #solver, #scan, #guides { display: none; }
-  #learn-picker.open, #tutorial.open, #solver.open, #scan.open, #guides.open { display: block; }
+  #learn-picker, #tutorial, #solver, #scan, #guides, #drill { display: none; }
+  #learn-picker.open, #tutorial.open, #solver.open, #scan.open, #guides.open, #drill.open { display: block; }
+  #drill-sets { width: 100%; }
+  #drill-sets button { flex: 1 1 0; }
+  #drill-hint { margin: 10px 0 0; font-size: var(--fs-sm); color: var(--muted); line-height: 1.55; }
 
   /* ── 설정 팝오버 (⚙) — 세션당 한두 번 쓰는 것들만 모아둔다 ── */
   #ui {
@@ -300,6 +306,7 @@
   .learn-list button,
   .learn-list .btn { width: 100%; justify-content: flex-start; text-decoration: none; }
   .learn-list .btn:hover { text-decoration: none; }
+  #guides .learn-list + .learn-list { margin-top: var(--gap); }
 
   #lang-switch { width: max-content; }
   #layer-mode { width: 100%; flex-wrap: wrap; }
@@ -349,6 +356,63 @@
     max-height: 72px; overflow-y: auto;
   }
   #solver-hud.open #solver-hud-moves { display: block; }
+
+  /* Play 타이머 HUD: 스크램블 표기 + ao5/ao12. 큐브는 가리지 않는다. */
+  #play-hud {
+    display: none; position: absolute; z-index: 4; left: 0; right: 0; top: 8px;
+    padding: 0 10px; pointer-events: none; text-align: center;
+  }
+  #shell[data-mode="play"] #play-hud.has-scramble { display: block; }
+  #play-scramble {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: var(--fs-sm); font-weight: 600; color: var(--warn);
+    line-height: 1.35; word-break: break-word;
+    text-shadow: 0 1px 2px var(--bg);
+    max-height: 2.8em; overflow: hidden;
+  }
+  #play-avgs {
+    pointer-events: auto; display: inline-flex; align-items: center; gap: 10px;
+    margin-top: 4px; padding: 3px 10px; width: auto; max-width: 100%;
+    min-height: 0; height: auto;
+    font-size: var(--fs-xs); font-weight: 600; color: var(--muted);
+    background: var(--glass); backdrop-filter: blur(8px);
+    border: 1px solid var(--border); border-radius: var(--r-full);
+  }
+  #play-avgs:hover { color: var(--text); background: var(--surface-2); }
+  #times-sheet {
+    display: none; position: absolute; z-index: 42; flex-direction: column;
+    left: 50%; bottom: 12px; transform: translateX(-50%);
+    width: min(420px, calc(100% - 24px)); max-height: min(48dvh, 400px);
+    background: var(--glass); backdrop-filter: blur(10px);
+    border: 1px solid var(--border); border-radius: var(--r-md); box-shadow: var(--shadow);
+  }
+  #times-sheet.open { display: flex; }
+  #times-body { overflow-y: auto; padding: 8px var(--pad-panel) var(--pad-panel); min-height: 0; }
+  .time-row {
+    display: grid; grid-template-columns: 4.6rem minmax(0, 1fr) auto;
+    gap: 8px; align-items: center;
+    padding: 6px 0; border-bottom: 1px solid var(--border);
+    font-size: var(--fs-xs);
+  }
+  .time-row:last-child { border-bottom: none; }
+  .time-ms { font-variant-numeric: tabular-nums; font-weight: 700; }
+  .time-scr {
+    font-family: ui-monospace, Menlo, monospace; color: var(--muted);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .time-acts { display: flex; gap: 4px; }
+  .time-acts button {
+    min-height: var(--h-ctl-sm); width: auto; padding: 0 8px;
+    font-size: var(--fs-xs); font-weight: 700;
+  }
+  .time-acts button.active {
+    background: var(--accent); color: var(--on-accent); border-color: var(--accent);
+  }
+  #times-empty { color: var(--muted); font-size: var(--fs-sm); text-align: center; padding: 16px 0; margin: 0; }
+  #stats .stat.inspect-warn b { color: var(--warn); }
+  #stats .stat.inspect-late b { color: #ff9f0a; }
+  #stats .stat.inspect-plus2 b,
+  #stats .stat.inspect-dnf b { color: var(--danger); }
 
   /* ── 스크롤바: 남은 두 개의 스크롤 영역만, 얇게 ── */
   #panel-body, #ui-body { scrollbar-width: thin; scrollbar-color: var(--surface-3) transparent; }
@@ -497,6 +561,11 @@
   #solve-moves { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: var(--fs-sm);
     color: var(--warn); line-height: 1.5; word-break: break-word; margin-bottom: 10px;
     max-height: 64px; overflow-y: auto; }
+  #solve-moves .solve-chunk, #solver-hud-moves .solve-chunk {
+    color: var(--accent); font-weight: 700;
+  }
+  #solve-mode { margin-bottom: 10px; }
+  #solve-mode button { flex: 1; }
   .solver-note { font-size: var(--fs-xs); color: var(--muted); margin-top: 10px; line-height: 1.5; }
 
   /* 큐브 스캔 본문 */
@@ -608,8 +677,10 @@
        Find My Step 결과가 붙으면 커지되 280px에서 잘리고 본문만 스크롤. */
     #shell[data-mode="learn"] { --panel-h: fit-content(280px); }
     #shell[data-mode="guides"] { --panel-h: fit-content(min(360px, 48dvh)); }
+    #shell[data-mode="drill"] { --panel-h: fit-content(200px); }
     #shell[data-mode="learn"] #panel { min-height: min-content; }
     #shell[data-mode="guides"] #panel { min-height: min-content; }
+    #shell[data-mode="drill"] #panel { min-height: min-content; }
 
     #rail {
       flex-direction: row; border-right: none; border-top: 1px solid var(--border);
@@ -735,7 +806,7 @@
         <option value="4" data-i18n="size4">4×4</option>
         <option value="5" data-i18n="size5">5×5</option>
       </select>
-      <span id="app-version" aria-label="Version">v1.6</span>
+      <span id="app-version" aria-label="Version">v1.9</span>
       <button type="button" id="settings-btn" class="btn-icon" aria-label="Settings" aria-expanded="false">⚙</button>
     </div>
   </header>
@@ -755,6 +826,21 @@
 
   <main id="stage">
     <div id="app"></div>
+    <div id="play-hud">
+      <div id="play-scramble"></div>
+      <button type="button" id="play-avgs" aria-expanded="false" aria-controls="times-sheet">
+        <span id="play-ao5">ao5 —</span>
+        <span id="play-ao12">ao12 —</span>
+        <span id="play-pb">PB —</span>
+      </button>
+    </div>
+    <aside id="times-sheet" aria-label="Session times">
+      <div class="sheet-head" style="padding: var(--pad-panel); border-bottom: 1px solid var(--border);">
+        <h2 data-i18n="session" style="font-size: var(--fs-md); margin: 0;">Session</h2>
+        <button type="button" id="times-close" class="btn-icon" aria-label="Close">✕</button>
+      </div>
+      <div id="times-body"></div>
+    </aside>
     <div id="toast" role="status" aria-live="polite"></div>
     <div id="solver-hud">
       <button type="button" id="solver-hud-status" aria-expanded="false" aria-controls="solver-hud-moves"
@@ -773,6 +859,11 @@
       <button type="button" id="solve-next-m" class="primary" data-i18n="solveNext">▶ Next move</button>
       <button type="button" id="solve-all-m" data-i18n="solveAll">⏭ Solve all</button>
     </div>
+    <div id="act-drill" class="act-set">
+      <button type="button" id="drill-retry" data-i18n="drillRetry">Retry</button>
+      <button type="button" id="drill-undo" data-i18n="undo">Undo</button>
+      <button type="button" id="drill-skip" class="primary" data-i18n="drillSkip">Skip</button>
+    </div>
   </footer>
 
   <aside id="panel" aria-label="Panel">
@@ -780,6 +871,7 @@
       <span class="sheet-handle-bar" aria-hidden="true"></span>
     </button>
     <div id="panel-head">
+      <button type="button" id="panel-back" class="btn-sm hidden" data-i18n="learnBack">← Back</button>
       <h2 id="panel-title"></h2>
       <button type="button" id="panel-close" class="btn-icon" aria-label="Close">✕</button>
     </div>
@@ -793,6 +885,7 @@
           <button type="button" id="open-f2l" class="n3-only" data-i18n="openF2l">🧩 F2L cases</button>
           <button type="button" id="open-oll" class="n3-only" data-i18n="openOll">🌕 OLL library</button>
           <button type="button" id="open-pll" class="n3-only" data-i18n="openPll">🔄 PLL library</button>
+          <button type="button" id="open-drill" class="n3-only" data-i18n="openDrill">🎯 Case drill</button>
           <button type="button" id="open-roux" class="n3-only" data-i18n="openRoux">🧱 Blocks (Roux)</button>
           <button type="button" id="detect-stage" class="n3-only" data-i18n="detectStage">🎯 Find My Step (Beginner)</button>
         </div>
@@ -800,6 +893,9 @@
       </div>
 
       <div id="guides">
+        <div class="learn-list">
+          <a class="btn primary" href="./how-to-solve/index.html" data-i18n="guideHub">All written guides</a>
+        </div>
         <div class="learn-list n2-only">
           <a class="btn" href="./how-to-solve-2x2/index.html" data-i18n="guide2x2">How to solve a 2×2 (written guide)</a>
         </div>
@@ -836,15 +932,31 @@
     </div>
       </div>
 
+      <div id="drill">
+        <div id="drill-sets" class="seg" role="tablist" aria-label="Drill set">
+          <button type="button" data-set="f2l" data-i18n="drillF2l">F2L</button>
+          <button type="button" data-set="oll" data-i18n="drillOll">OLL</button>
+          <button type="button" data-set="pll" data-i18n="drillPll">PLL</button>
+        </div>
+        <p id="drill-hint" data-i18n="drillHint">Read the case. Solve it. If the top is twisted, finish with U.</p>
+      </div>
+
       <div id="solver">
         <div id="solver-body">
+    <div id="solve-mode" class="seg n23-only" role="tablist" aria-label="Solve path">
+      <button type="button" id="solve-mode-beginner" data-mode="beginner" data-i18n="solveModeBeginner">Beginner</button>
+      <button type="button" id="solve-mode-fast" data-mode="fast" data-i18n="solveModeFast">Fast</button>
+    </div>
     <div id="solve-status" data-i18n="analyzing">Analyzing the current cube…</div>
     <div id="solve-moves"></div>
     <div class="row">
       <button type="button" id="solve-next" class="primary" style="flex:1" data-i18n="solveNext">▶ Next move</button>
       <button type="button" id="solve-all" style="flex:1" data-i18n="solveAll">⏭ Solve all</button>
     </div>
-    <div class="solver-note" data-i18n="solverNote">Reads the state automatically and guides you with an optimal solution (two-phase algorithm). Turn it yourself and the next move is recalculated.</div>
+    <div class="row n23-only" style="margin-top:8px">
+      <button type="button" id="solve-lesson" style="flex:1" data-i18n="solveOpenLesson">📖 Open this lesson</button>
+    </div>
+    <div id="solver-note" class="solver-note" data-i18n="solverNote">Reads the current cube and plays a solution. 2×2 and 3×3 are short searches (Kociemba on 3×3). 4×4 and 5×5 reduce to a 3×3 first. Turn it yourself and the next move is recalculated.</div>
       </div>
       </div>
 
@@ -892,11 +1004,12 @@
     </div>
 
     <div id="scan-stage-final">
-      <div id="scan-final-tip" data-i18n="scanFinalTip">All 6 faces confirmed. Apply opens Smart Solve with a solution.</div>
+      <div id="scan-final-tip" data-i18n="scanFinalTip">All 6 faces confirmed. Guide me follows beginner steps; Fast solve uses a short search.</div>
       <div id="scan-review"></div>
       <div id="scan-review-status"></div>
       <div class="row" style="margin-top:10px">
-        <button type="button" id="scan-apply" class="primary" style="flex:1" data-i18n="scanApply">Apply & solve</button>
+        <button type="button" id="scan-apply" class="primary n23-only" style="flex:1" data-i18n="scanApplyBeginner">Guide me (beginner)</button>
+        <button type="button" id="scan-apply-fast" style="flex:1" data-i18n="scanApplyFast">Fast solve</button>
       </div>
     </div>
       </div>
@@ -931,6 +1044,12 @@
         <option value="lego" data-i18n="themeLego">LEGO</option>
       </select>
 
+      <div class="label" data-i18n="inspectionLabel">Inspection</div>
+      <select id="inspection-select" class="menu-select" aria-label="Inspection">
+        <option value="on" data-i18n="inspectionOn">On (15s)</option>
+        <option value="off" data-i18n="inspectionOff">Off</option>
+      </select>
+
       <div class="n4-only">
         <div class="label" data-i18n="layerMode">Layer</div>
         <div id="layer-mode" class="seg">
@@ -962,7 +1081,7 @@
 
       <p class="hint-text" data-i18n="hint">Drag a face: turn · Drag empty space: orbit · Wheel: zoom</p>
       <div id="about">
-        <p id="about-blurb">Cube Lab is a free browser trainer for Rubik’s cubes. Play 2×2 through 5×5, learn the beginner method, CFOP, and Roux, scan a physical cube, and follow an optimal solve — no account required.</p>
+        <p id="about-blurb">Cube Lab is a free browser trainer for Rubik’s cubes. Play 2×2 through 5×5, learn the beginner method, CFOP, and Roux, scan a physical cube, and follow beginner steps or a fast solve — no account required.</p>
         <a href="https://maxmode-now.com/" target="_blank" rel="noopener noreferrer">maxmode-now.com</a>
         <a href="mailto:maxmode.now@gmail.com">maxmode.now@gmail.com</a>
       </div>
@@ -972,7 +1091,7 @@
 </div>
 
 <noscript>
-  <p>Cube Lab is a free browser trainer for Rubik’s cubes. Play 2×2 through 5×5, learn the beginner method, CFOP, and Roux, scan a physical cube, and follow an optimal solve — no account required.</p>
+  <p>Cube Lab is a free browser trainer for Rubik’s cubes. Play 2×2 through 5×5, learn the beginner method, CFOP, and Roux, scan a physical cube, and follow beginner steps or a fast solve — no account required.</p>
 </noscript>
 
 <script type="importmap">
@@ -988,15 +1107,18 @@
 <script src="https://cdn.jsdelivr.net/npm/cubejs@1.3.1/lib/cube.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/cubejs@1.3.1/lib/solve.js"></script>
 <script src="cube-solver.js"></script>
+<script src="beginner-solver.js"></script>
 <!-- 격자 수학: classic script (file://에서도 동작. ES import는 CORS로 모듈 전체가 죽음) -->
 <script src="cube-math.js"></script>
 <script src="cube-engine.js"></script>
+<script src="cube-timer.js"></script>
 <script src="cube-scan.js"></script>
 <script src="f2l-cases.js"></script>
 <script src="oll-cases-data.js"></script>
 <script src="oll-cases.js"></script>
 <script src="pll-cases-data.js"></script>
 <script src="pll-cases.js"></script>
+<script src="cube-drill.js"></script>
 <script src="lessons.js"></script>
 
 <script type="module">
@@ -1022,14 +1144,22 @@ const I18N = {
     turnFace: 'Turn a face', ccwHint: "Shift+click or key = counter-clockwise (′)",
     scramble: 'Scramble', undo: 'Undo', reset: 'Reset',
     unitSec: 's', unitMoves: ' moves',
-    openTut: '📖 Tutorial (Beginner)', openCfop: '⚡ Speed (CFOP / 4-look)', openF2l: '🧩 F2L cases', openOll: '🌕 OLL library', openPll: '🔄 PLL library', openRoux: '🧱 Blocks (Roux)',
+    openTut: '📖 Tutorial (Beginner)', openCfop: '⚡ Speed (CFOP / 4-look)', openF2l: '🧩 F2L cases', openOll: '🌕 OLL library', openPll: '🔄 PLL library', openDrill: '🎯 Case drill', openRoux: '🧱 Blocks (Roux)',
     openSolver: '🧠 Smart Solve', detectStage: '🎯 Find My Step (Beginner)',
     analyzing: 'Analyzing the current cube…',
     solveNext: '▶ Next move', solveAll: '⏭ Solve all',
-    solverNote: 'Reads the current cube and plays a solution. 2×2 and 3×3 are short searches (Kociemba on 3×3). 4×4 and 5×5 reduce to a 3×3 first. Turn it yourself and the next move is recalculated.',
-    prev: '← Prev', next: 'Next →',
+    solveModeBeginner: 'Beginner', solveModeFast: 'Fast',
+    solveOpenLesson: '📖 Open this lesson',
+    solverNote: 'Reads the current cube and plays a short solution. 2×2 and 3×3 use a search (Kociemba on 3×3). 4×4 and 5×5 reduce to a 3×3 first. Turn it yourself and the next move is recalculated.',
+    solverNoteBeginner: 'Guides this cube with the same beginner steps as the lessons. The current chunk is highlighted. Turn it yourself and the next move is recalculated.',
+    beginnerStep: (i, name, alg) => alg ? `Step ${i} · ${name} — ${alg}` : `Step ${i} · ${name}`,
+    beginnerNxN: 'Beginner steps are for 2×2 and 3×3. Using Fast solve.',
+    beginnerFailed: 'Could not build beginner steps. Try Fast solve, or edit the scan.',
+    stageFollowCube: '▶ Follow this cube',
+    prev: '← Prev', next: 'Next →', learnBack: '← Back',
     hint: 'Drag a face: turn · Drag empty space: orbit · Wheel: zoom',
     guideLessonReady: 'This step is open. The cube shows the goal — tap ▶ Demo to watch the moves.',
+    guideHub: 'All written guides',
     guide3x3: 'How to solve a 3×3 (written guide)',
     guide3x3cfop: 'How to solve a 3×3 with CFOP (written guide)',
     guide3x3f2l: 'F2L case library (written guide)',
@@ -1041,6 +1171,7 @@ const I18N = {
     guide5x5: 'How to solve a 5×5 (written guide)',
     solved: '✓ Solved!', solvedN: n => `✓ Solved! (${n} moves)`,
     alreadySolved: '✓ Already solved!',
+    solveIdle: 'Nothing to solve yet — the cube starts complete.',
     solverPreparing: 'Preparing solver… (first time only, takes a few seconds)',
     solverComputing: 'Finding a solution… (can take up to a minute)',
     solverComputingSec: s => `Finding a solution… ${s}s`,
@@ -1060,6 +1191,10 @@ const I18N = {
     tutStepOf: (i, n) => `${i} / ${n}`,
     tutShowMore: 'Details ▾', tutShowLess: 'Hide details ▴',
     demo: '▶ Demo',
+    drillF2l: 'F2L', drillOll: 'OLL', drillPll: 'PLL',
+    drillRetry: 'Retry', drillSkip: 'Skip',
+    drillHint: 'Read the case. Solve it. If the top is twisted, finish with U.',
+    drillSolved: name => `${name} — next`,
     trackBeginner: 'Solving the Cube — Beginner Method',
     trackBeginner2: 'Solving the 2×2 — Beginner',
     trackBeginner4: 'Solving the 4×4 — Beginner',
@@ -1079,7 +1214,7 @@ const I18N = {
     learn: 'Learn', more: 'More', learnTitle: 'Learn', assistTitle: 'Assist',
     settings: 'Settings', langLabel: 'Language',
     modePlay: 'Play', modeLearn: 'Learn', modeSolve: 'Solve', modeScan: 'Scan', modeGuides: 'Guide',
-    panelLearn: 'Learn', panelSolve: 'Smart Solve', panelScan: 'Scan cube', panelGuides: 'Guide',
+    panelLearn: 'Learn', panelSolve: 'Smart Solve', panelScan: 'Scan cube', panelGuides: 'Guide', panelDrill: 'Case drill',
     needScramble: 'Scramble the cube first',
     size2: '2×2', size3: '3×3', size4: '4×4', size5: '5×5',
     docTitle2: '2×2 Cube — Free Play', appTitle2: '2×2 Cube',
@@ -1097,13 +1232,21 @@ const I18N = {
     sizeLabel: 'Size',
     numbersLabel: 'Numbers', numbersOff: 'Off', numbersOn: 'On',
     themeLabel: 'Theme', themeClassic: 'Classic', themeLego: 'LEGO',
+    inspectionLabel: 'Inspection', inspectionOn: 'On (15s)', inspectionOff: 'Off',
+    ao5: 'ao5', ao12: 'ao12', pb: 'PB',
+    plus2: '+2', dnf: 'DNF',
+    session: 'Session', sessionEmpty: 'No times yet — scramble and solve.',
+    deleteTime: 'Delete',
+    solvedTime: (time, n) => `✓ ${time} (${n} moves)`,
     openScan: '📷 Scan cube',
     scanUpload: 'Upload photo', scanReplace: 'Replace photo',
     scanCam: 'Camera', scanSnap: 'Capture',
     scanRetake: 'Retake photo', scanConfirm: 'Confirm face →',
     scanApply: 'Apply & solve',
+    scanApplyBeginner: 'Guide me (beginner)',
+    scanApplyFast: 'Fast solve',
     scanCheckTip: 'Check this face against the photo. Tap a sticker to fix color, then confirm.',
-    scanFinalTip: 'All 6 faces confirmed. Apply opens Smart Solve with a solution.',
+    scanFinalTip: 'All 6 faces confirmed. Guide me follows beginner steps; Fast solve uses a short search.',
     scanCenterHint: face => `Center should be ${face}`,
     scanCenterBad: face => `Center should be ${face} — tap the middle sticker`,
     scanFaceOk: 'Looks good — confirm to continue',
@@ -1140,14 +1283,22 @@ const I18N = {
     turnFace: '면 돌리기', ccwHint: 'Shift+클릭 또는 키 = 반시계(′)',
     scramble: '섞기', undo: '되돌리기', reset: '리셋',
     unitSec: '초', unitMoves: '수',
-    openTut: '📖 튜토리얼 (초보자법)', openCfop: '⚡ 효율 (CFOP / 4-look)', openF2l: '🧩 F2L 케이스', openOll: '🌕 OLL 라이브러리', openPll: '🔄 PLL 라이브러리', openRoux: '🧱 블록 (Roux)',
+    openTut: '📖 튜토리얼 (초보자법)', openCfop: '⚡ 효율 (CFOP / 4-look)', openF2l: '🧩 F2L 케이스', openOll: '🌕 OLL 라이브러리', openPll: '🔄 PLL 라이브러리', openDrill: '🎯 케이스 드릴', openRoux: '🧱 블록 (Roux)',
     openSolver: '🧠 스마트 풀이', detectStage: '🎯 내 단계 찾기 (초보자법)',
     analyzing: '현재 큐브를 분석합니다…',
     solveNext: '▶ 다음 한 수', solveAll: '⏭ 전체 풀기',
-    solverNote: '지금 큐브를 읽고 수순을 안내합니다. 2×2·3×3은 짧은 탐색(3×3은 Kociemba), 4×4·5×5는 3×3으로 줄인 뒤 풉니다. 직접 돌려도 다음 수가 다시 계산됩니다.',
-    prev: '← 이전', next: '다음 →',
+    solveModeBeginner: '초보', solveModeFast: '빠른 풀이',
+    solveOpenLesson: '📖 이 단계 레슨 열기',
+    solverNote: '지금 큐브를 읽고 짧은 수순을 안내합니다. 2×2·3×3은 탐색(3×3은 Kociemba), 4×4·5×5는 3×3으로 줄인 뒤 풉니다. 직접 돌려도 다음 수가 다시 계산됩니다.',
+    solverNoteBeginner: '레슨과 같은 초보자법 단계로 이 큐브를 안내합니다. 지금 덩어리만 강조됩니다. 직접 돌려도 다음 수가 다시 계산됩니다.',
+    beginnerStep: (i, name, alg) => alg ? `${i}단계 · ${name} — ${alg}` : `${i}단계 · ${name}`,
+    beginnerNxN: '초보 안내는 2×2·3×3만 지원합니다. 빠른 풀이로 전환합니다.',
+    beginnerFailed: '초보 수순을 만들지 못했습니다. 빠른 풀이를 쓰거나 스캔을 고쳐 보세요.',
+    stageFollowCube: '▶ 이 큐브 따라가기',
+    prev: '← 이전', next: '다음 →', learnBack: '← 목록',
     hint: '드래그: 면 돌리기 · 빈 곳 드래그: 시점 회전 · 휠: 확대',
     guideLessonReady: '이 단계가 열렸습니다. 큐브는 목표 상태입니다. ▶시연을 눌러 공식을 보세요.',
+    guideHub: '가이드 한눈에 보기',
     guide3x3: '3×3 초보자 가이드 (글)',
     guide3x3cfop: '3×3 CFOP 가이드 (글)',
     guide3x3f2l: 'F2L 케이스 도감 (글)',
@@ -1159,6 +1310,7 @@ const I18N = {
     guide5x5: '5×5 초보자 가이드 (글)',
     solved: '✓ 완성!', solvedN: n => `✓ 완성! (${n}수)`,
     alreadySolved: '✓ 이미 완성된 상태예요!',
+    solveIdle: '아직 풀 게 없어요. 큐브는 맞춰진 상태로 시작해요.',
     solverPreparing: '솔버 준비 중… (최초 1회, 몇 초 걸려요)',
     solverComputing: '수순을 찾는 중… (최대 1분 걸릴 수 있어요)',
     solverComputingSec: s => `수순을 찾는 중… ${s}초`,
@@ -1178,6 +1330,10 @@ const I18N = {
     tutStepOf: (i, n) => `${i} / ${n}`,
     tutShowMore: '자세히 ▾', tutShowLess: '접기 ▴',
     demo: '▶ 시연',
+    drillF2l: 'F2L', drillOll: 'OLL', drillPll: 'PLL',
+    drillRetry: '다시', drillSkip: '건너뛰기',
+    drillHint: '케이스를 읽고 맞추세요. 맨 위가 비뚤면 U로 마무리하세요.',
+    drillSolved: name => `${name} — 다음`,
     trackBeginner: '큐브 맞추기 — 초보자법',
     trackBeginner2: '2×2 맞추기 — 초보자법',
     trackBeginner4: '4×4 맞추기 — 초보자법',
@@ -1197,7 +1353,7 @@ const I18N = {
     learn: '학습', more: '더보기', learnTitle: '학습', assistTitle: '도움',
     settings: '설정', langLabel: '언어',
     modePlay: '조작', modeLearn: '학습', modeSolve: '풀이', modeScan: '스캔', modeGuides: '가이드',
-    panelLearn: '학습', panelSolve: '스마트 풀이', panelScan: '큐브 스캔', panelGuides: '가이드',
+    panelLearn: '학습', panelSolve: '스마트 풀이', panelScan: '큐브 스캔', panelGuides: '가이드', panelDrill: '케이스 드릴',
     needScramble: '큐브를 먼저 섞어주세요',
     size2: '2×2', size3: '3×3', size4: '4×4', size5: '5×5',
     docTitle2: '2×2 큐브 — 자유 조작', appTitle2: '2×2 큐브',
@@ -1215,13 +1371,21 @@ const I18N = {
     sizeLabel: '크기',
     numbersLabel: '번호', numbersOff: '끄기', numbersOn: '켜기',
     themeLabel: '테마', themeClassic: '기본', themeLego: '레고',
+    inspectionLabel: '인스펙션', inspectionOn: '켜기 (15초)', inspectionOff: '끄기',
+    ao5: 'ao5', ao12: 'ao12', pb: 'PB',
+    plus2: '+2', dnf: 'DNF',
+    session: '기록', sessionEmpty: '아직 기록이 없습니다. 섞고 맞춰 보세요.',
+    deleteTime: '삭제',
+    solvedTime: (time, n) => `✓ ${time} (${n}수)`,
     openScan: '📷 큐브 스캔',
     scanUpload: '사진 올리기', scanReplace: '사진 바꾸기',
     scanCam: '카메라', scanSnap: '촬영',
     scanRetake: '사진 다시', scanConfirm: '이 면 확인 →',
     scanApply: '적용하고 풀이',
+    scanApplyBeginner: '초보 단계로 풀기',
+    scanApplyFast: '빠른 풀이',
     scanCheckTip: '사진과 맞춰 이 면을 확인하세요. 스티커를 탭해 색을 고친 뒤 확인하세요.',
-    scanFinalTip: '6면 모두 확인됨. 적용하면 스마트 풀이가 열립니다.',
+    scanFinalTip: '6면 모두 확인됨. 초보 단계로 풀기가 기본이고, 빠른 풀이는 짧은 탐색입니다.',
     scanCenterHint: face => `센터는 ${face} 이어야 해요`,
     scanCenterBad: face => `센터는 ${face} 이어야 해요 — 가운데 칸을 탭하세요`,
     scanFaceOk: '괜찮으면 확인을 눌러 다음으로',
@@ -1304,23 +1468,210 @@ function requireN3(label) {
   return false;
 }
 
+const T = globalThis.CubeTimer;
+const playHud = document.getElementById('play-hud');
+const playScrEl = document.getElementById('play-scramble');
+const playAvgsBtn = document.getElementById('play-avgs');
+const playAo5El = document.getElementById('play-ao5');
+const playAo12El = document.getElementById('play-ao12');
+const playPbEl = document.getElementById('play-pb');
+const timesSheet = document.getElementById('times-sheet');
+const timesBody = document.getElementById('times-body');
+const timerStat = document.querySelector('#stats .stat');
+const timerUnit = timerStat ? timerStat.querySelector('[data-i18n="unitSec"]') : null;
+
+const playAttempt = {
+  phase: 'idle',
+  scramble: '',
+  inspectAt: 0,
+  penalty: 0,
+  armed: false,
+  committed: false,
+};
+
+function isPlayMode() {
+  return !panelMode && !(drill && drill.isActive());
+}
+
+function cancelAttempt() {
+  playAttempt.phase = 'idle';
+  playAttempt.armed = false;
+  playAttempt.committed = false;
+  playAttempt.penalty = 0;
+  playAttempt.inspectAt = 0;
+}
+
+function resetAttemptFull() {
+  cancelAttempt();
+  playAttempt.scramble = '';
+  setTimesOpen(false);
+  renderPlayHud();
+}
+
+function beginAttempt(scramble) {
+  playAttempt.scramble = scramble || '';
+  playAttempt.penalty = 0;
+  playAttempt.committed = false;
+  playAttempt.armed = true;
+  if (T.getInspection()) {
+    playAttempt.phase = 'inspect';
+    playAttempt.inspectAt = performance.now();
+  } else {
+    playAttempt.phase = 'ready';
+    playAttempt.inspectAt = 0;
+  }
+  renderPlayHud();
+}
+
+function inspectElapsed() {
+  if (playAttempt.phase !== 'inspect' || !playAttempt.inspectAt) return 0;
+  return performance.now() - playAttempt.inspectAt;
+}
+
+function onFirstMove() {
+  if (!playAttempt.armed) return;
+  if (playAttempt.phase === 'inspect') {
+    playAttempt.penalty = T.inspectPenalty(inspectElapsed());
+  } else if (playAttempt.phase === 'ready') {
+    playAttempt.penalty = 0;
+  } else {
+    return;
+  }
+  playAttempt.phase = 'running';
+}
+
+function commitIfNeeded() {
+  if (!playAttempt.armed || playAttempt.committed) return null;
+  if (!isPlayMode()) return null;
+  const st = engine.stats;
+  if (!st.timerFrozen || st.moveCount <= 0) return null;
+  if (playAttempt.phase === 'inspect') {
+    playAttempt.penalty = T.inspectPenalty(inspectElapsed());
+  }
+  if (playAttempt.phase !== 'running' && playAttempt.phase !== 'inspect') return null;
+  playAttempt.phase = 'frozen';
+  playAttempt.committed = true;
+  playAttempt.armed = false;
+  const row = T.add(engine.n, {
+    ms: st.elapsed,
+    penalty: playAttempt.penalty,
+    scramble: playAttempt.scramble,
+  });
+  renderPlayHud();
+  renderTimesSheet();
+  return row;
+}
+
+function renderPlayHud() {
+  const has = !!playAttempt.scramble;
+  playHud.classList.toggle('has-scramble', has);
+  playScrEl.textContent = playAttempt.scramble;
+  const s = T.stats(engine.n);
+  playAo5El.textContent = t('ao5') + ' ' + T.formatAvg(s.ao5);
+  playAo12El.textContent = t('ao12') + ' ' + T.formatAvg(s.ao12);
+  playPbEl.textContent = t('pb') + ' ' + T.formatAvg(s.pb);
+}
+
+function renderTimesSheet() {
+  const list = T.times(engine.n);
+  if (!list.length) {
+    timesBody.innerHTML = '<p id="times-empty">' + t('sessionEmpty') + '</p>';
+    return;
+  }
+  const parts = [];
+  for (let recent = 0; recent < list.length; recent++) {
+    const e = list[list.length - 1 - recent];
+    const plus = e.penalty === 2 ? ' class="active"' : '';
+    const dnf = e.penalty === 'DNF' ? ' class="active"' : '';
+    parts.push(
+      '<div class="time-row" data-i="' + recent + '">' +
+        '<span class="time-ms">' + T.formatEntry(e) + '</span>' +
+        '<span class="time-scr">' + String(e.scramble || '').replace(/[&<>"]/g, function (c) {
+          return c === '&' ? '&amp;' : c === '<' ? '&lt;' : c === '>' ? '&gt;' : '&quot;';
+        }) + '</span>' +
+        '<span class="time-acts">' +
+          '<button type="button" data-act="plus2"' + plus + '>+2</button>' +
+          '<button type="button" data-act="dnf"' + dnf + '>' + t('dnf') + '</button>' +
+          '<button type="button" data-act="del" aria-label="' + t('deleteTime') + '">×</button>' +
+        '</span>' +
+      '</div>'
+    );
+  }
+  timesBody.innerHTML = parts.join('');
+}
+
+function setTimesOpen(on) {
+  timesSheet.classList.toggle('open', !!on);
+  playAvgsBtn.setAttribute('aria-expanded', on ? 'true' : 'false');
+  if (on) renderTimesSheet();
+}
+
 function syncStatsDom() {
   const s = engine.stats;
-  const time = (s.elapsed / 1000).toFixed(1);
   const moves = String(s.moveCount);
-  document.querySelectorAll('.js-timer').forEach(el => { el.textContent = time; });
   document.querySelectorAll('.js-moves').forEach(el => { el.textContent = moves; });
+
+  let time;
+  let mark = '';
+  let showUnit = true;
+  if (isPlayMode() && playAttempt.phase === 'inspect') {
+    const elap = inspectElapsed();
+    mark = T.inspectMark(elap);
+    if (mark === 'dnf') { time = t('dnf'); showUnit = false; }
+    else if (mark === 'plus2') { time = '+2'; showUnit = false; }
+    else time = String(Math.max(0, Math.ceil((T.INSPECT_MS - elap) / 1000)));
+  } else if (isPlayMode() && (playAttempt.phase === 'running' || playAttempt.phase === 'frozen')) {
+    if (playAttempt.penalty === 'DNF' && playAttempt.phase === 'frozen') {
+      time = t('dnf');
+      showUnit = false;
+    } else if (playAttempt.penalty === 2 && playAttempt.phase === 'frozen') {
+      time = T.formatClock(s.elapsed) + '+';
+    } else {
+      time = T.formatClock(s.elapsed);
+    }
+  } else if (isPlayMode()) {
+    time = T.formatClock(0);
+  } else {
+    time = (s.elapsed / 1000).toFixed(1);
+  }
+  document.querySelectorAll('.js-timer').forEach(el => { el.textContent = time; });
+  if (timerStat) {
+    timerStat.classList.remove('inspect-warn', 'inspect-late', 'inspect-plus2', 'inspect-dnf');
+    if (mark) timerStat.classList.add('inspect-' + mark);
+    else if (isPlayMode() && playAttempt.phase === 'frozen' && playAttempt.penalty === 'DNF') {
+      timerStat.classList.add('inspect-dnf');
+    } else if (isPlayMode() && playAttempt.phase === 'frozen' && playAttempt.penalty === 2) {
+      timerStat.classList.add('inspect-plus2');
+    }
+  }
+  if (timerUnit) timerUnit.hidden = !showUnit;
 }
 
 // 완성 안내는 '풀린 순간'에만 토스트로 띄운다. 상시 문구를 남기지 않는다.
 let wasSolved = true;
+let drill = null;
 function updateStatus() {
   const solved = engine.isSolved();
   // moveCount 가 0인 '완성'은 리셋/초기 상태다 — 축하할 일이 아니므로 띄우지 않는다
   if (solved && !wasSolved && engine.stats.moveCount > 0) {
-    toast(t('solvedN')(engine.stats.moveCount), 'solved');
+    if (drill && drill.isActive()) drill.onSolved();
+    else {
+      const row = commitIfNeeded();
+      if (row) toast(t('solvedTime')(T.formatEntry(row), engine.stats.moveCount), 'solved');
+      else toast(t('solvedN')(engine.stats.moveCount), 'solved');
+    }
   }
   wasSolved = solved;
+}
+
+function isIdleSolved() {
+  const st = engine.stats;
+  const untouched = st.moveCount === 0 && st.timerStart === null && !st.timerFrozen;
+  return untouched && engine.isSolved();
+}
+
+function emptySolveStatus() {
+  return isIdleSolved() ? t('solveIdle') : t('alreadySolved');
 }
 
 // 아직 섞지 않은 큐브에서는 '내 단계 찾기'가 할 일이 없다 →
@@ -1328,13 +1679,16 @@ function updateStatus() {
 function syncDetectStageEnabled() {
   const btn = document.getElementById('detect-stage');
   if (!btn) return;
-  const st = engine.stats;
-  const untouched = st.moveCount === 0 && st.timerStart === null && !st.timerFrozen;
-  btn.disabled = untouched;
-  btn.title = untouched ? t('needScramble') : '';
+  const idle = isIdleSolved();
+  btn.disabled = idle;
+  btn.title = idle ? t('needScramble') : '';
 }
 
-engine.subscribe(({ solver }) => {
+engine.subscribe(({ solver, alg }) => {
+  if (alg) cancelAttempt();
+  if (engine.stats.timerStart && (playAttempt.phase === 'inspect' || playAttempt.phase === 'ready')) {
+    onFirstMove();
+  }
   syncStatsDom();
   updateStatus();
   syncDetectStageEnabled();
@@ -1342,15 +1696,21 @@ engine.subscribe(({ solver }) => {
 });
 
 function reset() {
+  if (drill && drill.isActive()) {
+    drill.retry();
+    return;
+  }
   playAfterSolve = false;
   solveAllAfter = false;
   stopComputeUi();
   solverHost.abort();
   engine.reset();
+  resetAttemptFull();
   solverMoves = [];
+  solverChunks = [];
   solverInFlight = null;
   solverBusy = false;
-  setSolveStatus(t('alreadySolved'));
+  setSolveStatus(emptySolveStatus());
   setSolveMoves('');
   const sb = document.getElementById('stage-box');
   sb.classList.remove('show');
@@ -1432,6 +1792,34 @@ function applyPractice(kind) {
   }
 }
 
+let scrambleBusy = false;
+async function generateScramble(n) {
+  if (!FILE_PAGE && solverHost && !solverHost.pending) {
+    try {
+      const alg = await solverHost.scramble(n);
+      if (alg) return alg;
+    } catch (e) { /* worker 실패 시 메인 폴백 */ }
+  }
+  const S = globalThis.CubeSolver;
+  return S && S.scramble ? S.scramble(n) : '';
+}
+
+async function startPlayScramble() {
+  if (engine.busy || scrambleBusy) return;
+  scrambleBusy = true;
+  const btn = document.getElementById('scramble');
+  btn.disabled = true;
+  try {
+    const alg = await generateScramble(engine.n);
+    if (!alg) return;
+    const ok = await engine.applyScramble(alg);
+    if (ok) beginAttempt(alg);
+  } finally {
+    scrambleBusy = false;
+    btn.disabled = false;
+  }
+}
+
 document.querySelectorAll('[data-move]').forEach(btn => {
   btn.addEventListener('click', e => engine.doMove(moveNameForFace(btn.dataset.move), e.shiftKey));
 });
@@ -1441,9 +1829,32 @@ document.querySelectorAll('#layer-mode [data-layer]').forEach(btn => {
     syncLayerModeUi();
   });
 });
-document.getElementById('scramble').addEventListener('click', () => engine.scramble());
+document.getElementById('scramble').addEventListener('click', () => startPlayScramble());
 document.getElementById('reset').addEventListener('click', reset);
 document.getElementById('undo').addEventListener('click', () => engine.undo());
+
+playAvgsBtn.addEventListener('click', () => {
+  setTimesOpen(!timesSheet.classList.contains('open'));
+});
+document.getElementById('times-close').addEventListener('click', () => setTimesOpen(false));
+timesBody.addEventListener('click', e => {
+  const btn = e.target.closest('button[data-act]');
+  if (!btn) return;
+  const row = btn.closest('.time-row');
+  if (!row) return;
+  const i = Number(row.dataset.i);
+  const act = btn.dataset.act;
+  if (act === 'del') T.remove(engine.n, i);
+  else if (act === 'plus2') {
+    const cur = T.times(engine.n)[T.times(engine.n).length - 1 - i];
+    T.update(engine.n, i, { penalty: cur && cur.penalty === 2 ? 0 : 2 });
+  } else if (act === 'dnf') {
+    const cur = T.times(engine.n)[T.times(engine.n).length - 1 - i];
+    T.update(engine.n, i, { penalty: cur && cur.penalty === 'DNF' ? 0 : 'DNF' });
+  }
+  renderPlayHud();
+  renderTimesSheet();
+});
 
 window.addEventListener('keydown', e => {
   if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); engine.undo(); return; }
@@ -1556,7 +1967,9 @@ const tutPanel = document.getElementById('tutorial');
 const solverPanel = document.getElementById('solver');
 const scanPanel = document.getElementById('scan');
 const guidesPanel = document.getElementById('guides');
+const drillPanel = document.getElementById('drill');
 const panelTitleEl = document.getElementById('panel-title');
+const panelBackBtn = document.getElementById('panel-back');
 const panelFootEl = document.getElementById('panel-foot');
 const tutExpandBtn = document.getElementById('tut-expand');
 const sheetHandle = document.getElementById('sheet-handle');
@@ -1566,10 +1979,10 @@ const solverHud = document.getElementById('solver-hud');
 const hudStatusEl = document.getElementById('solver-hud-status');
 const hudMovesEl = document.getElementById('solver-hud-moves');
 
-// 패널 모드 5종. 'learn'(트랙 선택)과 'tutorial'(레슨)은 레일에서 같은 항목이다.
-const PANEL_MODES = ['learn', 'tutorial', 'solver', 'scan', 'guides'];
-const RAIL_OF  = { learn: 'learn', tutorial: 'learn', solver: 'solver', scan: 'scan', guides: 'guides' };
-const TITLE_OF = { learn: 'panelLearn', tutorial: 'panelLearn', solver: 'panelSolve', scan: 'panelScan', guides: 'panelGuides' };
+// 패널 모드 6종. 'learn' / 'tutorial' / 'drill' 은 레일에서 같은 항목이다.
+const PANEL_MODES = ['learn', 'tutorial', 'solver', 'scan', 'guides', 'drill'];
+const RAIL_OF  = { learn: 'learn', tutorial: 'learn', drill: 'learn', solver: 'solver', scan: 'scan', guides: 'guides' };
+const TITLE_OF = { learn: 'panelLearn', tutorial: 'panelLearn', drill: 'panelDrill', solver: 'panelSolve', scan: 'panelScan', guides: 'panelGuides' };
 
 let panelMode = null;      // null = Play (패널 닫힘)
 let settingsOpen = false;
@@ -1624,6 +2037,7 @@ function syncChrome() {
     sheetExpanded = false;
   }
   panelTitleEl.textContent = panelMode ? t(TITLE_OF[panelMode]) : '';
+  panelBackBtn.classList.toggle('hidden', panelMode !== 'tutorial' && panelMode !== 'drill');
   panelFootEl.classList.toggle('hidden', panelMode !== 'tutorial');
   ui.classList.toggle('open', settingsOpen);
   uiToggle.setAttribute('aria-expanded', settingsOpen ? 'true' : 'false');
@@ -1643,17 +2057,22 @@ function openOverlay(name) {
   if (panelMode === 'scan' && next !== 'scan' && typeof window.__scanStopCam === 'function') {
     window.__scanStopCam();
   }
+  if (panelMode === 'drill' && next !== 'drill' && drill) drill.close();
   settingsOpen = false;
   panelMode = next;
+  setTimesOpen(false);
   learnPicker.classList.toggle('open', next === 'learn');
   tutPanel.classList.toggle('open', next === 'tutorial');
   solverPanel.classList.toggle('open', next === 'solver');
   scanPanel.classList.toggle('open', next === 'scan');
   guidesPanel.classList.toggle('open', next === 'guides');
+  drillPanel.classList.toggle('open', next === 'drill');
   syncChrome();
 }
 
 function closeSettings() { settingsOpen = false; syncChrome(); }
+
+function openLearnMenu() { openOverlay('learn'); }
 
 function initChrome() {
   railBtns.forEach(btn => {
@@ -1661,7 +2080,7 @@ function initChrome() {
       const m = btn.dataset.mode;
       if (m === 'play') { openOverlay(null); return; }
       if (m === 'learn') {
-        openOverlay(panelMode === 'learn' || panelMode === 'tutorial' ? null : 'learn');
+        openOverlay(panelMode === 'learn' || panelMode === 'tutorial' || panelMode === 'drill' ? null : 'learn');
         return;
       }
       if (m === 'solver') {
@@ -1680,6 +2099,7 @@ function initChrome() {
   });
 
   document.getElementById('panel-close').addEventListener('click', () => openOverlay(null));
+  panelBackBtn.addEventListener('click', openLearnMenu);
   uiToggle.addEventListener('click', () => {
     if (settingsOpen) closeSettings(); else openOverlay('more');
   });
@@ -1698,6 +2118,7 @@ function initChrome() {
     if (e.key !== 'Escape') return;
     if (settingsOpen) closeSettings();
     else if (panelMode === 'tutorial' && sheetExpanded) setSheetExpanded(false);
+    else if (panelMode === 'tutorial' || panelMode === 'drill') openLearnMenu();
     else if (panelMode) openOverlay(null);
   });
 
@@ -1834,6 +2255,57 @@ function demoInverseAlg(alg) {
   });
 }
 
+function drillCasesOf(set) {
+  if (set === 'f2l') return (globalThis.CubeF2L && globalThis.CubeF2L.cases) || [];
+  if (set === 'oll') return (globalThis.CubeOLL && globalThis.CubeOLL.cases) || [];
+  if (set === 'pll') return (globalThis.CubePLL && globalThis.CubePLL.cases) || [];
+  return [];
+}
+
+function syncDrillUi() {
+  const set = drill && drill.currentSet();
+  document.querySelectorAll('#drill-sets [data-set]').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.set === set);
+  });
+  const locked = !drill || !drill.isActive() || drill.isBusy();
+  const retryBtn = document.getElementById('drill-retry');
+  const skipBtn = document.getElementById('drill-skip');
+  const undoBtn = document.getElementById('drill-undo');
+  if (retryBtn) retryBtn.disabled = locked;
+  if (skipBtn) skipBtn.disabled = locked;
+  if (undoBtn) undoBtn.disabled = !drill || !drill.isActive();
+}
+
+drill = globalThis.CubeDrill.create({
+  engine,
+  invertAlg: invertAlgString,
+  casesOf: drillCasesOf,
+  titleOf: c => (c && c.title && (c.title[lang] || c.title.en)) || '',
+  t,
+  toast,
+  onChange: syncDrillUi,
+});
+syncDrillUi();
+
+function openDrill(set) {
+  if (!requireN3('openDrill')) return;
+  openOverlay('drill');
+  const name = (set || '').toLowerCase();
+  if (name === 'f2l' || name === 'oll' || name === 'pll') drill.start(name);
+  syncDrillUi();
+}
+
+document.getElementById('open-drill').addEventListener('click', () => openDrill());
+document.querySelectorAll('#drill-sets [data-set]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (panelMode !== 'drill') openOverlay('drill');
+    drill.start(btn.dataset.set);
+  });
+});
+document.getElementById('drill-retry').addEventListener('click', () => { if (drill) drill.retry(); });
+document.getElementById('drill-skip').addEventListener('click', () => { if (drill) drill.skip(); });
+document.getElementById('drill-undo').addEventListener('click', () => engine.undo());
+
 function openTrack(name, startIndex = 0, opts) {
   if (!tracksForN(engine.n)[name]) return;
   tut.track = name;
@@ -1876,6 +2348,12 @@ function applyDeepLink() {
     const want = nRaw === '2' ? 2 : nRaw === '4' ? 4 : nRaw === '5' ? 5 : 3;
     if (engine.n !== want) setCubeN(want);
     openOverlay('learn');
+    return;
+  }
+  if (learn === 'drill') {
+    if (engine.n !== 3) setCubeN(3);
+    if (engine.n !== 3) return;
+    openDrill((q.get('set') || '').toLowerCase());
     return;
   }
   if (learn !== 'beginner' && learn !== 'cfop' && learn !== 'roux' && learn !== 'f2l' && learn !== 'oll' && learn !== 'pll') {
@@ -2066,15 +2544,58 @@ const solverHost = {
       this.worker.postMessage({ type: 'solve', job: job, facelets: facelets, n: n });
     }));
   },
+
+  scramble(n) {
+    const fallback = () => {
+      const S = globalThis.CubeSolver;
+      return Promise.resolve(S && S.scramble ? S.scramble(n) : '');
+    };
+    if (this.pending) return fallback();
+    return this.ensure().then(() => new Promise((resolve, reject) => {
+      if (!this.worker) {
+        fallback().then(resolve, reject);
+        return;
+      }
+      const job = ++this.job;
+      this.pending = { job: job, resolve: resolve, reject: reject };
+      this.worker.postMessage({ type: 'scramble', job: job, n: n });
+    })).catch(err => {
+      if (err && err.cancelled) return '';
+      return fallback();
+    });
+  },
 };
 
 async function computeSolution() {
   await engine.whenIdle();
-  const inv = engine.scrambleSolution && engine.scrambleSolution();
-  if (inv) return inv;
+  if (!useBeginner()) {
+    const inv = engine.scrambleSolution && engine.scrambleSolution();
+    if (inv) {
+      solverChunks = [];
+      return inv;
+    }
+  }
   const st = engine.readState();
   if (!st || !st.facelets || st.facelets.indexOf('?') >= 0) return '';
   try {
+    if (useBeginner()) {
+      const B = globalThis.CubeBeginner;
+      if (!B) throw new Error('beginner');
+      const r = B.solve(st.facelets, st.n);
+      if (r.error) {
+        const err = new Error(r.error === 'parse' || r.error === 'size' ? r.error : 'beginner');
+        err.beginner = true;
+        throw err;
+      }
+      solverChunks = (r.chunks || []).map(ch => ({
+        lessonIdx: ch.lessonIdx,
+        start: ch.start,
+        len: ch.len,
+        alg: ch.alg || '',
+      }));
+      return (r.toks || []).join(' ');
+    }
+    solverChunks = [];
     if (st.n < 4) return await solveOnMain(st.facelets, st.n);
     if (!FILE_PAGE) return await solverHost.solve(st.facelets, st.n);
     const CS = globalThis.CubeSolver;
@@ -2087,6 +2608,10 @@ async function computeSolution() {
       setSolveStatus(t('solverTimeout'));
       throw e;
     }
+    if (e && e.beginner) {
+      setSolveStatus(t('beginnerFailed'));
+      throw e;
+    }
     setSolveStatus(t('solverError')(e && e.message ? e.message : e));
     throw e;
   }
@@ -2097,6 +2622,45 @@ let solverReady = false;
 let solverIniting = false;
 let solverWaiters = [];
 let solverMoves = [];   // 남은 수순. Next move는 이걸 한 수씩 소모 (매 수 재계산하지 않음)
+let solverChunks = [];  // beginner 모드 덩어리 (lessonIdx / alg / len)
+let solveMode = 'beginner';
+try {
+  const savedMode = localStorage.getItem('cubeSolveMode');
+  if (savedMode === 'fast' || savedMode === 'beginner') solveMode = savedMode;
+} catch (e) { /* 저장 불가 */ }
+
+function beginnerSupported() {
+  return engine.n === 2 || engine.n === 3;
+}
+function useBeginner() {
+  return solveMode === 'beginner' && beginnerSupported();
+}
+function syncSolveModeUi() {
+  const beginner = useBeginner();
+  const shown = beginnerSupported() ? solveMode : 'fast';
+  document.querySelectorAll('#solve-mode [data-mode]').forEach(b => {
+    b.classList.toggle('active', b.dataset.mode === shown);
+  });
+  const note = document.getElementById('solver-note');
+  if (note) note.textContent = beginner ? t('solverNoteBeginner') : t('solverNote');
+  const lessonBtn = document.getElementById('solve-lesson');
+  if (lessonBtn) lessonBtn.hidden = !beginner;
+  const fastScan = document.getElementById('scan-apply-fast');
+  if (fastScan) fastScan.classList.toggle('primary', !beginnerSupported());
+}
+function setSolveMode(mode, opts) {
+  const next = mode === 'fast' ? 'fast' : 'beginner';
+  if (next === 'beginner' && !beginnerSupported()) {
+    toast(t('beginnerNxN'), 'hint');
+    solveMode = 'fast';
+  } else {
+    solveMode = next;
+  }
+  try { localStorage.setItem('cubeSolveMode', solveMode); }
+  catch (e) { /* 저장 불가 */ }
+  syncSolveModeUi();
+  if (!(opts && opts.silent)) maybeRefreshSolver();
+}
 let solverBusy = false;
 let solverInFlight = null;
 let playAfterSolve = false;
@@ -2161,6 +2725,7 @@ function loadMoves() {
   const job = (async () => {
     const sol = await computeSolution();
     solverMoves = globalThis.CubeSolver.parseMoves(sol);
+    if (!useBeginner()) solverChunks = [];
     return solverMoves;
   })();
   solverInFlight = job;
@@ -2191,15 +2756,45 @@ function setSolveMoves(text) {
   solverHud.classList.toggle('has-moves', has);
   if (!has) setHudMovesOpen(false);
 }
-
-function showSolverMoves() {
+function escapeSolveTok(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function renderSolveMoves() {
   if (!solverMoves.length) {
-    setSolveStatus(t('alreadySolved'));
     setSolveMoves('');
     return;
   }
-  setSolveStatus(t('nextMoveIs')(solverMoves[0], solverMoves.length));
-  setSolveMoves(solverMoves.join(' '));
+  const ch = useBeginner() ? solverChunks[0] : null;
+  const n = ch ? Math.max(0, ch.len) : 0;
+  const html = solverMoves.map((tok, i) => {
+    const e = escapeSolveTok(tok);
+    return (ch && i < n) ? `<span class="solve-chunk">${e}</span>` : e;
+  }).join(' ');
+  solveMovesEl.innerHTML = html;
+  hudMovesEl.innerHTML = html;
+  solverHud.classList.toggle('has-moves', true);
+}
+function chunkStatusText() {
+  if (!solverMoves.length) return emptySolveStatus();
+  if (!useBeginner() || !solverChunks.length) {
+    return t('nextMoveIs')(solverMoves[0], solverMoves.length);
+  }
+  const ch = solverChunks[0];
+  const L = lessonsOf('beginner')[ch.lessonIdx];
+  const name = L ? L.name : '';
+  return t('beginnerStep')(ch.lessonIdx, name, ch.alg || '');
+}
+
+function showSolverMoves() {
+  const lessonBtn = document.getElementById('solve-lesson');
+  if (lessonBtn) lessonBtn.hidden = !useBeginner() || !solverChunks.length;
+  if (!solverMoves.length) {
+    setSolveStatus(emptySolveStatus());
+    setSolveMoves('');
+    return;
+  }
+  setSolveStatus(chunkStatusText());
+  renderSolveMoves();
 }
 function solverOpen() {
   return document.getElementById('solver').classList.contains('open');
@@ -2210,6 +2805,7 @@ function maybeRefreshSolver() {
   stopComputeUi();
   solverHost.abort();
   solverMoves = [];
+  solverChunks = [];
   solverInFlight = null;
   solverBusy = false;
   if (solverOpen()) refreshSolution();
@@ -2221,7 +2817,11 @@ function playOneSolverMove() {
     showSolverMoves();
     return false;
   }
-  const hm = String(tok).match(/^(3|2)?(Uw|Dw|Lw|Rw|Fw|Bw|[UDLRFB])/i);
+  if (solverChunks.length) {
+    solverChunks[0].len -= 1;
+    if (solverChunks[0].len <= 0) solverChunks.shift();
+  }
+  const hm = String(tok).match(/^(3|2)?(Uw|Dw|Lw|Rw|Fw|Bw|[UDLRFBxyz])/i);
   if (hm) {
     const pre = hm[1] || '';
     const face = /w$/i.test(hm[2]) ? hm[2][0].toUpperCase() + 'w' : hm[2].toUpperCase();
@@ -2244,6 +2844,7 @@ function refreshSolution() {
         playAfterSolve = false;
         const sol = solverMoves.join(' ');
         solverMoves = [];
+        solverChunks = [];
         if (!sol) { showSolverMoves(); return; }
         setSolveStatus(t('autoSolving'));
         setSolveMoves(sol);
@@ -2266,10 +2867,14 @@ function refreshSolution() {
         setSolveStatus(t('solverTimeout'));
         return;
       }
+      if (e && e.beginner) {
+        setSolveStatus(t('beginnerFailed'));
+        return;
+      }
       setSolveStatus(t('solverError')(e && e.message ? e.message : e));
     }
   };
-  if (hasScrambleSolution()) run();
+  if (useBeginner() || hasScrambleSolution()) run();
   else ensureSolver(run);
 }
 
@@ -2277,6 +2882,10 @@ function refreshSolution() {
 // 상태를 다시 읽으면 같은 면을 또 제안해서 루프에 빠지므로 재계산하지 않는다.
 // 사용자가 직접 돌리면 maybeRefreshSolver()가 수순을 다시 뽑는다.
 function solveNext() {
+  if (isIdleSolved()) {
+    toast(t('needScramble'));
+    return;
+  }
   if (!solverMoves.length) {
     playAfterSolve = true;
     if (engine.n >= 4 && !hasScrambleSolution()) {
@@ -2304,6 +2913,10 @@ function solveNext() {
 
 // 전체 자동 풀이
 function solveAll() {
+  if (isIdleSolved()) {
+    toast(t('needScramble'));
+    return;
+  }
   solveAllAfter = true;
   playAfterSolve = false;
   if (engine.n >= 4 && !solverMoves.length && !hasScrambleSolution()) {
@@ -2313,6 +2926,7 @@ function solveAll() {
   if (solverMoves.length) {
     const sol = solverMoves.join(' ');
     solverMoves = [];
+    solverChunks = [];
     (async () => {
       if (solverBusy) return;
       solverBusy = true;
@@ -2339,7 +2953,7 @@ function solveAll() {
 function openSolverPane() {
   openOverlay('solver');
   refreshSolution();
-  if (!solverHintShown && window.matchMedia(COMPACT_SOLVER_MQ).matches) {
+  if (!solverHintShown && !isIdleSolved() && window.matchMedia(COMPACT_SOLVER_MQ).matches) {
     solverHintShown = true;
     toast(t('solverHintMobile'));
   }
@@ -2348,6 +2962,16 @@ document.getElementById('solve-next').addEventListener('click', solveNext);
 document.getElementById('solve-all').addEventListener('click', solveAll);
 document.getElementById('solve-next-m').addEventListener('click', solveNext);
 document.getElementById('solve-all-m').addEventListener('click', solveAll);
+document.querySelectorAll('#solve-mode [data-mode]').forEach(btn => {
+  btn.addEventListener('click', () => setSolveMode(btn.dataset.mode));
+});
+document.getElementById('solve-lesson').addEventListener('click', () => {
+  if (!useBeginner()) return;
+  const ch = solverChunks[0];
+  const idx = ch ? ch.lessonIdx : 1;
+  openTrack('beginner', idx);
+});
+syncSolveModeUi();
 hudStatusEl.addEventListener('click', () => {
   if (!solverHud.classList.contains('has-moves')) return;
   setHudMovesOpen(!solverHud.classList.contains('open'));
@@ -2773,7 +3397,7 @@ hudStatusEl.addEventListener('click', () => {
     openOverlay('scan');
   }
 
-  function applyScan() {
+  function applyScan(mode) {
     if (engine.busy) {
       setMsg(elReviewStatus, t('scanBusy'), 'err');
       return;
@@ -2781,6 +3405,9 @@ hudStatusEl.addEventListener('click', () => {
     if (!validateFinal()) return;
     if (engine.n !== scanN) setCubeN(scanN);
     stopCam();
+    const path = (mode === 'fast' || !beginnerSupported()) ? 'fast' : 'beginner';
+    if (mode === 'beginner' && !beginnerSupported()) toast(t('beginnerNxN'), 'hint');
+    setSolveMode(path, { silent: true });
     applyDiagramState(CS.toDiagramState(faces));
     openOverlay('solver');
     refreshSolution();
@@ -2802,7 +3429,8 @@ hudStatusEl.addEventListener('click', () => {
   btnSnap.addEventListener('click', snapCam);
   document.getElementById('scan-check-retake').addEventListener('click', retakeFromCheck);
   btnCheckOk.addEventListener('click', confirmFace);
-  document.getElementById('scan-apply').addEventListener('click', applyScan);
+  document.getElementById('scan-apply').addEventListener('click', () => applyScan('beginner'));
+  document.getElementById('scan-apply-fast').addEventListener('click', () => applyScan('fast'));
 
   window.__scanRefreshI18n = () => {
     if (panelMode !== 'scan') return;
@@ -2891,7 +3519,12 @@ function renderStageBox() {
     `<div class="sb-step">${t('stageNext')(idx)}</div>
      <div class="sb-title">${L.name}</div>
      ${alg ? `<div class="sb-alg">${alg}</div>` : ''}${note}
+     <div class="sb-link"><button type="button" id="goto-follow" class="btn-sm primary">${t('stageFollowCube')}</button></div>
      <div class="sb-link"><button type="button" id="goto-lesson" class="btn-sm">${t('stageOpenLesson')}</button></div>`;
+  document.getElementById('goto-follow').addEventListener('click', () => {
+    setSolveMode('beginner');
+    openSolverPane();
+  });
   document.getElementById('goto-lesson').addEventListener('click', () => openTrack('beginner', idx));
   if (typeof engine !== 'undefined' && engine.resize) engine.resize();
 }
@@ -2899,9 +3532,7 @@ function renderStageBox() {
 document.getElementById('detect-stage').addEventListener('click', () => {
   const idx = detectStageIndex();
   if (idx == null) return;
-  // 실제로 사용자가 손을 댔는지(타이머가 돌았던 적 있는지) 구분
-  const st = engine.stats;
-  if (st.moveCount === 0 && st.timerStart === null && !st.timerFrozen) {
+  if (isIdleSolved()) {
     toast(t('needScramble'));
     return;
   }
@@ -2929,8 +3560,9 @@ function applySizeUi() {
   if (panelMode === 'scan') {
     if (typeof window.__scanOnSizeChange === 'function') window.__scanOnSizeChange();
     syncChrome();
-  } else if (panelMode === 'tutorial') openOverlay(null);
+  } else if (panelMode === 'tutorial' || panelMode === 'drill') openOverlay(null);
   else syncChrome();
+  syncSolveModeUi();
   if (engine.n !== 3) {
     const sb = document.getElementById('stage-box');
     sb.classList.remove('show');
@@ -2943,6 +3575,7 @@ function applySizeUi() {
     stopComputeUi();
     solverHost.abort();
     solverMoves = [];
+    solverChunks = [];
     solverInFlight = null;
     solverBusy = false;
     refreshSolution();
@@ -2959,6 +3592,7 @@ function setCubeN(n) {
   cubeN = engine.n;
   try { localStorage.setItem('cubeN', String(cubeN)); }
   catch (e) { /* 저장 불가 — 이 세션에서만 적용 */ }
+  resetAttemptFull();
   applySizeUi();
 }
 
@@ -2974,6 +3608,10 @@ document.getElementById('numbers-select').addEventListener('change', e => {
   engine.setShowNumbers(on);
   try { localStorage.setItem('cubeNumbers', on ? 'on' : 'off'); }
   catch (err) { /* 저장 불가 — 이 세션에서만 적용 */ }
+});
+
+document.getElementById('inspection-select').addEventListener('change', e => {
+  T.setInspection(e.target.value === 'on');
 });
 
 function applyCubeTheme(id) {
@@ -3021,10 +3659,14 @@ function applyLang(next) {
   updateStatus();
   syncChrome();
   if (panelMode === 'tutorial') { syncTutExpandBtn(); renderLesson(); }
+  if (panelMode === 'drill') syncDrillUi();
   renderStageBox();
   // 솔버 패널이 열려 있으면 위 루프가 안내 문구를 초기값으로 덮었으므로 다시 계산
   if (panelMode === 'solver') refreshSolution();
   syncSizeLabels();
+  syncSolveModeUi();
+  renderPlayHud();
+  if (timesSheet.classList.contains('open')) renderTimesSheet();
   if (typeof window.__scanRefreshI18n === 'function') window.__scanRefreshI18n();
   syncDetectStageEnabled();
 }
@@ -3032,13 +3674,19 @@ function applyLang(next) {
 document.querySelectorAll('#lang-switch button').forEach(b => {
   b.addEventListener('click', () => applyLang(b.dataset.lang));
 });
+document.getElementById('inspection-select').value = T.getInspection() ? 'on' : 'off';
 applyLang();
 syncStatsDom();
 initChrome();
 applyDeepLink();
+renderPlayHud();
+if (!FILE_PAGE) solverHost.ensure().catch(() => {});
 
 (function tickUi() {
   requestAnimationFrame(tickUi);
+  if (engine.stats.timerStart && (playAttempt.phase === 'inspect' || playAttempt.phase === 'ready')) {
+    onFirstMove();
+  }
   syncStatsDom();
 })();
 

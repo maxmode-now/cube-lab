@@ -9,6 +9,12 @@ self.onmessage = function (e) {
       self.postMessage({ type: 'ready', job: msg.job, ok: true });
       return;
     }
+    if (msg.type === 'scramble') {
+      CubeSolver.init();
+      const alg = CubeSolver.scramble(msg.n | 0);
+      self.postMessage({ type: 'done', job: msg.job, ok: true, sol: alg || '' });
+      return;
+    }
     if (msg.type === 'solve') {
       const maxMs = 45000;
       CubeSolver.setYield(function () {

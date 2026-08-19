@@ -84,8 +84,16 @@
     return [p[0], p[1], p[2], nrm[0], nrm[1], nrm[2]].map(v => Math.round(v * 2)).join(',');
   }
 
+  function allLayers(n) {
+    const outer = (n - 1) / 2;
+    const layers = [];
+    for (let i = 0; i < n; i++) layers.push(i - outer);
+    return layers;
+  }
+
   function moveDefs(n) {
     const outer = (n - 1) / 2;
+    const all = allLayers(n);
     const defs = {
       U: { axis: 1, layers: [outer], dir: -1 },
       D: { axis: 1, layers: [-outer], dir: 1 },
@@ -93,6 +101,9 @@
       L: { axis: 0, layers: [-outer], dir: 1 },
       F: { axis: 2, layers: [outer], dir: -1 },
       B: { axis: 2, layers: [-outer], dir: 1 },
+      x: { axis: 0, layers: all, dir: -1 },
+      y: { axis: 1, layers: all, dir: -1 },
+      z: { axis: 2, layers: all, dir: -1 },
     };
     if (n >= 4) {
       const inner = outer - 1;
@@ -170,9 +181,17 @@
       perms[name + "'"] = p3;
       names.push(name + '2', name + "'");
     });
-    permCache[n] = { perms, names, spec };
+    const specIndex = {};
+    for (let i = 0; i < spec.length; i++) specIndex[keyOf(spec[i].p, spec[i].nrm)] = i;
+    permCache[n] = { perms, names, spec, specIndex };
     moveNameCache[n] = names;
     return permCache[n];
+  }
+
+  function colorAt(n, arr, p, nrm) {
+    const i = tablesFor(n).specIndex[keyOf(p, nrm)];
+    if (i == null) return null;
+    return FACE[arr[i]];
   }
 
   function cloneArr(a) {
@@ -252,7 +271,7 @@
   }
 
   function scrambleArr(n, count, rng) {
-    const names = Object.keys(moveDefs(n));
+    const names = Object.keys(moveDefs(n)).filter(k => k !== 'x' && k !== 'y' && k !== 'z');
     const arr = solvedArr(n);
     const toks = [];
     let last = '';
@@ -267,6 +286,76 @@
       toks.push(tok);
     }
     return { arr, toks };
+  }
+
+  function axisOfName(name) {
+    const f = faceOf(name).replace(/w$/i, '').slice(-1).toUpperCase();
+    if (f === 'U' || f === 'D' || f === 'E') return 1;
+    if (f === 'R' || f === 'L' || f === 'M') return 0;
+    return 2;
+  }
+
+  function scrambleCount(n) {
+    if (n <= 2) return 11;
+    if (n === 3) return 25;
+    if (n === 4) return 40;
+    return 60;
+  }
+
+  function scramblePool(n) {
+    if (n >= 5) {
+      return ['U', 'D', 'R', 'L', 'F', 'B',
+        '2U', '2D', '2R', '2L', '2F', '2B',
+        '3U', '3D', '3R', '3L', '3F', '3B'];
+    }
+    if (n >= 4) {
+      return ['U', 'D', 'R', 'L', 'F', 'B', '2U', '2D', '2R', '2L', '2F', '2B'];
+    }
+    return ['U', 'D', 'R', 'L', 'F', 'B'];
+  }
+
+  function scrambleMoves(n, count, rng) {
+    rng = rng || Math.random;
+    const pool = scramblePool(n);
+    if (count == null) count = scrambleCount(n);
+    const toks = [];
+    let prevFace = null;
+    let prevAxis = null;
+    let prev2Axis = null;
+    for (let i = 0; i < count; i++) {
+      let name = pool[0];
+      let face = faceOf(name);
+      let axis = axisOfName(name);
+      for (let t = 0; t < 24; t++) {
+        name = pool[Math.floor(rng() * pool.length)];
+        face = faceOf(name);
+        axis = axisOfName(name);
+        if (face === prevFace) continue;
+        if (prevAxis != null && prev2Axis != null && axis === prevAxis && axis === prev2Axis) continue;
+        break;
+      }
+      const r = rng();
+      const suff = r < 1 / 3 ? '2' : r < 2 / 3 ? "'" : '';
+      toks.push(name + suff);
+      prev2Axis = prevAxis;
+      prevAxis = axis;
+      prevFace = face;
+    }
+    return toks;
+  }
+
+  function scramble(n, rng) {
+    n = n | 0;
+    if (n === 3) {
+      try {
+        const C = Cube();
+        if (C && typeof C.scramble === 'function') {
+          const s = C.scramble();
+          if (s && String(s).trim()) return String(s).trim();
+        }
+      } catch (e) { /* solver tables not ready — random-move fallback */ }
+    }
+    return scrambleMoves(n, scrambleCount(n), rng).join(' ');
   }
 
   // ── 2×2: 코너 퍼뮤테이션 + 오리엔테이션 IDA* ──
@@ -1456,6 +1545,8 @@
 
   g.CubeSolver = {
     init, solve, parseMoves, needsKociemba, setYield,
-    _test: { tablesFor, applyName, applyAlg, solvedArr, scrambleArr, isSolvedArr, solve2, solveNxN, solveCenters, pairEdges, to3x3, parseFacelets, pairedCount, edgeSlots, faceCentersSolved, slotPaired, findUnpairedGroup, searchImproveFace, lastFourCenterMoves, fillFaceGreedy, faceCenterCount, preserveUMoves, basicMoveNames, bfsCenters, plusIdxs, xIdxs },
+    FACE, parseFacelets, applyAlg, applyName, toStr, isSolvedArr, solvedArr, colorAt,
+    scramble, scrambleMoves, scrambleCount,
+    _test: { tablesFor, applyName, applyAlg, solvedArr, scrambleArr, scrambleMoves, scrambleCount, scramble, isSolvedArr, solve2, solveNxN, solveCenters, pairEdges, to3x3, parseFacelets, pairedCount, edgeSlots, faceCentersSolved, slotPaired, findUnpairedGroup, searchImproveFace, lastFourCenterMoves, fillFaceGreedy, faceCenterCount, preserveUMoves, basicMoveNames, bfsCenters, plusIdxs, xIdxs, colorAt },
   };
 })(typeof globalThis !== 'undefined' ? globalThis : this);

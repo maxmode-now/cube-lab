@@ -1,12 +1,14 @@
-const STATIC = 'cube-static-v1.6';
-const RUNTIME = 'cube-runtime-v1.6';
+const STATIC = 'cube-static-v1.9';
+const RUNTIME = 'cube-runtime-v1.9';
 
 const PRECACHE = [
   './index.html',
   './manifest.json',
   './cube-solver.js',
+  './beginner-solver.js',
   './cube-math.js',
   './cube-engine.js',
+  './cube-timer.js',
   './cube-scan.js',
   './lessons.js',
   './f2l-cases.js',

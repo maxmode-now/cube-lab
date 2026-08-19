@@ -65,12 +65,6 @@
   }
   .brand { font-weight: 700; color: var(--text-strong); text-decoration: none; flex: 0 0 auto; }
   .brand:hover { color: var(--accent); text-decoration: none; }
-  .top-cta {
-    display: inline-flex; align-items: center; min-height: 36px; padding: 0 12px;
-    font-size: 13px; font-weight: 600; color: var(--on-accent);
-    background: var(--accent); border-radius: 8px; text-decoration: none; flex: 0 0 auto;
-  }
-  .top-cta:hover { background: var(--accent-hover); color: var(--on-accent); text-decoration: none; }
   nav.sizes {
     display: flex; align-items: center; justify-content: center;
     gap: 2px; flex: 1 1 auto;
@@ -163,12 +157,12 @@
   <header class="top">
     <a class="brand" href="../../../index.html">Cube Lab</a>
     <nav class="sizes" aria-label="Written guides">
+      <a href="../../../how-to-solve/index.html">All</a>
       <a href="../../../how-to-solve-2x2/index.html">2×2</a>
       <a href="../../../how-to-solve-3x3/index.html" aria-current="page">3×3</a>
       <a href="../../../how-to-solve-4x4/index.html">4×4</a>
       <a href="../../../how-to-solve-5x5/index.html">5×5</a>
     </nav>
-    <a class="top-cta" href="../../../index.html?n=3&amp;learn=oll&amp;step=0">Open the trainer</a>
     <nav class="methods" aria-label="3×3 methods">
       <a href="../../../how-to-solve-3x3/index.html">Beginner</a>
       <a href="../../../how-to-solve-3x3/cfop/index.html" aria-current="page">CFOP</a>
@@ -196,6 +190,7 @@
       <p>2-Look OLL does not try to solve every last-layer pattern in one algorithm. Instead, you do <b>edges first</b>, then <b>corners</b>. That is why it is much easier to learn than full OLL.</p>
       <p class="note"><strong>Demo plays the case, then the fix.</strong> Cube Lab resets, applies the inverse instantly so you see the pattern, then animates the algorithm.</p>
       <a class="cta" href="../../../index.html?n=3&amp;learn=oll&amp;step=0">Open 2-Look OLL in Cube Lab</a>
+      <p><a class="cta" href="../../../index.html?n=3&amp;learn=drill&amp;set=oll">Practice random OLL cases in Cube Lab</a></p>
 
       <h2 id="cross">1. Yellow cross</h2>
       <p>Read only three edge patterns: <b>dot</b>, <b>L-shape</b>, and <b>line</b>. Your goal is the yellow cross. Side colours do not matter yet.</p>

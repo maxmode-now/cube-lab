@@ -720,6 +720,7 @@
       timerStart = null;
       timerFrozen = false;
       frozenElapsed = 0;
+      scrambleToks = [];
     }
 
     function selectLayers(axisIndex, layerValues) {
@@ -795,7 +796,14 @@
       return rotateLayers(axisIndex, [layerValue], dir, instant);
     }
 
+    function allLayers(n, outer) {
+      const layers = [];
+      for (let i = 0; i < n; i++) layers.push(i - outer);
+      return layers;
+    }
+
     function makeMoves(n, outer) {
+      const all = allLayers(n, outer);
       const m = {
         U: { axis: 1, layers: [outer], dir: -1 },
         D: { axis: 1, layers: [-outer], dir: 1 },
@@ -803,6 +811,9 @@
         L: { axis: 0, layers: [-outer], dir: 1 },
         F: { axis: 2, layers: [outer], dir: -1 },
         B: { axis: 2, layers: [-outer], dir: 1 },
+        x: { axis: 0, layers: all, dir: -1 },
+        y: { axis: 1, layers: all, dir: -1 },
+        z: { axis: 2, layers: all, dir: -1 },
       };
       if (n === 3) {
         // M follows L, E follows D, S follows F. Wide = outer + middle.
@@ -850,6 +861,12 @@
     let MOVES = makeMoves(N, OUTER);
 
     function parseMoveToken(tok) {
+      const xyz = String(tok).match(/^([xyz])(2|')?$/i);
+      if (xyz) {
+        const name = xyz[1].toLowerCase();
+        if (!MOVES[name]) return null;
+        return { name: name, prime: xyz[2] === "'", double: xyz[2] === '2' };
+      }
       const m = String(tok).match(/^(3|2)?(Uw|Dw|Lw|Rw|Fw|Bw|[UDLRFB]|[udlrfb]|[MESmes])(2|')?$/i);
       if (!m) return null;
       const prefix = m[1] || '';
@@ -896,6 +913,7 @@
     function playAlg(str, record, instant) {
       if (record == null) record = false;
       if (instant == null) instant = false;
+      if (!record) notify({ solver: false, alg: true });
       const toks = str.trim().split(/\s+/);
       for (let i = 0; i < toks.length; i++) {
         const parsed = parseMoveToken(toks[i]);
@@ -917,53 +935,48 @@
       });
     }
 
-    function doMoveAwaitable(name, prime) {
-      const spec = MOVES[name];
-      animating = true;
-      return rotateLayers(spec.axis, spec.layers, spec.dir * (prime ? -1 : 1), false).then(() => {
-        animating = false;
-      });
+    function applyTokenInstant(parsed) {
+      const spec = MOVES[parsed.name];
+      if (!spec) return;
+      const dir = spec.dir * (parsed.prime ? -1 : 1);
+      const times = parsed.double ? 2 : 1;
+      for (let k = 0; k < times; k++) {
+        finalizeLayer(grabLayers(spec.axis, spec.layers), (Math.PI / 2) * dir);
+      }
     }
 
-    function pickFromPool(pool, lastAxis) {
-      let name = pool[Math.floor(Math.random() * pool.length)];
-      let spec = MOVES[name];
-      for (let t = 0; t < 12 && spec && spec.axis === lastAxis; t++) {
-        name = pool[Math.floor(Math.random() * pool.length)];
-        spec = MOVES[name];
+    function applyScramble(alg) {
+      if (animating || scrambling || drag) return Promise.resolve(false);
+      const toks = typeof alg === 'string'
+        ? alg.trim().split(/\s+/).filter(Boolean)
+        : (alg || []).slice();
+      if (!toks.length) return Promise.resolve(false);
+      scrambling = true;
+      queue.length = 0;
+      drag = null;
+      controls.enabled = true;
+      clearHighlight();
+      buildCube();
+      for (let i = 0; i < toks.length; i++) {
+        const parsed = parseMoveToken(toks[i]);
+        if (parsed) applyTokenInstant(parsed);
       }
-      return name;
+      resetStats();
+      scrambleToks = toks.slice();
+      scrambling = false;
+      notify({ solver: true });
+      return Promise.resolve(true);
     }
 
     function scramble(count) {
-      if (animating || scrambling) return Promise.resolve();
-      queue.length = 0;
-      scrambleToks = [];
-      const outer = ['U', 'D', 'R', 'L', 'F', 'B'];
-      const inner = ['2U', '2D', '2R', '2L', '2F', '2B'];
-      const wide = ['Uw', 'Dw', 'Rw', 'Lw', 'Fw', 'Bw'];
-      if (count == null) count = N <= 2 ? 11 : N >= 5 ? 20 : N >= 4 ? 40 : 25;
-      const names = N >= 5 ? outer.concat(inner, wide) : Object.keys(MOVES);
-      const seq = [];
-      let lastAxis = -1;
-      for (let i = 0; i < count; i++) {
-        const name = pickFromPool(names, lastAxis);
-        lastAxis = MOVES[name].axis;
-        const prime = Math.random() < 0.5;
-        seq.push({ name: name, prime: prime, tok: name + (prime ? "'" : '') });
+      if (animating || scrambling || drag) return Promise.resolve(false);
+      const S = g.CubeSolver;
+      let alg = '';
+      if (S && typeof S.scramble === 'function') {
+        alg = count == null ? S.scramble(N) : S.scrambleMoves(N, count).join(' ');
       }
-      scrambling = true;
-      let p = Promise.resolve();
-      for (let i = 0; i < seq.length; i++) {
-        const step = seq[i];
-        p = p.then(() => doMoveAwaitable(step.name, step.prime));
-      }
-      return p.then(() => {
-        scrambleToks = seq.map(s => s.tok);
-        scrambling = false;
-        resetStats();
-        notify({ solver: true });
-      });
+      if (!alg) return Promise.resolve(false);
+      return applyScramble(alg);
     }
 
     function resetCube() {
@@ -1408,6 +1421,7 @@
       get moves() { return MOVES; },
       get busy() { return animating || scrambling || queue.length > 0 || !!drag; },
       scrambleSolution,
+      get scrambleText() { return scrambleToks.join(' '); },
       get stats() {
         return {
           moveCount,
@@ -1419,6 +1433,7 @@
       doMove,
       playAlg,
       scramble,
+      applyScramble,
       undo,
       reset: resetCube,
       isSolved,
