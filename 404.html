@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>404 — Cube Lab</title>
+<meta name="description" content="This page is not on Cube Lab. Go home or email us." />
+<meta name="robots" content="noindex, nofollow" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="404 — Cube Lab" />
+<meta property="og:description" content="This page is not on Cube Lab." />
+<meta property="og:image" content="https://cube.maxmode-now.com/docs/play.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Righteous&display=swap" rel="stylesheet" />
+<style>
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: linear-gradient(180deg, #05060a 0%, #0a1020 100%);
+}
+.scene {
+  --px: 0;
+  --py: 0;
+  position: relative;
+  height: 100%;
+  min-height: 100dvh;
+  overflow: hidden;
+}
+.sky {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 80% 18% at 72% 38%, rgba(160, 170, 220, 0.14) 0%, transparent 70%),
+    radial-gradient(ellipse 55% 45% at 82% 42%, rgba(88, 70, 160, 0.42) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 35% at 70% 78%, rgba(20, 110, 130, 0.26) 0%, transparent 68%),
+    radial-gradient(ellipse 30% 28% at 92% 18%, rgba(140, 60, 120, 0.2) 0%, transparent 65%),
+    radial-gradient(ellipse 12% 10% at 88% 58%, rgba(255, 255, 255, 0.12) 0%, transparent 70%);
+}
+.nebula {
+  position: absolute;
+  inset: -8%;
+  z-index: 0;
+  pointer-events: none;
+  transform: translate(calc(var(--px) * -16px), calc(var(--py) * -16px));
+  will-change: transform;
+  background:
+    radial-gradient(ellipse 50% 40% at 78% 48%, rgba(110, 80, 200, 0.32) 0%, transparent 62%),
+    radial-gradient(ellipse 28% 36% at 86% 72%, rgba(30, 150, 160, 0.2) 0%, transparent 60%);
+  filter: blur(18px);
+  mix-blend-mode: screen;
+}
+.stars {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  will-change: transform;
+}
+.stars--far {
+  z-index: 0;
+  transform: translate(calc(var(--px) * -6px), calc(var(--py) * -6px));
+}
+.stars--mid {
+  z-index: 0;
+  transform: translate(calc(var(--px) * -18px), calc(var(--py) * -18px));
+}
+.stars--near {
+  z-index: 2;
+  transform: translate(calc(var(--px) * -38px), calc(var(--py) * -38px));
+}
+.vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 38% 42%, transparent 42%, rgba(0, 0, 0, 0.55) 100%);
+}
+.moon-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  transform: translate(calc(var(--px) * -10px), calc(var(--py) * -10px));
+  will-change: transform;
+}
+.lang-switch {
+  position: absolute;
+  top: max(12px, env(safe-area-inset-top));
+  right: max(12px, env(safe-area-inset-right));
+  z-index: 4;
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  background: rgba(24, 27, 32, 0.7);
+  border: 1px solid #2f3640;
+  border-radius: 8px;
+}
+.lang-switch button {
+  min-height: 28px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 6px;
+  font: 600 12px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #9aa0ad;
+  background: none;
+  cursor: pointer;
+}
+.lang-switch button[aria-pressed="true"] {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+.moon-disk {
+  position: absolute;
+  top: -100px;
+  left: -300px;
+  width: 900px;
+  height: 900px;
+  border-radius: 50%;
+  box-shadow:
+    0 0 80px 20px rgba(220, 200, 170, 0.18),
+    0 0 160px 50px rgba(180, 160, 140, 0.1);
+}
+.moon {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 50%;
+  box-shadow:
+    inset 70px 48px 110px rgba(255, 250, 244, 0.2),
+    inset -90px -60px 130px rgba(28, 24, 22, 0.38);
+}
+.moon__photo {
+  position: absolute;
+  inset: 0;
+  background: url("./images/moon.png") center / 132% 132% no-repeat;
+  filter: brightness(1.52) contrast(0.96) saturate(0.58) sepia(0.12);
+}
+.moon__tint {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(115deg, #f0ece6 0%, #d8d2ca 48%, #c4bdb4 100%);
+  mix-blend-mode: screen;
+  opacity: 0.4;
+}
+.moon__read {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 30% 32%, rgba(255, 252, 248, 0.4) 0%, transparent 38%),
+    radial-gradient(ellipse 48% 42% at 38% 40%, rgba(255, 250, 244, 0.2) 0%, transparent 72%);
+}
+.moon__shade {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 82% 66%, rgba(20, 16, 14, 0.38) 0%, transparent 48%),
+    radial-gradient(circle at 36% 34%, transparent 40%, rgba(20, 16, 14, 0.08) 72%, rgba(12, 10, 9, 0.32) 100%);
+}
+.star {
+  position: absolute;
+  border-radius: 100%;
+  animation: shimmer 1.5s infinite alternate;
+}
+@keyframes shimmer {
+  from { opacity: 0.15; }
+  to { opacity: 0.95; }
+}
+.error {
+  position: absolute;
+  left: 100px;
+  top: 40%;
+  transform: translateY(-40%);
+  z-index: 4;
+  font-family: Righteous, cursive;
+  color: #363e49;
+}
+.error__title { font-size: 10em; line-height: 0.9; }
+.error__subtitle { font-size: 2em; }
+.error__description { opacity: 0.5; margin-top: 0.4em; }
+html[data-lang="en"] [data-copy="ko"],
+html[data-lang="ko"] [data-copy="en"] { display: none; }
+.error__button {
+  display: inline-block;
+  min-width: 7em;
+  margin-top: 3em;
+  margin-right: 0.5em;
+  padding: 0.5em 2em;
+  outline: none;
+  border: 2px solid #2f3640;
+  background: transparent;
+  border-radius: 8em;
+  color: #576375;
+  cursor: pointer;
+  transition: 0.2s;
+  font-size: 0.75em;
+  font-family: Righteous, cursive;
+  text-align: center;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+.error__button:hover { color: #21252c; text-decoration: none; }
+.error__button--active {
+  background-color: #e67e22;
+  border: 2px solid #e67e22;
+  color: #fff;
+}
+.error__button--active:hover {
+  box-shadow: 0 0 8px 0 rgba(0,0,0,0.5);
+  color: #fff;
+}
+.astronaut-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  transform: translate(calc(var(--px) * -42px), calc(var(--py) * -42px));
+  will-change: transform;
+}
+.astronaut-float {
+  position: absolute;
+  left: 70%;
+  top: 50%;
+  width: 320px;
+  height: 320px;
+  transform: translate(-50%, -50%) rotate(6deg) scale(1.05);
+  animation: drift 8s ease-in-out infinite alternate;
+}
+.astronaut {
+  position: absolute;
+  inset: 0;
+  background: url("./images/astronaut.png") center / 108% 108% no-repeat;
+  filter: brightness(1.08) contrast(1.05) drop-shadow(-18px 22px 18px rgba(0, 0, 0, 0.55));
+  pointer-events: none;
+}
+.astronaut__tether {
+  position: absolute;
+  left: -280px;
+  top: -40px;
+  width: 420px;
+  height: 320px;
+  pointer-events: none;
+}
+@keyframes drift {
+  from { transform: translate(-50%, -50%) rotate(6deg) scale(1.05); }
+  to { transform: translate(-46%, -56%) rotate(14deg) scale(1.05); }
+}
+@media (max-width: 900px) {
+  .moon-disk { top: -180px; left: -360px; width: 640px; height: 640px; }
+  .error { left: 28px; right: 28px; top: 38%; }
+  .error__title { font-size: 5.5em; }
+  .error__subtitle { font-size: 1.4em; }
+  .astronaut-float {
+    width: 220px;
+    height: 220px;
+    left: 78%;
+    top: 72%;
+    transform: translate(-50%, -50%) rotate(6deg) scale(0.9);
+  }
+  .astronaut__tether {
+    left: -190px;
+    top: -28px;
+    width: 300px;
+    height: 220px;
+  }
+  @keyframes drift {
+    from { transform: translate(-50%, -50%) rotate(6deg) scale(0.9); }
+    to { transform: translate(-46%, -56%) rotate(14deg) scale(0.9); }
+  }
+}
+@media (max-width: 520px) {
+  .error { top: 42%; transform: translateY(-50%); }
+  .error__title { font-size: 4.2em; }
+  .error__button { margin-top: 1.6em; }
+  .astronaut-float { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .star, .astronaut-float { animation: none; }
+  .nebula, .stars, .moon-wrap, .astronaut-wrap { transform: none; will-change: auto; }
+}
+</style>
+</head>
+<body data-page="notfound">
+  <div class="scene">
+    <div class="lang-switch" role="group" aria-label="Language">
+      <button type="button" data-lang="en" aria-pressed="true">EN</button>
+      <button type="button" data-lang="ko" aria-pressed="false">한국어</button>
+    </div>
+
+    <div class="sky" aria-hidden="true"></div>
+    <div class="nebula" aria-hidden="true"></div>
+    <div class="stars stars--far" id="stars-far" aria-hidden="true"></div>
+    <div class="stars stars--mid" id="stars-mid" aria-hidden="true"></div>
+
+    <div class="moon-wrap" aria-hidden="true">
+      <div class="moon-disk">
+        <div class="moon">
+          <div class="moon__photo"></div>
+          <div class="moon__tint"></div>
+          <div class="moon__read"></div>
+          <div class="moon__shade"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stars stars--near" id="stars-near" aria-hidden="true"></div>
+    <div class="vignette" aria-hidden="true"></div>
+
+    <div class="error">
+      <div class="error__title">404</div>
+      <div class="error__subtitle">
+        <span data-copy="en">Page not found</span>
+        <span data-copy="ko">페이지를 찾을 수 없습니다</span>
+      </div>
+      <div class="error__description">
+        <span data-copy="en">This scramble has no solution — the page is gone</span>
+        <span data-copy="ko">이 스크램블은 풀이가 없어요. 페이지가 없습니다</span>
+      </div>
+      <a class="error__button error__button--active" href="./index.html">
+        <span data-copy="en">HOME</span>
+        <span data-copy="ko">홈</span>
+      </a>
+      <a class="error__button" href="./about/index.html">
+        <span data-copy="en">CONTACT</span>
+        <span data-copy="ko">문의</span>
+      </a>
+    </div>
+
+    <div class="astronaut-wrap">
+      <div class="astronaut-float" aria-hidden="true">
+        <canvas class="astronaut__tether" id="tether" width="420" height="320"></canvas>
+        <div class="astronaut"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="./legal.js"></script>
+  <script>
+  (function () {
+    var tints = ['#fff', '#e8f0ff', '#fff6e8', '#dce8ff'];
+
+    function fill(id, count, minSize, maxSize, glowAt, leftMin) {
+      var field = document.getElementById(id);
+      if (!field) return;
+      var html = '';
+      var i;
+      for (i = 0; i < count; i++) {
+        var size = (Math.random() * (maxSize - minSize) + minSize).toFixed(1);
+        var left = (Math.random() * (100 - leftMin) + leftMin).toFixed(2);
+        var glow = parseFloat(size) >= glowAt
+          ? 'box-shadow:0 0 ' + (parseFloat(size) * 2.2).toFixed(1) + 'px 1px rgba(200,220,255,0.75);'
+          : '';
+        html += '<span class="star" style="'
+          + 'top:' + (Math.random() * 100).toFixed(2) + '%;'
+          + 'left:' + left + '%;'
+          + 'width:' + size + 'px;height:' + size + 'px;'
+          + 'background:' + tints[i % tints.length] + ';'
+          + 'animation-duration:' + (1.1 + Math.random() * 2.4).toFixed(2) + 's;'
+          + 'animation-delay:' + (Math.random() * 4).toFixed(2) + 's;'
+          + glow
+          + '"></span>';
+      }
+      field.innerHTML = html;
+    }
+
+    fill('stars-far', 70, 0.8, 1.6, 9, 0);
+    fill('stars-mid', 45, 1.2, 2.4, 2.2, 0);
+    fill('stars-near', 22, 2.2, 3.4, 2.4, 52);
+
+    var scene = document.querySelector('.scene');
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!scene || reduce) return;
+
+    function setParallax(clientX, clientY) {
+      var x = clientX / window.innerWidth - 0.5;
+      var y = clientY / window.innerHeight - 0.5;
+      scene.style.setProperty('--px', x.toFixed(3));
+      scene.style.setProperty('--py', y.toFixed(3));
+    }
+
+    window.addEventListener('mousemove', function (e) {
+      setParallax(e.clientX, e.clientY);
+    }, { passive: true });
+  })();
+  </script>
+  <script>
+  (function () {
+    var canvas = document.getElementById('tether');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var y1 = 140;
+    var y2 = 100;
+    var y3 = 120;
+    var y1Forward = true;
+    var y2Forward = false;
+    var y3Forward = true;
+
+    function frame() {
+      var w = canvas.width;
+      var h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+      ctx.beginPath();
+      // attach near suit hip/backpack, trail left toward the moon
+      ctx.moveTo(w - 36, h * 0.58);
+      ctx.bezierCurveTo(w * 0.62, y1, w * 0.32, y2, 18, y3);
+      ctx.strokeStyle = 'rgba(255,255,255,0.92)';
+      ctx.lineWidth = 6;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+
+      if (reduce) return;
+
+      if (y1 <= 90) y1Forward = true;
+      if (y1 >= 210) y1Forward = false;
+      if (y2 <= 80) y2Forward = true;
+      if (y2 >= 200) y2Forward = false;
+      if (y3 <= 90) y3Forward = true;
+      if (y3 >= 200) y3Forward = false;
+
+      y1 += y1Forward ? 1 : -1;
+      y2 += y2Forward ? 1 : -1;
+      y3 += y3Forward ? 1 : -1;
+      requestAnimationFrame(frame);
+    }
+
+    if (reduce) {
+      frame();
+      return;
+    }
+    requestAnimationFrame(frame);
+  })();
+  </script>
+</body>
+</html>

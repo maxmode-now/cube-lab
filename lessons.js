@@ -357,7 +357,7 @@ const ROUX_EN = [
     goal: 'Orient the last six edges using only M and U.',
     desc: `<p>LSE (Last Six Edges) is Roux’s signature step. All remaining work is <b>M</b> and <b>U</b>. First, make every leftover edge oriented (yellow or white on U/D).</p>
       <p>Read the “bad edges” (wrong orientation). Common shapes: arrow, line, L, dot. The arrow case below is the one you will see most.</p>
-      <p>Tap M in Settings or press the <b>M</b> key (Shift = M′). Do not rotate the cube in your hands — M is the slice between L and R, same direction as L.</p>`,
+      <p>Tap M in Moves or press the <b>M</b> key (Shift = M′). Do not rotate the cube in your hands — M is the slice between L and R, same direction as L.</p>`,
     algs: [
       { label: 'Arrow case (4a)', alg: "M' U M' U' M'" },
       { label: 'Line (4a)', alg: "M' U2 M' U2" },
@@ -431,7 +431,7 @@ const ROUX_KO = [
     goal: '남은 엣지 6개의 방향을 M과 U만으로 맞춥니다.',
     desc: `<p>LSE(Last Six Edges)가 Roux의 대표 단계예요. 남은 일은 전부 <b>M</b>과 <b>U</b>. 먼저 남은 엣지 방향부터 (노랑·흰이 U/D에 오게).</p>
       <p>‘나쁜 엣지’(방향이 틀린 것) 개수와 모양을 봐요. 화살표, 일자, L, 점. 아래 화살표 케이스가 가장 자주 나와요.</p>
-      <p>설정에서 M을 누르거나 키보드 <b>M</b>(Shift = M′). 큐브를 손에 돌리지 마세요. M은 L과 R 사이 슬라이스이고 L과 같은 방향입니다.</p>`,
+      <p>회전에서 M을 누르거나 키보드 <b>M</b>(Shift = M′). 큐브를 손에 돌리지 마세요. M은 L과 R 사이 슬라이스이고 L과 같은 방향입니다.</p>`,
     algs: [
       { label: '화살표 케이스 (4a)', alg: "M' U M' U' M'" },
       { label: '일자 (4a)', alg: "M' U2 M' U2" },
@@ -873,8 +873,8 @@ const LESSONS_4_EN = [
     title: 'Notation (4×4)', name: 'Notation', intro: true,
     goal: 'Outer faces use the same letters as 3×3. Inner slices (2R) and wide turns (Rw) are new.',
     desc: `<p><b>U D L R F B</b> — outer face, 90° clockwise. <b>'</b> counter-clockwise, <b>2</b> a half turn.</p>
-      <p><b>2R</b> <b>2U</b> … — the inner slice next to that face. Settings → Layer → <b>Inner</b>, then tap R / U.</p>
-      <p><b>Rw</b> <b>Uw</b> — outer and inner together. Settings → Layer → <b>Wide</b>.</p>
+      <p><b>2R</b> <b>2U</b> … — the inner slice next to that face. Moves → Layer → <b>Inner</b>, then tap R / U.</p>
+      <p><b>Rw</b> <b>Uw</b> — outer and inner together. Moves → Layer → <b>Wide</b>.</p>
       <p>A wide or inner turn moves the 2×2 centres. Pairing uses <b>Uw</b> to bring edges together, then you undo that slice so the centres come back. ▶Demo plays an inner-slice trigger.</p>`,
     algs: [
       { label: 'Inner-slice trigger', alg: "2R U 2R' U'" },
@@ -900,7 +900,7 @@ const LESSONS_4_EN = [
   {
     title: 'Step 3 · Solve as a 3×3', name: 'Solve as a 3×3',
     goal: 'Outer turns only. Each 2×2 centre is a 3×3 centre. Each paired edge is a 3×3 edge.',
-    desc: `<p>Switch Layer back to <b>Outer</b>. Follow the 3×3 beginner method: white cross, white corners, middle edges, yellow cross, yellow face, then last-layer permutation.</p>
+    desc: `<p>Moves → Layer → <b>Outer</b>. Follow the 3×3 beginner method: white cross, white corners, middle edges, yellow cross, yellow face, then last-layer permutation.</p>
       <p>If the last layer looks impossible — one flipped edge pair, or two edges that will not permute — that is parity, not a broken reduction. Go to the next steps.</p>`,
     algs: [{ label: 'Example outer turn (cross lift)', alg: 'F2' }],
   },
@@ -908,7 +908,7 @@ const LESSONS_4_EN = [
     title: 'Step 4 · OLL parity', name: 'OLL parity',
     goal: 'One edge pair looks flipped. The rest of the last layer can be oriented as usual.',
     desc: `<p>This cannot happen on a 3×3. On 4×4 it is normal after pairing. Hold the flipped pair at the <b>front</b> and run the algorithm, then continue yellow cross / Sune as on 3×3.</p>
-      <p>▶Demo uses inner slices (<b>2R</b> / <b>2L</b>) mixed with outer U and F. To turn those yourself: Settings → Layer → Inner for 2R / 2L, Outer for U and F.</p>`,
+      <p>▶Demo uses inner slices (<b>2R</b> / <b>2L</b>) mixed with outer U and F. To turn those yourself: Moves → Layer → Inner for 2R / 2L, Outer for U and F.</p>`,
     algs: [{ label: 'OLL parity — flip the front edge pair', alg: "2R' U2 2L F2 2L' F2 2R2 U2 2R U2 2R' U2 F2 2R2 F2" }],
   },
   {
@@ -925,8 +925,8 @@ const LESSONS_4_KO = [
     title: '표기법 (4×4)', name: '표기법', intro: true,
     goal: '겉면 글자는 3×3과 같습니다. 안쪽 슬라이스(2R)와 와이드(Rw)가 추가됩니다.',
     desc: `<p><b>U D L R F B</b> — 겉면, 시계 90°. <b>'</b> 반시계, <b>2</b> 180°.</p>
-      <p><b>2R</b> <b>2U</b> … — 그 면 바로 안쪽 층. 설정 → 층 → <b>안쪽</b> 후 R / U.</p>
-      <p><b>Rw</b> <b>Uw</b> — 겉+안쪽을 같이. 설정 → 층 → <b>와이드</b>.</p>
+      <p><b>2R</b> <b>2U</b> … — 그 면 바로 안쪽 층. 회전 → 층 → <b>안쪽</b> 후 R / U.</p>
+      <p><b>Rw</b> <b>Uw</b> — 겉+안쪽을 같이. 회전 → 층 → <b>와이드</b>.</p>
       <p>안쪽·와이드는 2×2 센터를 움직입니다. 페어링은 <b>Uw</b>로 붙인 뒤 슬라이스를 되돌려 센터를 복구합니다. ▶시연은 안쪽 트리거입니다.</p>`,
     algs: [
       { label: '안쪽 슬라이스 트리거', alg: "2R U 2R' U'" },
@@ -952,7 +952,7 @@ const LESSONS_4_KO = [
   {
     title: '3단계 · 3×3처럼 풀기', name: '3×3처럼 풀기',
     goal: '겉면만 돌립니다. 2×2 센터는 3×3 센터, 맞춘 엣지 쌍은 3×3 엣지입니다.',
-    desc: `<p>층을 <b>겉면</b>으로 되돌립니다. 3×3 초보자법: 흰 십자, 흰 코너, 중간 엣지, 노란 십자, 노란 면, 마지막 층 순열.</p>
+    desc: `<p>회전 → 층 → <b>겉면</b>. 3×3 초보자법: 흰 십자, 흰 코너, 중간 엣지, 노란 십자, 노란 면, 마지막 층 순열.</p>
       <p>마지막 층이 불가능해 보이면 — 엣지 한 쌍이 뒤집히거나 두 엣지가 안 바뀌면 — 리덕션이 깨진 게 아니라 패리티입니다. 다음 단계로 가세요.</p>`,
     algs: [{ label: '겉면 예시 (십자 올리기)', alg: 'F2' }],
   },
@@ -960,7 +960,7 @@ const LESSONS_4_KO = [
     title: '4단계 · OLL 패리티', name: 'OLL 패리티',
     goal: '엣지 한 쌍이 뒤집혀 보입니다. 나머지 마지막 층은 평소처럼 방향을 맞춥니다.',
     desc: `<p>3×3에서는 안 나옵니다. 4×4에서는 페어링 후 정상입니다. 뒤집힌 쌍을 <b>앞</b>에 두고 공식을 적용한 뒤 노란 십자 / Sune을 이어갑니다.</p>
-      <p>▶시연은 안쪽(<b>2R</b> / <b>2L</b>)과 겉면 U·F를 섞습니다. 직접 돌리려면 설정 → 층 → 안쪽(2R / 2L), 겉면(U·F).</p>`,
+      <p>▶시연은 안쪽(<b>2R</b> / <b>2L</b>)과 겉면 U·F를 섞습니다. 직접 돌리려면 회전 → 층 → 안쪽(2R / 2L), 겉면(U·F).</p>`,
     algs: [{ label: 'OLL 패리티 — 앞 엣지 쌍 뒤집기', alg: "2R' U2 2L F2 2L' F2 2R2 U2 2R U2 2R' U2 F2 2R2 F2" }],
   },
   {
@@ -977,9 +977,9 @@ const LESSONS_5_EN = [
     title: 'Notation (5×5)', name: 'Notation', intro: true,
     goal: 'Outer faces use the same letters as 3×3. 5×5 adds inner (2R), mid (3R), Wide, and 3-Wide.',
     desc: `<p><b>U D L R F B</b> — outer face. <b>'</b> counter-clockwise, <b>2</b> a half turn.</p>
-      <p><b>2R</b> — inner slice (wings). Settings → Layer → <b>Inner</b>.</p>
-      <p><b>3R</b> — middle slice (fixed centres and middle edges). Settings → Layer → <b>Mid</b>.</p>
-      <p><b>Rw</b> — outer + inner. <b>3Rw</b> — those plus the mid slice. Settings → <b>Wide</b> / <b>3-Wide</b>.</p>
+      <p><b>2R</b> — inner slice (wings). Moves → Layer → <b>Inner</b>.</p>
+      <p><b>3R</b> — middle slice (fixed centres and middle edges). Moves → Layer → <b>Mid</b>.</p>
+      <p><b>Rw</b> — outer + inner. <b>3Rw</b> — those plus the mid slice. Moves → Layer → <b>Wide</b> / <b>3-Wide</b>.</p>
       <p>The very middle sticker of each face never moves. Pairing uses <b>Uw</b>, then you undo the slice so the 3×3 centres come back. ▶Demo plays an inner-slice trigger.</p>`,
     algs: [
       { label: 'Inner-slice trigger', alg: "2R U 2R' U'" },
@@ -1013,7 +1013,7 @@ const LESSONS_5_EN = [
   {
     title: 'Step 4 · Solve as a 3×3', name: 'Solve as a 3×3',
     goal: 'Outer turns only. Each 3×3 centre is a 3×3 centre. Each triple edge is a 3×3 edge.',
-    desc: `<p>Switch Layer back to <b>Outer</b>. Follow the 3×3 beginner method: white cross, white corners, middle edges, yellow cross, yellow face, then last-layer permutation.</p>
+    desc: `<p>Moves → Layer → <b>Outer</b>. Follow the 3×3 beginner method: white cross, white corners, middle edges, yellow cross, yellow face, then last-layer permutation.</p>
       <p>There is no PLL parity on 5×5. A single flipped edge is OLL parity — next step.</p>`,
     algs: [{ label: 'Example outer turn (cross lift)', alg: 'F2' }],
   },
@@ -1031,9 +1031,9 @@ const LESSONS_5_KO = [
     title: '표기법 (5×5)', name: '표기법', intro: true,
     goal: '겉면 글자는 3×3과 같습니다. 안쪽(2R), 가운데(3R), 와이드, 3와이드가 추가됩니다.',
     desc: `<p><b>U D L R F B</b> — 겉면. <b>'</b> 반시계, <b>2</b> 180°.</p>
-      <p><b>2R</b> — 안쪽 층(날개). 설정 → 층 → <b>안쪽</b>.</p>
-      <p><b>3R</b> — 가운데 층(고정 센터·중간 엣지). 설정 → 층 → <b>가운데</b>.</p>
-      <p><b>Rw</b> — 겉+안쪽. <b>3Rw</b> — 거기에 가운데까지. 설정 → <b>와이드</b> / <b>3와이드</b>.</p>
+      <p><b>2R</b> — 안쪽 층(날개). 회전 → 층 → <b>안쪽</b>.</p>
+      <p><b>3R</b> — 가운데 층(고정 센터·중간 엣지). 회전 → 층 → <b>가운데</b>.</p>
+      <p><b>Rw</b> — 겉+안쪽. <b>3Rw</b> — 거기에 가운데까지. 회전 → 층 → <b>와이드</b> / <b>3와이드</b>.</p>
       <p>각 면 한가운데 스티커는 움직이지 않습니다. 페어링은 <b>Uw</b>로 붙인 뒤 슬라이스를 되돌려 3×3 센터를 복구합니다. ▶시연은 안쪽 트리거입니다.</p>`,
     algs: [
       { label: '안쪽 슬라이스 트리거', alg: "2R U 2R' U'" },
@@ -1067,7 +1067,7 @@ const LESSONS_5_KO = [
   {
     title: '4단계 · 3×3처럼 풀기', name: '3×3처럼 풀기',
     goal: '겉면만 돌립니다. 3×3 센터는 3×3 센터, 삼중 엣지는 3×3 엣지입니다.',
-    desc: `<p>층을 <b>겉면</b>으로 되돌립니다. 3×3 초보자법: 흰 십자, 흰 코너, 중간 엣지, 노란 십자, 노란 면, 마지막 층 순열.</p>
+    desc: `<p>회전 → 층 → <b>겉면</b>. 3×3 초보자법: 흰 십자, 흰 코너, 중간 엣지, 노란 십자, 노란 면, 마지막 층 순열.</p>
       <p>5×5에는 PLL 패리티가 없습니다. 엣지 하나가 뒤집히면 OLL 패리티 — 다음 단계.</p>`,
     algs: [{ label: '겉면 예시 (십자 올리기)', alg: 'F2' }],
   },

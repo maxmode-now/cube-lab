@@ -37,12 +37,13 @@
 <link rel="canonical" href="https://cube.maxmode-now.com/" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://cube.maxmode-now.com/" />
-<meta property="og:title" content="Cube Lab — Play, Learn, Scan &amp; Solve Rubik's Cubes" />
+<meta property="og:title" content="Cube Lab — Online Rubik's Cube Trainer, Timer &amp; Solver" />
 <meta property="og:description" content="Free browser trainer for 2×2–5×5. Learn beginner, CFOP, and Roux, scan a 2×2–5×5 from photos, and follow beginner steps or a fast solve. No account." />
 <meta property="og:image" content="https://cube.maxmode-now.com/docs/play.png" />
 <meta property="og:locale" content="en_US" />
+<meta property="og:locale:alternate" content="ko_KR" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Cube Lab — Play, Learn, Scan &amp; Solve Rubik's Cubes" />
+<meta name="twitter:title" content="Cube Lab — Online Rubik's Cube Trainer, Timer &amp; Solver" />
 <meta name="twitter:description" content="Free browser trainer for 2×2–5×5. Learn beginner, CFOP, and Roux, scan a 2×2–5×5 from photos, and follow beginner steps or a fast solve. No account." />
 <meta name="twitter:image" content="https://cube.maxmode-now.com/docs/play.png" />
 <meta name="mobile-web-app-capable" content="yes" />
@@ -52,7 +53,7 @@
 <link rel="manifest" href="./manifest.json" />
 <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
 <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
-<title>Cube Lab — Play, Learn, Scan &amp; Solve Rubik's Cubes</title>
+<title>Cube Lab — Online Rubik's Cube Trainer, Timer &amp; Solver</title>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -63,12 +64,21 @@
   "applicationCategory": "GameApplication",
   "operatingSystem": "Any",
   "browserRequirements": "Requires JavaScript. HTML5.",
+  "inLanguage": ["en", "ko"],
+  "isAccessibleForFree": true,
+  "screenshot": "https://cube.maxmode-now.com/docs/play.png",
+  "featureList": ["Play", "Learn", "Scan", "Solve", "Timer"],
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
   "author": {
     "@type": "Person",
     "name": "maxmode",
     "url": "https://maxmode-now.com/",
     "email": "maxmode.now@gmail.com"
+  },
+  "hasPart": {
+    "@type": "WebPage",
+    "name": "Cube solving guides",
+    "url": "https://cube.maxmode-now.com/how-to-solve/index.html"
   }
 }
 </script>
@@ -159,6 +169,12 @@
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     height: var(--app-h);
   }
+  /* 크롤러용 정적 소개. display:none / clip 하지 않는다. body overflow:hidden 이 앱 화면을 유지한다. */
+  #seo { margin: 0; padding: 24px 16px; max-width: 40em; }
+  #seo h1 { font-size: var(--fs-lg); margin: 0 0 8px; }
+  #seo h2 { font-size: var(--fs-md); margin: 16px 0 8px; }
+  #seo p, #seo li { font-size: var(--fs-sm); color: var(--muted); line-height: 1.6; }
+  #seo ul { margin: 0; padding-left: 1.2em; }
   /* iOS PWA: 100dvh 는 노치를 빼서 아래에 빈칸이 생긴다. 100vh 만 화면 전체.
      -webkit-fill-available 도 같은 이유로 쓰면 안 된다. */
   @media (display-mode: standalone) {
@@ -169,7 +185,7 @@
   /* ══════════════════════════════════════════════════════════════
      앱 셸 — 큐브가 중앙(stage)을 소유하고, 크롬은 가장자리 트랙에 붙는다.
      패널은 큐브 위에 뜨지 않고 grid 컬럼/행을 차지해 stage 를 밀어낸다.
-     스크롤되는 요소는 #panel-body / #ui-body 둘뿐이다.
+     스크롤되는 요소는 #panel-body / #ui-body / #moves-body 뿐이다.
      ══════════════════════════════════════════════════════════════ */
   #shell {
     position: relative; width: 100%; height: 100%;
@@ -195,7 +211,7 @@
     padding: var(--safe-t) calc(12px + var(--safe-r)) 0 calc(12px + var(--safe-l));
     background: var(--surface-1); border-bottom: 1px solid var(--border);
   }
-  #app-title { font-size: var(--fs-md); font-weight: 700; margin: 0; white-space: nowrap; }
+  #size-label { font-size: var(--fs-md); font-weight: 700; margin: 0; white-space: nowrap; }
   #stats { margin-left: auto; display: flex; gap: 14px; font-size: var(--fs-sm);
     font-variant-numeric: tabular-nums; }
   #stats .stat { color: var(--muted); white-space: nowrap; }
@@ -276,7 +292,7 @@
   #drill-sets button { flex: 1 1 0; }
   #drill-hint { margin: 10px 0 0; font-size: var(--fs-sm); color: var(--muted); line-height: 1.55; }
 
-  /* ── 설정 팝오버 (⚙) — 세션당 한두 번 쓰는 것들만 모아둔다 ── */
+  /* ── 설정 팝오버 (⚙) — 세션당 한두 번 쓰는 환경설정만 ── */
   #ui {
     position: absolute; z-index: 40; display: none; flex-direction: column;
     top: calc(var(--top-h) + 8px);
@@ -286,14 +302,12 @@
     border: 1px solid var(--border); border-radius: var(--r-md); box-shadow: var(--shadow);
   }
   #ui.open { display: flex; }
-  #ui-body { overflow-y: auto; scrollbar-gutter: stable; padding: var(--pad-panel); min-height: 0; }
-  #more-head { flex: 0 0 auto; padding: var(--pad-panel); border-bottom: 1px solid var(--border); }
+  #ui-body, #moves-body { overflow-y: auto; scrollbar-gutter: stable; padding: var(--pad-panel); min-height: 0; }
+  #settings-head { flex: 0 0 auto; padding: var(--pad-panel); border-bottom: 1px solid var(--border); }
   .sheet-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 0; }
   .sheet-head h2 { font-size: var(--fs-md); margin: 0; }
   #ccw-hint { font-size: var(--fs-xs); color: var(--muted); margin-bottom: 4px; }
   .hint-text { font-size: var(--fs-xs); color: var(--muted); line-height: 1.6; margin: 12px 0 0; }
-  .hint-text a { color: var(--accent); text-decoration: none; }
-  .hint-text a:hover { text-decoration: underline; }
   #about {
     display: flex; flex-direction: column; gap: 4px;
     margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border);
@@ -303,13 +317,22 @@
     text-decoration: none; width: max-content;
   }
   #about a:hover { color: var(--accent); }
-  #about-blurb { margin: 0 0 8px; font-size: var(--fs-xs); color: var(--muted); line-height: 1.6; }
+  #moves-sheet {
+    display: none; position: absolute; z-index: 40; flex-direction: column;
+    right: 12px; bottom: 12px;
+    width: 300px; max-height: min(60dvh, calc(100% - 24px));
+    background: var(--glass); backdrop-filter: blur(10px);
+    border: 1px solid var(--border); border-radius: var(--r-md); box-shadow: var(--shadow);
+  }
+  #moves-sheet.open { display: flex; }
+  #moves-sheet .sheet-head { flex: 0 0 auto; padding: var(--pad-panel); border-bottom: 1px solid var(--border); }
   .learn-list { display: flex; flex-direction: column; gap: var(--gap); }
   .learn-list button,
   .learn-list .btn { width: 100%; justify-content: flex-start; text-decoration: none; }
   .learn-list .btn:hover { text-decoration: none; }
 
-  #lang-switch { width: max-content; }
+  #ui-body .seg { width: 100%; margin: 0 0 8px; }
+  #ui-body .seg button { flex: 1; }
   #layer-mode { width: 100%; flex-wrap: wrap; }
   #layer-mode button { flex: 1 1 30%; }
   #layer-mode.guide-focus {
@@ -416,14 +439,15 @@
   #stats .stat.inspect-dnf b { color: var(--danger); }
 
   /* ── 스크롤바: 남은 두 개의 스크롤 영역만, 얇게 ── */
-  #panel-body, #ui-body { scrollbar-width: thin; scrollbar-color: var(--surface-3) transparent; }
-  #panel-body::-webkit-scrollbar, #ui-body::-webkit-scrollbar { width: 10px; }
-  #panel-body::-webkit-scrollbar-track, #ui-body::-webkit-scrollbar-track { background: transparent; }
-  #panel-body::-webkit-scrollbar-thumb, #ui-body::-webkit-scrollbar-thumb {
+  #panel-body, #ui-body, #moves-body { scrollbar-width: thin; scrollbar-color: var(--surface-3) transparent; }
+  #panel-body::-webkit-scrollbar, #ui-body::-webkit-scrollbar, #moves-body::-webkit-scrollbar { width: 10px; }
+  #panel-body::-webkit-scrollbar-track, #ui-body::-webkit-scrollbar-track, #moves-body::-webkit-scrollbar-track { background: transparent; }
+  #panel-body::-webkit-scrollbar-thumb, #ui-body::-webkit-scrollbar-thumb, #moves-body::-webkit-scrollbar-thumb {
     background: var(--surface-3); border-radius: var(--r-full);
     border: 3px solid transparent; background-clip: content-box;
   }
-  #panel-body::-webkit-scrollbar-thumb:hover, #ui-body::-webkit-scrollbar-thumb:hover {
+  #panel-body::-webkit-scrollbar-thumb:hover, #ui-body::-webkit-scrollbar-thumb:hover,
+  #moves-body::-webkit-scrollbar-thumb:hover {
     background: var(--border-strong); background-clip: content-box;
   }
 
@@ -458,7 +482,7 @@
   [data-n="4"] .n4-only,
   [data-n="5"] .n4-only { display: block !important; }
   .n5-only { display: none !important; }
-  [data-n="5"] .n5-only { display: block !important; }
+  [data-n="5"] button.n5-only { display: flex !important; }
 
   /* ══════════════════════════════════════════════════════════════
      버튼 — 단일 베이스 하나 + 모디파이어.
@@ -712,8 +736,12 @@
       bottom: calc(var(--rail-h) + var(--act-h) + 8px);
       max-height: min(60dvh, calc(100dvh - var(--rail-h) - var(--act-h) - var(--top-h) - 16px));
     }
+    #moves-sheet {
+      left: 8px; right: 8px; width: auto; bottom: 8px;
+      max-height: min(60dvh, calc(100% - 16px));
+    }
 
-    #app-title { display: none; }        /* 상단 바는 수치와 컨트롤만 */
+    #size-label { display: none; }        /* 상단 바는 수치와 컨트롤만 */
     #stats { margin-left: 0; }
   }
 
@@ -777,12 +805,15 @@
     #actions button, #actions .primary { flex: 0 0 auto; width: 92px; max-width: none; }
     #act-play button, #act-play .primary { width: 104px; }
     #panel { border-left: 1px solid var(--border); border-top: none; }
-    #app-title { display: none; }
+    #size-label { display: none; }
     #stats { margin-left: auto; }
     #ui {
       top: calc(var(--top-h) + 8px); bottom: auto;
       right: calc(12px + var(--safe-r)); left: auto; width: 300px;
       max-height: calc(100dvh - var(--top-h) - 20px);
+    }
+    #moves-sheet {
+      left: auto; right: 8px; width: 300px; bottom: 8px;
     }
   }
 
@@ -807,7 +838,7 @@
 <div id="shell" data-panel="closed" data-mode="play">
 
   <header id="topbar">
-    <h1 id="app-title" data-i18n="appTitle">3×3 Cube</h1>
+    <p id="size-label" data-i18n="appTitle">3×3 Cube</p>
     <div id="stats">
       <span class="stat"><b class="js-timer">0.0</b><span data-i18n="unitSec">s</span></span>
       <span class="stat"><b class="js-moves">0</b><span data-i18n="unitMoves">moves</span></span>
@@ -819,7 +850,7 @@
         <option value="4" data-i18n="size4">4×4</option>
         <option value="5" data-i18n="size5">5×5</option>
       </select>
-      <span id="app-version" aria-label="Version">v2.3</span>
+      <span id="app-version" aria-label="Version">v2.4</span>
       <button type="button" id="settings-btn" class="btn-icon" aria-label="Settings" aria-expanded="false">⚙</button>
     </div>
   </header>
@@ -854,6 +885,35 @@
       </div>
       <div id="times-body"></div>
     </aside>
+    <aside id="moves-sheet" aria-label="Moves">
+      <div class="sheet-head">
+        <h2 data-i18n="moves">Moves</h2>
+        <button type="button" id="moves-close" class="btn-icon" aria-label="Close">✕</button>
+      </div>
+      <div id="moves-body">
+        <div class="n4-only">
+          <div class="label" data-i18n="layerMode">Layer</div>
+          <div id="layer-mode" class="seg">
+            <button type="button" data-layer="outer" class="active" data-i18n="layerOuter">Outer</button>
+            <button type="button" data-layer="inner" data-i18n="layerInner">Inner</button>
+            <button type="button" data-layer="mid" class="n5-only" data-i18n="layerMid">Mid</button>
+            <button type="button" data-layer="wide" data-i18n="layerWide">Wide</button>
+            <button type="button" data-layer="wide3" class="n5-only" data-i18n="layerWide3">3-Wide</button>
+          </div>
+        </div>
+        <div class="label" data-i18n="turnFace">Turn a face</div>
+        <div class="grid">
+          <button type="button" data-move="U">U</button>
+          <button type="button" data-move="D">D</button>
+          <button type="button" data-move="L">L</button>
+          <button type="button" data-move="R">R</button>
+          <button type="button" data-move="F">F</button>
+          <button type="button" data-move="B">B</button>
+          <button type="button" data-move="M" class="n3-only">M</button>
+        </div>
+        <div id="ccw-hint" data-i18n="ccwHint">Shift+click or key = counter-clockwise (′)</div>
+      </div>
+    </aside>
     <div id="toast" role="status" aria-live="polite"></div>
     <div id="solver-hud">
       <button type="button" id="solver-hud-status" aria-expanded="false" aria-controls="solver-hud-moves"
@@ -867,6 +927,7 @@
       <button type="button" id="scramble" class="primary" data-i18n="scramble">Scramble</button>
       <button type="button" id="undo" data-i18n="undo">Undo</button>
       <button type="button" id="reset" data-i18n="reset">Reset</button>
+      <button type="button" id="moves-btn" aria-expanded="false" aria-controls="moves-sheet" data-i18n="moves">Moves</button>
     </div>
     <div id="act-solver" class="act-set">
       <button type="button" id="solve-next-m" class="primary" data-i18n="solveNext">▶ Next move</button>
@@ -1029,71 +1090,107 @@
   </aside>
 
   <aside id="ui" aria-label="Settings">
-    <div id="more-head" class="sheet-head">
+    <div id="settings-head" class="sheet-head">
       <h2 data-i18n="settings">Settings</h2>
-      <button type="button" id="more-close" class="btn-icon" aria-label="Close">✕</button>
+      <button type="button" id="settings-close" class="btn-icon" aria-label="Close">✕</button>
     </div>
     <div id="ui-body">
       <div class="label" data-i18n="numbersLabel">Numbers</div>
-      <select id="numbers-select" class="menu-select" aria-label="Sticker numbers">
-        <option value="off" data-i18n="numbersOff">Off</option>
-        <option value="on" data-i18n="numbersOn">On</option>
-      </select>
+      <div id="numbers-switch" class="seg" role="group" aria-label="Sticker numbers">
+        <button type="button" data-numbers="off" class="active" data-i18n="numbersOff">Off</button>
+        <button type="button" data-numbers="on" data-i18n="numbersOn">On</button>
+      </div>
 
       <div class="label" data-i18n="themeLabel">Theme</div>
-      <select id="theme-select" class="menu-select" aria-label="Cube theme">
-        <option value="classic" data-i18n="themeClassic">Classic</option>
-        <option value="lego" data-i18n="themeLego">LEGO</option>
-      </select>
+      <div id="theme-switch" class="seg" role="group" aria-label="Cube theme">
+        <button type="button" data-theme="classic" class="active" data-i18n="themeClassic">Classic</button>
+        <button type="button" data-theme="lego" data-i18n="themeLego">LEGO</button>
+      </div>
 
       <div class="label" data-i18n="inspectionLabel">Inspection</div>
-      <select id="inspection-select" class="menu-select" aria-label="Inspection">
-        <option value="on" data-i18n="inspectionOn">On (15s)</option>
-        <option value="off" data-i18n="inspectionOff">Off</option>
-      </select>
-
-      <div class="n4-only">
-        <div class="label" data-i18n="layerMode">Layer</div>
-        <div id="layer-mode" class="seg">
-          <button type="button" data-layer="outer" class="active" data-i18n="layerOuter">Outer</button>
-          <button type="button" data-layer="inner" data-i18n="layerInner">Inner</button>
-          <button type="button" data-layer="mid" class="n5-only" data-i18n="layerMid">Mid</button>
-          <button type="button" data-layer="wide" data-i18n="layerWide">Wide</button>
-          <button type="button" data-layer="wide3" class="n5-only" data-i18n="layerWide3">3-Wide</button>
-        </div>
+      <div id="inspection-switch" class="seg" role="group" aria-label="Inspection">
+        <button type="button" data-inspection="on" class="active" data-i18n="inspectionOn">On (15s)</button>
+        <button type="button" data-inspection="off" data-i18n="inspectionOff">Off</button>
       </div>
-
-      <div class="label" data-i18n="turnFace">Turn a face</div>
-      <div class="grid">
-        <button data-move="U">U</button>
-        <button data-move="D">D</button>
-        <button data-move="L">L</button>
-        <button data-move="R">R</button>
-        <button data-move="F">F</button>
-        <button data-move="B">B</button>
-        <button data-move="M" class="n3-only">M</button>
-      </div>
-      <div id="ccw-hint" data-i18n="ccwHint">Shift+click or key = counter-clockwise (′)</div>
 
       <div class="label" data-i18n="langLabel">Language</div>
-      <div id="lang-switch" class="seg">
-        <button data-lang="en">EN</button>
-        <button data-lang="ko">한국어</button>
+      <div id="lang-switch" class="seg" role="group" aria-label="Language">
+        <button type="button" data-lang="en">EN</button>
+        <button type="button" data-lang="ko">한국어</button>
       </div>
 
       <p class="hint-text" data-i18n="hint">Drag a face: turn · Drag empty space: orbit · Wheel: zoom</p>
       <div id="about">
-        <p id="about-blurb">Cube Lab is a free browser trainer for Rubik’s cubes. Play 2×2 through 5×5, learn the beginner method, CFOP, and Roux, scan a physical cube, and follow beginner steps or a fast solve — no account required.</p>
-        <a href="https://maxmode-now.com/" target="_blank" rel="noopener noreferrer">maxmode-now.com</a>
-        <a href="mailto:maxmode.now@gmail.com">maxmode.now@gmail.com</a>
+        <a href="./about/index.html" data-i18n="linkAbout">About</a>
+        <a href="./terms/index.html" data-i18n="linkTerms">Terms</a>
+        <a href="./privacy/index.html" data-i18n="linkPrivacy">Privacy</a>
       </div>
     </div>
   </aside>
 
 </div>
 
+<section id="seo">
+  <h1>Cube Lab</h1>
+  <p>Cube Lab is a free browser trainer for Rubik’s cubes. Play 2×2 through 5×5, learn the beginner method, CFOP, and Roux, scan a physical cube from photos, and follow beginner steps or a fast solve. A WCA-style timer runs in Play. No account required.</p>
+  <h2>Modes</h2>
+  <ul>
+    <li>Play — scramble, inspect, and time solves on a 3D cube.</li>
+    <li>Learn — beginner, Ortega, CFOP, Roux, and case libraries with demos.</li>
+    <li>Solve — beginner steps or a fast computer search for the current cube.</li>
+    <li>Scan — capture or paint all six faces, then open a guided solve.</li>
+  </ul>
+  <h2>Written guides</h2>
+  <ul>
+    <li><a href="./how-to-solve/index.html">Cube solving guides hub</a></li>
+    <li><a href="./how-to-solve/notation/index.html">Cube notation reference</a></li>
+    <li><a href="./how-to-solve-2x2/index.html">How to solve a 2×2</a></li>
+    <li><a href="./how-to-solve-2x2/ortega/index.html">2×2 Ortega method</a></li>
+    <li><a href="./how-to-solve-3x3/index.html">How to solve a 3×3 (beginner)</a></li>
+    <li><a href="./how-to-solve-3x3/cfop/index.html">3×3 CFOP / 4-look last layer</a></li>
+    <li><a href="./how-to-solve-3x3/cfop/f2l/index.html">F2L case library</a></li>
+    <li><a href="./how-to-solve-3x3/cfop/oll/index.html">OLL library</a></li>
+    <li><a href="./how-to-solve-3x3/cfop/pll/index.html">PLL library</a></li>
+    <li><a href="./how-to-solve-3x3/roux/index.html">3×3 Roux method</a></li>
+    <li><a href="./how-to-solve-4x4/index.html">How to solve a 4×4</a></li>
+    <li><a href="./how-to-solve-5x5/index.html">How to solve a 5×5</a></li>
+  </ul>
+  <p>
+    <a href="./about/index.html">About</a> ·
+    <a href="./terms/index.html">Terms</a> ·
+    <a href="./privacy/index.html">Privacy</a>
+  </p>
+</section>
+
 <noscript>
-  <p>Cube Lab is a free browser trainer for Rubik’s cubes. Play 2×2 through 5×5, learn the beginner method, CFOP, and Roux, scan a physical cube, and follow beginner steps or a fast solve — no account required.</p>
+  <p>Cube Lab is a free browser trainer for Rubik’s cubes. Play 2×2 through 5×5, learn the beginner method, CFOP, and Roux, scan a physical cube from photos, and follow beginner steps or a fast solve. A WCA-style timer runs in Play. No account required.</p>
+  <h2>Modes</h2>
+  <ul>
+    <li>Play — scramble, inspect, and time solves on a 3D cube.</li>
+    <li>Learn — beginner, Ortega, CFOP, Roux, and case libraries with demos.</li>
+    <li>Solve — beginner steps or a fast computer search for the current cube.</li>
+    <li>Scan — capture or paint all six faces, then open a guided solve.</li>
+  </ul>
+  <h2>Written guides</h2>
+  <ul>
+    <li><a href="./how-to-solve/index.html">Cube solving guides hub</a></li>
+    <li><a href="./how-to-solve/notation/index.html">Cube notation reference</a></li>
+    <li><a href="./how-to-solve-2x2/index.html">How to solve a 2×2</a></li>
+    <li><a href="./how-to-solve-2x2/ortega/index.html">2×2 Ortega method</a></li>
+    <li><a href="./how-to-solve-3x3/index.html">How to solve a 3×3 (beginner)</a></li>
+    <li><a href="./how-to-solve-3x3/cfop/index.html">3×3 CFOP / 4-look last layer</a></li>
+    <li><a href="./how-to-solve-3x3/cfop/f2l/index.html">F2L case library</a></li>
+    <li><a href="./how-to-solve-3x3/cfop/oll/index.html">OLL library</a></li>
+    <li><a href="./how-to-solve-3x3/cfop/pll/index.html">PLL library</a></li>
+    <li><a href="./how-to-solve-3x3/roux/index.html">3×3 Roux method</a></li>
+    <li><a href="./how-to-solve-4x4/index.html">How to solve a 4×4</a></li>
+    <li><a href="./how-to-solve-5x5/index.html">How to solve a 5×5</a></li>
+  </ul>
+  <p>
+    <a href="./about/index.html">About</a> ·
+    <a href="./terms/index.html">Terms</a> ·
+    <a href="./privacy/index.html">Privacy</a>
+  </p>
 </noscript>
 
 <script type="importmap">
@@ -1207,6 +1304,7 @@ const I18N = {
     uiMenu: 'Menu', uiCloseMenu: 'Close',
     learn: 'Learn', more: 'More', learnTitle: 'Learn', assistTitle: 'Assist',
     settings: 'Settings', langLabel: 'Language',
+    moves: 'Moves',
     modePlay: 'Play', modeLearn: 'Learn', modeSolve: 'Solve', modeScan: 'Scan', modeGuides: 'Guide',
     panelLearn: 'Learn', panelSolve: 'Smart Solve', panelScan: 'Scan cube', panelDrill: 'Case drill',
     needScramble: 'Scramble the cube first',
@@ -1241,7 +1339,7 @@ const I18N = {
     scanApplyFast: 'Fast solve',
     scanPaint: 'Paint colors',
     scanCheckTip: 'Check this face against the photo. Tap a sticker to fix color, then confirm.',
-    scanPaintTip: 'Paint this face: pick a color from the palette, then tap stickers. Odd cubes have fixed centers.',
+    scanPaintTip: 'Paint this face: pick a color from the palette, then tap each sticker to set its color. Turn on Numbers (Settings) to see each sticker\'s position number — tap that numbered sticker to paint it. Odd cubes have fixed centers.',
     scanPaintReset: 'Clear face',
     scanPaintNeedCells: 'Fill all stickers on this face first',
     scanFinalTip: 'All 6 faces confirmed. Guide me follows beginner steps; Fast solve uses a short search.',
@@ -1274,6 +1372,9 @@ const I18N = {
     scanInvalidEven: n => `Each color should appear ${n * n} times — edit a face, then apply again`,
     scanBusy: 'Wait for the cube to finish moving',
     scanAllDone: 'All 6 faces confirmed',
+    linkAbout: 'About',
+    linkTerms: 'Terms',
+    linkPrivacy: 'Privacy',
   },
   ko: {
     docTitle: '3×3 큐브 — 자유 조작',
@@ -1342,6 +1443,7 @@ const I18N = {
     uiMenu: '메뉴', uiCloseMenu: '닫기',
     learn: '학습', more: '더보기', learnTitle: '학습', assistTitle: '도움',
     settings: '설정', langLabel: '언어',
+    moves: '회전',
     modePlay: '조작', modeLearn: '학습', modeSolve: '풀이', modeScan: '스캔', modeGuides: '가이드',
     panelLearn: '학습', panelSolve: '스마트 풀이', panelScan: '큐브 스캔', panelDrill: '케이스 드릴',
     needScramble: '큐브를 먼저 섞어주세요',
@@ -1376,7 +1478,7 @@ const I18N = {
     scanApplyFast: '빠른 풀이',
     scanPaint: '색 직접 입력',
     scanCheckTip: '사진과 맞춰 이 면을 확인하세요. 스티커를 탭해 색을 고친 뒤 확인하세요.',
-    scanPaintTip: '색 팔레트에서 색을 고르고, 스티커를 탭해 칠하세요. 홀수 큐브는 가운데가 고정됩니다.',
+    scanPaintTip: '팔레트에서 색을 고른 뒤 스티커를 탭해 칠하세요. 설정에서 번호를 켜면 각 스티커의 위치 번호가 표시됩니다. 번호를 확인하면 원하는 칸에 정확히 색을 입힐 수 있어요. 홀수 큐브는 가운데가 고정됩니다.',
     scanPaintReset: '면 지우기',
     scanPaintNeedCells: '이 면의 모든 칸을 먼저 채워야 해요',
     scanFinalTip: '6면 모두 확인됨. 초보 단계로 풀기가 기본이고, 빠른 풀이는 짧은 탐색입니다.',
@@ -1409,6 +1511,9 @@ const I18N = {
     scanInvalidEven: n => `각 색이 ${n * n}장이어야 해요 — 면을 고친 뒤 다시 적용하세요`,
     scanBusy: '큐브가 움직이는 동안은 기다려 주세요',
     scanAllDone: '6면 모두 확인됨',
+    linkAbout: '소개',
+    linkTerms: '이용약관',
+    linkPrivacy: '개인정보',
   },
 };
 
@@ -1453,8 +1558,6 @@ const engine = globalThis.CubeEngine.create({
 });
 document.body.dataset.n = String(engine.n);
 if (cubeNumbers) engine.setShowNumbers(true);
-document.getElementById('numbers-select').value = cubeNumbers ? 'on' : 'off';
-document.getElementById('theme-select').value = engine.theme;
 
 function requireN3(label) {
   if (engine.n === 3) return true;
@@ -1471,6 +1574,9 @@ const playAo12El = document.getElementById('play-ao12');
 const playPbEl = document.getElementById('play-pb');
 const timesSheet = document.getElementById('times-sheet');
 const timesBody = document.getElementById('times-body');
+const movesSheet = document.getElementById('moves-sheet');
+const movesBtn = document.getElementById('moves-btn');
+let movesOpen = false;
 const timerStat = document.querySelector('#stats .stat');
 const timerUnit = timerStat ? timerStat.querySelector('[data-i18n="unitSec"]') : null;
 
@@ -1595,9 +1701,28 @@ function renderTimesSheet() {
 }
 
 function setTimesOpen(on) {
+  if (on) {
+    settingsOpen = false;
+    ui.classList.remove('open');
+    uiToggle.setAttribute('aria-expanded', 'false');
+    setMovesOpen(false);
+  }
   timesSheet.classList.toggle('open', !!on);
   playAvgsBtn.setAttribute('aria-expanded', on ? 'true' : 'false');
   if (on) renderTimesSheet();
+}
+
+function setMovesOpen(on) {
+  if (on) {
+    settingsOpen = false;
+    ui.classList.remove('open');
+    uiToggle.setAttribute('aria-expanded', 'false');
+    timesSheet.classList.remove('open');
+    playAvgsBtn.setAttribute('aria-expanded', 'false');
+  }
+  movesOpen = !!on;
+  movesSheet.classList.toggle('open', movesOpen);
+  movesBtn.setAttribute('aria-expanded', movesOpen ? 'true' : 'false');
 }
 
 function syncStatsDom() {
@@ -1747,7 +1872,7 @@ function applyPractice(kind) {
   if (kind === 'turns') {
     reset();
     setLayerMode('inner');
-    openOverlay('more');
+    setMovesOpen(true);
     if (layerEl) {
       layerEl.classList.add('guide-focus');
       layerEl.scrollIntoView({ block: 'nearest' });
@@ -1831,6 +1956,8 @@ playAvgsBtn.addEventListener('click', () => {
   setTimesOpen(!timesSheet.classList.contains('open'));
 });
 document.getElementById('times-close').addEventListener('click', () => setTimesOpen(false));
+movesBtn.addEventListener('click', () => setMovesOpen(!movesOpen));
+document.getElementById('moves-close').addEventListener('click', () => setMovesOpen(false));
 timesBody.addEventListener('click', e => {
   const btn = e.target.closest('button[data-act]');
   if (!btn) return;
@@ -2044,9 +2171,8 @@ function syncChrome() {
 }
 
 // 기존 호출부와 호환되는 진입점.
-//   'more' = 설정 팝오버, null = Play(패널 닫힘), 그 외 = 패널 모드
+//   null = Play(패널 닫힘), 그 외 = 패널 모드
 function openOverlay(name) {
-  if (name === 'more') { settingsOpen = true; syncChrome(); return; }
   const next = PANEL_MODES.indexOf(name) >= 0 ? name : null;
   if (panelMode === 'scan' && next !== 'scan' && typeof window.__scanStopCam === 'function') {
     window.__scanStopCam();
@@ -2055,6 +2181,7 @@ function openOverlay(name) {
   settingsOpen = false;
   panelMode = next;
   setTimesOpen(false);
+  setMovesOpen(false);
   learnPicker.classList.toggle('open', next === 'learn');
   tutPanel.classList.toggle('open', next === 'tutorial');
   solverPanel.classList.toggle('open', next === 'solver');
@@ -2064,6 +2191,12 @@ function openOverlay(name) {
 }
 
 function closeSettings() { settingsOpen = false; syncChrome(); }
+function openSettings() {
+  setTimesOpen(false);
+  setMovesOpen(false);
+  settingsOpen = true;
+  syncChrome();
+}
 
 function openLearnMenu() { openOverlay('learn'); }
 
@@ -2091,22 +2224,23 @@ function initChrome() {
   document.getElementById('panel-close').addEventListener('click', () => openOverlay(null));
   panelBackBtn.addEventListener('click', openLearnMenu);
   uiToggle.addEventListener('click', () => {
-    if (settingsOpen) closeSettings(); else openOverlay('more');
+    if (settingsOpen) closeSettings(); else openSettings();
   });
-  document.getElementById('more-close').addEventListener('click', closeSettings);
+  document.getElementById('settings-close').addEventListener('click', closeSettings);
 
-  // 설정 팝오버는 바깥을 누르면 닫힌다 (패널은 레일/닫기로만 닫는다)
+  // 설정·Moves 팝오버는 바깥을 누르면 닫힌다 (패널은 레일/닫기로만 닫는다)
   document.addEventListener('pointerdown', e => {
-    if (!settingsOpen) return;
     const el = e.target;
     if (!(el instanceof Node)) return;
-    if (ui.contains(el) || uiToggle.contains(el)) return;
-    closeSettings();
+    if (settingsOpen && !ui.contains(el) && !uiToggle.contains(el)) closeSettings();
+    if (movesOpen && !movesSheet.contains(el) && !movesBtn.contains(el)) setMovesOpen(false);
   }, true);
 
   window.addEventListener('keydown', e => {
     if (e.key !== 'Escape') return;
     if (settingsOpen) closeSettings();
+    else if (movesOpen) setMovesOpen(false);
+    else if (timesSheet.classList.contains('open')) setTimesOpen(false);
     else if (panelMode === 'tutorial' && sheetExpanded) setSheetExpanded(false);
     else if (panelMode === 'tutorial' || panelMode === 'drill') openLearnMenu();
     else if (panelMode) openOverlay(null);
@@ -3652,8 +3786,8 @@ function sizeTitleKey() {
 
 function syncSizeLabels() {
   document.body.dataset.n = String(engine.n);
-  const h1 = document.getElementById('app-title');
-  if (h1) h1.textContent = t(sizeTitleKey());
+  const sizeLabel = document.getElementById('size-label');
+  if (sizeLabel) sizeLabel.textContent = t(sizeTitleKey());
   const sizeSel = document.getElementById('size-select');
   if (sizeSel) sizeSel.value = String(engine.n);
 }
@@ -3705,37 +3839,57 @@ document.getElementById('size-select').addEventListener('change', e => {
   if (engine.n !== Number(e.target.value)) e.target.value = String(prev);
 });
 
-document.getElementById('numbers-select').addEventListener('change', e => {
-  const on = e.target.value === 'on';
-  cubeNumbers = on;
-  engine.setShowNumbers(on);
-  try { localStorage.setItem('cubeNumbers', on ? 'on' : 'off'); }
-  catch (err) { /* 저장 불가 — 이 세션에서만 적용 */ }
+function syncPrefUi() {
+  document.querySelectorAll('#numbers-switch [data-numbers]').forEach(b => {
+    b.classList.toggle('active', (b.dataset.numbers === 'on') === cubeNumbers);
+  });
+  document.querySelectorAll('#theme-switch [data-theme]').forEach(b => {
+    b.classList.toggle('active', b.dataset.theme === cubeTheme);
+  });
+  const insp = T.getInspection();
+  document.querySelectorAll('#inspection-switch [data-inspection]').forEach(b => {
+    b.classList.toggle('active', (b.dataset.inspection === 'on') === insp);
+  });
+}
+
+document.querySelectorAll('#numbers-switch [data-numbers]').forEach(b => {
+  b.addEventListener('click', () => {
+    const on = b.dataset.numbers === 'on';
+    cubeNumbers = on;
+    engine.setShowNumbers(on);
+    try { localStorage.setItem('cubeNumbers', on ? 'on' : 'off'); }
+    catch (err) { /* 저장 불가 — 이 세션에서만 적용 */ }
+    syncPrefUi();
+  });
 });
 
-document.getElementById('inspection-select').addEventListener('change', e => {
-  T.setInspection(e.target.value === 'on');
+document.querySelectorAll('#inspection-switch [data-inspection]').forEach(b => {
+  b.addEventListener('click', () => {
+    T.setInspection(b.dataset.inspection === 'on');
+    syncPrefUi();
+  });
 });
 
 function applyCubeTheme(id) {
   if (!engine.setTheme(id)) {
-    document.getElementById('theme-select').value = engine.theme;
+    cubeTheme = engine.theme;
+    syncPrefUi();
     return;
   }
   cubeTheme = engine.theme;
   try { localStorage.setItem('cubeTheme', cubeTheme); }
   catch (err) { /* 저장 불가 — 이 세션에서만 적용 */ }
+  syncPrefUi();
   syncDiagPalette();
   if (panelMode === 'tutorial') { syncTutExpandBtn(); renderLesson(); }
   renderStageBox();
 }
 
-document.getElementById('theme-select').addEventListener('change', e => {
-  if (engine.busy) {
-    e.target.value = engine.theme;
-    return;
-  }
-  applyCubeTheme(e.target.value);
+document.querySelectorAll('#theme-switch [data-theme]').forEach(b => {
+  b.addEventListener('click', () => {
+    if (engine.busy) return;
+    applyCubeTheme(b.dataset.theme);
+  });
 });
 
 // ──────────────────────────────────────────────────────────
@@ -3755,6 +3909,7 @@ function applyLang(next) {
   document.querySelectorAll('#lang-switch button').forEach(b => {
     b.classList.toggle('active', b.dataset.lang === lang);
   });
+  syncPrefUi();
   syncDiagPalette();
 
   // JS가 그리는 부분은 따로 다시 렌더한다.
@@ -3777,7 +3932,6 @@ function applyLang(next) {
 document.querySelectorAll('#lang-switch button').forEach(b => {
   b.addEventListener('click', () => applyLang(b.dataset.lang));
 });
-document.getElementById('inspection-select').value = T.getInspection() ? 'on' : 'off';
 applyLang();
 syncStatsDom();
 initChrome();

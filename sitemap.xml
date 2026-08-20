@@ -6,6 +6,21 @@
     <priority>1.0</priority>
   </url>
   <url>
+    <loc>https://cube.maxmode-now.com/about/index.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://cube.maxmode-now.com/terms/index.html</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://cube.maxmode-now.com/privacy/index.html</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
     <loc>https://cube.maxmode-now.com/how-to-solve/index.html</loc>
     <changefreq>weekly</changefreq>
     <priority>0.95</priority>
