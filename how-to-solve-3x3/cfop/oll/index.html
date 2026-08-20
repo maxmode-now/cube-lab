@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>OLL Library — 2-Look + Full 57 — Cube Lab</title>
-<meta name="description" content="Learn 2-Look OLL for the 3×3, then browse all 57 one-look OLL cases with recognition tips and algorithms. Demo every case in Cube Lab." />
+<meta name="description" content="Learn 2-Look OLL then all 57 one-look cases: why 2-look first, recognition by shape, practice path, and demos in Cube Lab." />
 <link rel="canonical" href="https://cube.maxmode-now.com/how-to-solve-3x3/cfop/oll/index.html" />
 <script type="application/ld+json">
 {
@@ -16,9 +16,69 @@
   "totalTime": "PT30M",
   "tool": { "@type": "HowToTool", "name": "3×3 Rubik's Cube" },
   "step": [
-    { "@type": "HowToStep", "position": 1, "name": "Yellow cross", "url": "https://cube.maxmode-now.com/how-to-solve-3x3/cfop/oll/index.html#cross" },
-    { "@type": "HowToStep", "position": 2, "name": "Yellow corners", "url": "https://cube.maxmode-now.com/how-to-solve-3x3/cfop/oll/index.html#corners" },
-    { "@type": "HowToStep", "position": 3, "name": "Case library", "url": "https://cube.maxmode-now.com/how-to-solve-3x3/cfop/oll/index.html#cases" }
+    { "@type": "HowToStep", "position": 1, "name": "Why 2-Look then full OLL", "url": "https://cube.maxmode-now.com/how-to-solve-3x3/cfop/oll/index.html#why" },
+    { "@type": "HowToStep", "position": 2, "name": "Yellow cross", "url": "https://cube.maxmode-now.com/how-to-solve-3x3/cfop/oll/index.html#cross" },
+    { "@type": "HowToStep", "position": 3, "name": "Yellow corners", "url": "https://cube.maxmode-now.com/how-to-solve-3x3/cfop/oll/index.html#corners" },
+    { "@type": "HowToStep", "position": 4, "name": "Case library", "url": "https://cube.maxmode-now.com/how-to-solve-3x3/cfop/oll/index.html#library" }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Cube solving guides", "item": "https://cube.maxmode-now.com/how-to-solve/index.html" },
+    { "@type": "ListItem", "position": 2, "name": "3×3 CFOP", "item": "https://cube.maxmode-now.com/how-to-solve-3x3/cfop/index.html" },
+    { "@type": "ListItem", "position": 3, "name": "OLL library", "item": "https://cube.maxmode-now.com/how-to-solve-3x3/cfop/oll/index.html" }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Do I need all 57 OLL cases?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Not at first. 2-Look OLL covers every scramble with a handful of algorithms. Add full OLL when 2-look feels automatic and you want fewer looks on last layer."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "In what order should I learn OLL?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Dot, L-shape, and line for the yellow cross; then Sune and Antisune for corners; then the other 2-look corner shapes; then full 57 by yellow shape family."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Why does the first two layers look broken mid-algorithm?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "OLL algorithms open F2L on purpose and close it at the end. Finish the whole sequence before judging the cube."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "When is full OLL worth it?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "When your F2L is steady and 2-look OLL is no longer the bottleneck. Many cubers sit on 2-look for a long time and still improve with better F2L and PLL."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Should I learn OLL or PLL next?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Stay in order: finish 2-look OLL, then 2-look PLL. Full OLL and full PLL come after 4-look last layer is comfortable."
+      }
+    }
   ]
 }
 </script>
@@ -28,7 +88,11 @@
 <meta property="og:description" content="2-Look OLL on-ramp plus all 57 one-look OLL cases with demos in Cube Lab." />
 <meta property="og:image" content="https://cube.maxmode-now.com/docs/play.png" />
 <meta property="og:locale" content="en_US" />
+<meta property="og:locale:alternate" content="ko_KR" />
 <meta name="twitter:card" content="summary_large_image" />
+<link rel="alternate" hreflang="en" href="https://cube.maxmode-now.com/how-to-solve-3x3/cfop/oll/index.html" />
+<link rel="alternate" hreflang="ko" href="https://cube.maxmode-now.com/ko/how-to-solve-3x3/cfop/oll/index.html" />
+<link rel="alternate" hreflang="x-default" href="https://cube.maxmode-now.com/how-to-solve-3x3/cfop/oll/index.html" />
 <link rel="icon" type="image/png" sizes="192x192" href="../../../icons/icon-192.png" />
 <style>
   :root {
@@ -151,11 +215,21 @@
     nav.toc { position: static; padding-bottom: 8px; }
     nav.toc ol { display: flex; flex-wrap: wrap; gap: 0 14px; padding-left: 0; list-style: none; }
   }
+
+  .lang-switch { display: flex; gap: 8px; align-items: center; font-size: 13px; font-weight: 600; flex: 0 0 auto; }
+  .lang-switch a { color: var(--muted); text-decoration: none; }
+  .lang-switch a:hover { color: var(--text); }
+  .lang-switch a[aria-current="true"] { color: var(--text-strong); }
+
 </style>
 </head>
 <body>
   <header class="top">
     <a class="brand" href="../../../index.html">Cube Lab</a>
+    <nav class="lang-switch" aria-label="Language">
+      <a href="./index.html" aria-current="true">EN</a>
+      <a href="../../../ko/how-to-solve-3x3/cfop/oll/index.html">한국어</a>
+    </nav>
     <nav class="sizes" aria-label="Written guides">
       <a href="../../../how-to-solve/index.html">All</a>
       <a href="../../../how-to-solve-2x2/index.html">2×2</a>
@@ -175,9 +249,14 @@
       <h2>On this page</h2>
       <ol>
         <li><a href="#start">Before you start</a></li>
+        <li><a href="#why">Why 2-Look then full</a></li>
         <li><a href="#cross">Yellow cross</a></li>
         <li><a href="#corners">Yellow corners</a></li>
         <li><a href="#library">Full OLL library</a></li>
+        <li><a href="#practice">Practice path</a></li>
+        <li><a href="#stuck">Stuck?</a></li>
+        <li><a href="#next">After this page</a></li>
+        <li><a href="#faq">FAQ</a></li>
       </ol>
     </nav>
 
@@ -187,15 +266,19 @@
 
       <h2 id="start">Before you start</h2>
       <p>This page is the OLL part of <a href="../index.html">CFOP</a>. Finish <a href="../f2l/index.html">F2L</a> first so the bottom two layers are solved and white stays on the <b>bottom</b>.</p>
-      <p>2-Look OLL does not try to solve every last-layer pattern in one algorithm. Instead, you do <b>edges first</b>, then <b>corners</b>. That is why it is much easier to learn than full OLL.</p>
+      <p>2-Look OLL does not try to solve every last-layer pattern in one algorithm. Instead, you do <b>edges first</b>, then <b>corners</b>. Notation refresher: <a href="../../../how-to-solve/notation/index.html">cube notation</a>.</p>
       <p class="note"><strong>Demo plays the case, then the fix.</strong> Cube Lab resets, applies the inverse instantly so you see the pattern, then animates the algorithm.</p>
       <a class="cta" href="../../../index.html?n=3&amp;learn=oll&amp;step=0">Open 2-Look OLL in Cube Lab</a>
       <p><a class="cta" href="../../../index.html?n=3&amp;learn=drill&amp;set=oll">Practice random OLL cases in Cube Lab</a></p>
 
+      <h2 id="why">Why 2-Look then full OLL</h2>
+      <p>Full OLL is 57 algorithms — one per yellow orientation. 2-Look OLL covers every scramble with a small set: make the yellow cross, then orient corners. You trade one extra look for a list you can actually finish learning.</p>
+      <p>Stay on 2-look until it is automatic. Full OLL is worth it when last-layer recognition — not F2L — is what slows you down.</p>
+
       <h2 id="cross">1. Yellow cross</h2>
       <p>Read only three edge patterns: <b>dot</b>, <b>L-shape</b>, and <b>line</b>. Your goal is the yellow cross. Side colours do not matter yet.</p>
       <ul>
-        <li><b>Dot:</b> no oriented top edges yet. Use the same edge idea twice.</li>
+        <li><b>Dot:</b> no oriented top edges yet. Use the same edge idea twice (dot → L or line, then finish).</li>
         <li><b>L-shape:</b> hold the L with its arms pointing <b>up</b> and <b>left</b>.</li>
         <li><b>Line:</b> hold the yellow line <b>horizontally</b>.</li>
       </ul>
@@ -220,10 +303,41 @@
 
       <h2 id="library">Full OLL library (57 cases)</h2>
       <p>After 2-Look OLL, speedcubers learn <b>one algorithm per last-layer orientation pattern</b>. The library below lists all <b>57</b> standard cases, grouped by the yellow shape on top: <b>dot, line, L-shape, T-shape,</b> and <b>other</b>.</p>
-      <p>Each card shows one primary algorithm and a short recognition tip. Tap <b>Demo in Cube Lab</b> to see the pattern and solution animated in the trainer.</p>
+      <p>Learning order for the full set: filter by the shape you recognise from 2-look first (dot / line / L), then expand into T and other families. Each card shows one primary algorithm and a short recognition tip.</p>
       <div class="chips" id="filters" role="group" aria-label="Filter cases"></div>
       <p class="count" id="count"></p>
       <div id="list"></div>
+
+      <h2 id="practice">Practice path</h2>
+      <ul>
+        <li>Drill yellow-cross shapes until you never pause on hold (L up-left, line horizontal).</li>
+        <li>Add Sune and Antisune; do ten random corner cases each in Cube Lab.</li>
+        <li>Solve full CFOP with 2-look OLL only — no peeking at the 57 list.</li>
+        <li>When 2-look is automatic, pick one shape family from the library and add 3–5 cases a week.</li>
+      </ul>
+      <p><a class="cta" href="../../../index.html?n=3&amp;learn=drill&amp;set=oll">Random OLL drill in Cube Lab</a></p>
+
+      <h2 id="stuck">Stuck?</h2>
+      <p>If the yellow cross will not appear, check the hold: L arms up and left, line horizontal. Wrong hold turns the same alg into a different case.</p>
+      <p>If F2L stays broken after OLL, you stopped mid-algorithm or rotated the cube. Undo to white-down after F2L and retry.</p>
+      <p>Need the short CFOP recipe? <a href="../index.html">How to solve a 3×3 with CFOP</a>. Still learning pairs? <a href="../f2l/index.html">F2L library</a>.</p>
+
+      <h2 id="next">After this page</h2>
+      <p>Open the <a href="../pll/index.html">PLL library</a> and learn 2-look PLL next. Full 57 OLL can wait until 4-look last layer feels easy. Return to the <a href="../index.html">CFOP overview</a> for the whole flow.</p>
+
+      <section id="faq">
+        <h2>FAQ</h2>
+        <h3>Do I need all 57 OLL cases?</h3>
+        <p>Not at first. 2-Look OLL covers every scramble with a handful of algorithms. Add full OLL when 2-look feels automatic and you want fewer looks on last layer.</p>
+        <h3>In what order should I learn OLL?</h3>
+        <p>Dot, L-shape, and line for the yellow cross; then Sune and Antisune for corners; then the other 2-look corner shapes; then full 57 by yellow shape family.</p>
+        <h3>Why does the first two layers look broken mid-algorithm?</h3>
+        <p>OLL algorithms open F2L on purpose and close it at the end. Finish the whole sequence before judging the cube.</p>
+        <h3>When is full OLL worth it?</h3>
+        <p>When your F2L is steady and 2-look OLL is no longer the bottleneck. Many cubers sit on 2-look for a long time and still improve with better F2L and PLL.</p>
+        <h3>Should I learn OLL or PLL next?</h3>
+        <p>Stay in order: finish 2-look OLL, then 2-look PLL. Full OLL and full PLL come after 4-look last layer is comfortable.</p>
+      </section>
 
       <footer class="page">
         <p><a href="../index.html">Back to CFOP</a> · <a href="../../../index.html">Cube Lab</a> — play, learn, scan, and solve in the browser. <a href="https://maxmode-now.com/">maxmode-now.com</a></p>

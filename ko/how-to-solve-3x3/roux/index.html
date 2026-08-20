@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Roux로 3×3 맞추기 (블록, CMLL, LSE) — Cube Lab</title>
+<meta name="description" content="3×3 Roux: First Block, Second Block, 2-look CMLL, 이어서 M·U로 LSE. 다이어그램과 공식, Cube Lab에서 연습." />
+<link rel="canonical" href="https://cube.maxmode-now.com/ko/how-to-solve-3x3/roux/index.html" />
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": "Roux로 3×3 루빅스 큐브 맞추기",
+  "description": "입문용 Roux: First Block, Second Block, 2-look CMLL, 이어서 M·U로 Last Six Edges.",
+  "url": "https://cube.maxmode-now.com/ko/how-to-solve-3x3/roux/index.html",
+  "totalTime": "PT45M",
+  "tool": { "@type": "HowToTool", "name": "3×3 루빅스 큐브" },
+  "step": [
+    { "@type": "HowToStep", "position": 1, "name": "First Block", "url": "https://cube.maxmode-now.com/ko/how-to-solve-3x3/roux/index.html#step-1" },
+    { "@type": "HowToStep", "position": 2, "name": "Second Block", "url": "https://cube.maxmode-now.com/ko/how-to-solve-3x3/roux/index.html#step-2" },
+    { "@type": "HowToStep", "position": 3, "name": "CMLL", "url": "https://cube.maxmode-now.com/ko/how-to-solve-3x3/roux/index.html#step-3" },
+    { "@type": "HowToStep", "position": 4, "name": "LSE 엣지 방향", "url": "https://cube.maxmode-now.com/ko/how-to-solve-3x3/roux/index.html#step-4" },
+    { "@type": "HowToStep", "position": 5, "name": "LSE UL·UR", "url": "https://cube.maxmode-now.com/ko/how-to-solve-3x3/roux/index.html#step-5" },
+    { "@type": "HowToStep", "position": 6, "name": "LSE M slice", "url": "https://cube.maxmode-now.com/ko/how-to-solve-3x3/roux/index.html#step-6" }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "큐브 맞추기 가이드", "item": "https://cube.maxmode-now.com/ko/how-to-solve/index.html" },
+    { "@type": "ListItem", "position": 2, "name": "3×3 입문", "item": "https://cube.maxmode-now.com/ko/how-to-solve-3x3/index.html" },
+    { "@type": "ListItem", "position": 3, "name": "Roux", "item": "https://cube.maxmode-now.com/ko/how-to-solve-3x3/roux/index.html" }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Roux가 CFOP보다 나은가요?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "어느 쪽이 절대적으로 낫지는 않아요. Roux는 평균 수가 적고 회전도 적고, CFOP는 학습 자료와 룩어헤드 문화가 더 탄탄해요. 입문 후에 둘 다 써 보세요."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "전체 CMLL이 필요한가요?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "처음엔 아니요. 이 페이지는 2-look CMLL(Sune 다음 A-perm)이에요. 그게 편해진 뒤에 전체 CMLL 42케이스를 배워요."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "CMLL 중에 블록이 왜 깨지나요?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sune이 일부러 블록을 열었다가 되돌립니다. 공식을 끝까지 하세요. 엣지가 틀린 채로 남는 건 정상이에요 — 그게 LSE예요."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Roux에서 무엇을 먼저 연습하나요?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "인스펙션에서 페어를 빨리 찾을 때까지 First Block, 왼쪽을 깨지 않고 Second Block, 그다음 2-look CMLL, 이어서 LSE 4a/4b/4c 순서예요."
+      }
+    }
+  ]
+}
+</script>
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://cube.maxmode-now.com/ko/how-to-solve-3x3/roux/index.html" />
+<meta property="og:title" content="Roux로 3×3 맞추기 (블록, CMLL, LSE) — Cube Lab" />
+<meta property="og:description" content="3×3 Roux: First Block, Second Block, 2-look CMLL, 이어서 M·U로 LSE. 다이어그램과 공식, Cube Lab에서 연습." />
+<meta property="og:image" content="https://cube.maxmode-now.com/docs/play.png" />
+<meta property="og:locale" content="ko_KR" />
+<meta property="og:locale:alternate" content="en_US" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="alternate" hreflang="en" href="https://cube.maxmode-now.com/how-to-solve-3x3/roux/index.html" />
+<link rel="alternate" hreflang="ko" href="https://cube.maxmode-now.com/ko/how-to-solve-3x3/roux/index.html" />
+<link rel="alternate" hreflang="x-default" href="https://cube.maxmode-now.com/how-to-solve-3x3/roux/index.html" />
+<link rel="icon" type="image/png" sizes="192x192" href="../../../icons/icon-192.png" />
+<style>
+  :root {
+    --bg: #0f1117;
+    --sunken: #0e1018;
+    --surface: #181b24;
+    --border: #272b36;
+    --text: #e6e8ee;
+    --text-strong: #fff;
+    --muted: #9aa0ad;
+    --accent: #4c8dff;
+    --accent-hover: #5d99ff;
+    --warn: #ffd60a;
+    --on-accent: #fff;
+    --r: 12px;
+    --fs: 17px;
+    --safe-t: env(safe-area-inset-top, 0px);
+    --safe-b: env(safe-area-inset-bottom, 0px);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 400 var(--fs)/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { color: var(--accent-hover); text-decoration: underline; }
+  .top {
+    position: sticky; top: 0; z-index: 10;
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px;
+    padding: calc(10px + var(--safe-t)) 20px 10px;
+    background: rgba(15, 17, 23, 0.92); backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .brand { font-weight: 700; color: var(--text-strong); text-decoration: none; flex: 0 0 auto; }
+  .brand:hover { color: var(--accent); text-decoration: none; }
+  .lang-switch { display: flex; gap: 8px; font-size: 13px; font-weight: 600; flex: 0 0 auto; }
+  .lang-switch a { color: var(--muted); text-decoration: none; }
+  .lang-switch a:hover { color: var(--text); text-decoration: none; }
+  .lang-switch a[aria-current="true"] { color: var(--text-strong); }
+  nav.sizes {
+    display: flex; align-items: center; justify-content: center;
+    gap: 2px; flex: 1 1 auto;
+  }
+  nav.sizes a {
+    display: inline-flex; align-items: center; min-height: 32px; padding: 0 10px;
+    font-size: 13px; font-weight: 600; color: var(--muted);
+    text-decoration: none; border-radius: 8px; white-space: nowrap;
+  }
+  nav.sizes a:hover { color: var(--text); text-decoration: none; }
+  nav.sizes a[aria-current="page"] {
+    color: var(--text-strong); background: rgba(255, 255, 255, 0.08);
+  }
+  nav.methods {
+    order: 4; flex: 1 1 100%;
+    display: flex; align-items: center; justify-content: center; gap: 2px;
+  }
+  nav.methods a {
+    display: inline-flex; align-items: center; min-height: 28px; padding: 0 12px;
+    font-size: 13px; font-weight: 600; color: var(--muted);
+    text-decoration: none; border-radius: 8px; white-space: nowrap;
+  }
+  nav.methods a:hover { color: var(--text); text-decoration: none; }
+  nav.methods a[aria-current="page"] {
+    color: var(--text-strong); background: rgba(255, 255, 255, 0.08);
+  }
+  .wrap {
+    display: grid; grid-template-columns: 200px minmax(0, 40rem); gap: 40px;
+    max-width: 920px; margin: 0 auto; padding: 32px 20px calc(48px + var(--safe-b));
+  }
+  nav.toc { position: sticky; top: 108px; align-self: start; }
+  nav.toc h2 { margin: 0 0 8px; font-size: 11px; font-weight: 700; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--muted); }
+  nav.toc ol { margin: 0; padding: 0 0 0 1.1em; font-size: 13px; line-height: 1.7; }
+  nav.toc a { color: var(--muted); }
+  nav.toc a:hover { color: var(--text); }
+  h1 { font-size: 2rem; line-height: 1.2; color: var(--text-strong); margin: 0 0 12px; }
+  .lede { font-size: 1.05rem; color: var(--muted); margin: 0 0 24px; }
+  h2 { font-size: 1.35rem; color: var(--text-strong); margin: 2.2em 0 0.6em; }
+  h3 { font-size: 1.05rem; color: var(--text-strong); margin: 1.4em 0 0.4em; }
+  p { margin: 0 0 0.9em; }
+  ul { margin: 0 0 1em; padding-left: 1.2em; }
+  li { margin: 0.25em 0; }
+  .note {
+    margin: 1em 0; padding: 10px 12px;
+    background: var(--surface); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0;
+    font-size: 0.95rem; color: var(--muted);
+  }
+  .note strong { color: var(--text); }
+  .goal { color: var(--muted); font-size: 0.95rem; margin-bottom: 0.8em; }
+  .diag {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 6px;
+    margin: 12px 0 16px; padding: 12px; background: var(--sunken); border-radius: var(--r);
+    width: max-content; max-width: 100%;
+  }
+  .diag-cap { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .alg-box {
+    margin: 12px 0 8px; padding: 10px 12px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+  }
+  .alg-box .lbl { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  .alg-box code {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 1.05rem; font-weight: 600; color: var(--warn); letter-spacing: .02em;
+    word-break: break-word;
+  }
+  table {
+    width: 100%; border-collapse: collapse; font-size: 0.92rem; margin: 0 0 1em;
+  }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { color: var(--muted); font-size: 12px; font-weight: 700; }
+  .cta {
+    display: inline-flex; align-items: center; min-height: 40px; padding: 0 14px; margin: 8px 0 0;
+    font-size: 14px; font-weight: 600; color: var(--on-accent);
+    background: var(--accent); border-radius: 8px; text-decoration: none;
+  }
+  .cta:hover { background: var(--accent-hover); color: var(--on-accent); text-decoration: none; }
+  footer.page {
+    margin-top: 3em; padding-top: 1.2em; border-top: 1px solid var(--border);
+    font-size: 13px; color: var(--muted);
+  }
+  @media (max-width: 800px) {
+    nav.sizes { order: 3; flex: 1 1 100%; }
+    .wrap { grid-template-columns: 1fr; gap: 8px; padding-top: 20px; }
+    nav.toc { position: static; padding-bottom: 8px; }
+    nav.toc ol { display: flex; flex-wrap: wrap; gap: 0 14px; padding-left: 0; list-style: none; }
+  }
+</style>
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="../../../index.html">Cube Lab</a>
+    <nav class="lang-switch" aria-label="Language">
+      <a href="../../../how-to-solve-3x3/roux/index.html">EN</a>
+      <a href="./index.html" aria-current="true">한국어</a>
+    </nav>
+    <nav class="sizes" aria-label="글 가이드">
+      <a href="../../how-to-solve/index.html">전체</a>
+      <a href="../../how-to-solve-2x2/index.html">2×2</a>
+      <a href="../../how-to-solve-3x3/index.html" aria-current="page">3×3</a>
+      <a href="../../how-to-solve-4x4/index.html">4×4</a>
+      <a href="../../how-to-solve-5x5/index.html">5×5</a>
+    </nav>
+    <nav class="methods" aria-label="3×3 방법">
+      <a href="../../how-to-solve-3x3/index.html">입문</a>
+      <a href="../../how-to-solve-3x3/cfop/index.html">CFOP</a>
+      <a href="../../how-to-solve-3x3/roux/index.html" aria-current="page">Roux</a>
+    </nav>
+  </header>
+
+  <div class="wrap">
+    <nav class="toc" aria-label="이 페이지">
+      <h2>단계</h2>
+      <ol>
+        <li><a href="#start">시작하기 전에</a></li>
+        <li><a href="#overview">Roux 개요</a></li>
+        <li><a href="#step-1">First Block</a></li>
+        <li><a href="#step-2">Second Block</a></li>
+        <li><a href="#step-3">CMLL</a></li>
+        <li><a href="#step-4">LSE · 방향</a></li>
+        <li><a href="#step-5">LSE · UL / UR</a></li>
+        <li><a href="#step-6">LSE · M slice</a></li>
+        <li><a href="#practice">연습 경로</a></li>
+        <li><a href="#stuck">막혔을 때</a></li>
+        <li><a href="#next">이 페이지 다음</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ol>
+    </nav>
+
+    <article>
+      <h1>Roux로 3×3 맞추기</h1>
+      <p class="lede">블록 빌딩 속도법: 1x2x3 블록 둘, 코너, 이어서 M·U만으로 마지막 엣지 여섯. 평균 약 48수, 큐브 회전은 거의 없어요. Cube Lab에서 단계별로 연습하세요.</p>
+
+      <h2 id="start">시작하기 전에</h2>
+      <p>아직 3×3을 못 맞추면 먼저 <a href="../../how-to-solve-3x3/index.html">입문법</a>을 쓰세요. Roux는 CFOP와 레시피가 달라요 — 층이 아니라 왼쪽·오른쪽 블록이 핵심이에요.</p>
+      <p>First Block은 <b>왼쪽</b>, 마지막 층은 <b>위</b>에 두세요(이 가이드는 주황 왼쪽, 흰 아래, 노랑 위). 공식은 한 면이 Front라고 가정해요 — 공식 중간에 손으로 큐브를 돌리지 마세요.</p>
+      <p><b>M</b>은 L과 R 사이 슬라이스이며 L과 같은 방향으로 돌아요. <b>M'</b>은 반대, <b>M2</b>는 180°. 소문자 <b>r</b>은 wide R(R + M'). Cube Lab에서는 Moves → M, 또는 <b>M</b> 키(Shift = M′). 전체 표: <a href="../../how-to-solve/notation/index.html">큐브 표기법 참고</a>.</p>
+      <p class="note"><strong>2-look CMLL이지, 전체 Roux가 아니에요.</strong> 전체 CMLL은 42케이스예요. 여기서는 Sune으로 방향을 맞춘 뒤 사이클 하나로 순열하니 공식이 몇 개면 돼요. LSE도 짧은 세 룩으로 나눕니다.</p>
+
+      <h2 id="overview">Roux 개요</h2>
+      <p class="goal">네 단계: First Block · Second Block · CMLL · LSE. CFOP보다 수가 적고, 큐브 회전도 적어요.</p>
+      <div class="diag" data-state="0"><span class="diag-cap">맞춘 큐브 — 색 지도</span></div>
+      <p><b>FB</b>(왼쪽 1x2x3) → <b>SB</b>(오른쪽 1x2x3) → <b>CMLL</b>(마지막 층 코너) → <b>LSE</b>(M·U로 마지막 엣지 여섯).</p>
+      <table>
+        <thead>
+          <tr><th></th><th>Roux</th><th>CFOP</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>평균 수</td><td>~48</td><td>~60</td></tr>
+          <tr><td>큐브 회전</td><td>거의 없음</td><td>많음</td></tr>
+          <tr><td>시작용 공식</td><td>몇 개 (2-look CMLL)</td><td>몇 개 (4-look LL)</td></tr>
+          <tr><td>나중에 전체</td><td>CMLL 42</td><td>OLL 57 + PLL 21</td></tr>
+          <tr><td>마지막 단계</td><td>M + U 흐름</td><td>PLL 인식</td></tr>
+          <tr><td>잘 맞는 경우</td><td>한손, 낮은 수</td><td>룩어헤드, 안정감</td></tr>
+        </tbody>
+      </table>
+      <a class="cta" href="../../../index.html?lang=ko&amp;n=3&amp;learn=roux&amp;step=0">Cube Lab에서 Roux 개요 보기</a>
+
+      <h2 id="step-1">1 · First Block (FB)</h2>
+      <p class="goal">왼쪽 1x2x3을 약 7–8수로. 외운 경로가 아니라 직관이에요.</p>
+      <div class="diag" data-state="1"><span class="diag-cap">왼쪽 1x2x3 — L 아래 두 줄 + 맞는 D</span></div>
+      <p>코너와 엣지를 짝 지어 사각형을 만든 뒤, 왼쪽 블록 전체로 키우세요. L의 윗줄과 M slice 전체는 비워 두세요 — 나중 조각이에요.</p>
+      <p>인스펙션에서 이미 만들어진 페어를 찾으세요. 색 중립(흰색 또는 노랑을 아래)이면 페어를 더 빨리 찾아요.</p>
+      <div class="alg-box">
+        <div class="lbl">페어 삽입 예시 (오른쪽)</div>
+        <code>U R U' R'</code>
+      </div>
+      <a class="cta" href="../../../index.html?lang=ko&amp;n=3&amp;learn=roux&amp;step=1">Cube Lab에서 First Block 연습</a>
+
+      <h2 id="step-2">2 · Second Block (SB)</h2>
+      <p class="goal">오른쪽에 맞는 1x2x3. First Block을 깨지 마세요.</p>
+      <div class="diag" data-state="2"><span class="diag-cap">양쪽 1x2x3 블록 완료</span></div>
+      <p><b>R, r (Rw), U</b>를 우선하세요. L과 Lw는 왼쪽 블록을 부숴요. Second Block 조각이 아직 M slice에 있으면 M은 건너뛰세요.</p>
+      <p>위에서 코너–엣지 페어를 만든 뒤(대개 FR / FU) 삽입하세요. Keyhole: 오른쪽에 이미 넣은 페어를 뜯지 않도록 U로 삽입을 준비해요.</p>
+      <div class="alg-box">
+        <div class="lbl">오른쪽 슬롯에 삽입</div>
+        <code>U R U' R'</code>
+      </div>
+      <div class="alg-box">
+        <div class="lbl">Wide R (r) 트리거</div>
+        <code>Rw U Rw'</code>
+      </div>
+      <a class="cta" href="../../../index.html?lang=ko&amp;n=3&amp;learn=roux&amp;step=2">Cube Lab에서 Second Block 삽입 보기</a>
+
+      <h2 id="step-3">3 · CMLL — 마지막 층 코너</h2>
+      <p class="goal">U 코너 네 개를 모두 맞춤. M-slice 엣지는 무시 — 섞여도 돼요.</p>
+      <div class="diag" data-state="3"><span class="diag-cap">U 코너 맞춤 — 엣지는 아직 자유</span></div>
+      <p>CFOP OLL과 달리 CMLL은 엣지를 신경 쓰지 않아서 공식이 짧아요. 전체 CMLL은 일곱 그룹(O, H, Pi, U, T, S, As, L)에 42케이스. 먼저 2-look으로 시작하세요.</p>
+      <p><b>룩 1 — 방향:</b> U 코너마다 위에 노랑이 올 때까지 Sune. 방향 안 맞은 코너를 왼쪽 앞에 두고 반복하세요.</p>
+      <p><b>룩 2 — 순열:</b> A-perm으로 코너 셋을 사이클. 이미 맞은 코너가 있으면 그걸 기준으로. 없으면 한 번 돌리고 다시 보세요.</p>
+      <p class="note"><strong>중간에는 섞여 보여요.</strong> Sune 중에 블록이 깨졌다가 돌아옵니다. 공식 중간에 멈추지 마세요. 엣지가 틀린 채로 남는 건 정상 — 그게 LSE예요.</p>
+      <div class="alg-box">
+        <div class="lbl">Sune — 코너 방향</div>
+        <code>R U R' U R U2 R'</code>
+      </div>
+      <div class="alg-box">
+        <div class="lbl">A-perm — 코너 3사이클</div>
+        <code>R' F R' B2 R F' R' B2 R2</code>
+      </div>
+      <a class="cta" href="../../../index.html?lang=ko&amp;n=3&amp;learn=roux&amp;step=3">Cube Lab에서 CMLL 연습</a>
+
+      <h2 id="step-4">4 · LSE ① — 엣지 방향 (4a)</h2>
+      <p class="goal">마지막 엣지 여섯의 방향을 M·U만으로. 노랑 또는 흰색이 U/D에 와야 해요.</p>
+      <div class="diag" data-state="4"><span class="diag-cap">엣지 방향 맞춤 — UL / UR / M slice는 아직</span></div>
+      <p>LSE(Last Six Edges)는 Roux의 시그니처 단계예요. “bad”(방향이 틀린) 엣지가 몇 개인지 읽으세요. 흔한 모양: arrow, line, L, dot. 가장 자주 보는 건 arrow예요.</p>
+      <p>큐브는 고정. M은 가운데 슬라이스 — Moves → M, 또는 <b>M</b> 키(Shift = M′).</p>
+      <div class="alg-box">
+        <div class="lbl">Arrow 케이스 (4a)</div>
+        <code>M' U M' U' M'</code>
+      </div>
+      <div class="alg-box">
+        <div class="lbl">Line (4a)</div>
+        <code>M' U2 M' U2</code>
+      </div>
+      <a class="cta" href="../../../index.html?lang=ko&amp;n=3&amp;learn=roux&amp;step=4">Cube Lab에서 엣지 방향 맞추기</a>
+
+      <h2 id="step-5">4 · LSE ② — UL과 UR (4b)</h2>
+      <p class="goal">UL·UR 엣지를 왼쪽·오른쪽 센터와 맞게 두세요.</p>
+      <div class="diag" data-state="5"><span class="diag-cap">UL·UR 자리 — M-slice 엣지 넷 남음</span></div>
+      <p>M·U로 그 두 엣지를 M slice로 가져온 뒤 M2(또는 짧은 M/U 사이클)로 넣으세요. 옆면을 맞추려면 AUF(U 한 번)하세요.</p>
+      <p>나중에 EOLR이 4a와 4b를 한 룩으로 합쳐 줘요. 지금은 필요 없어요.</p>
+      <div class="alg-box">
+        <div class="lbl">M2로 UL/UR 삽입</div>
+        <code>M2 U M2</code>
+      </div>
+      <div class="alg-box">
+        <div class="lbl">사이클 후 삽입</div>
+        <code>M' U2 M U2</code>
+      </div>
+      <a class="cta" href="../../../index.html?lang=ko&amp;n=3&amp;learn=roux&amp;step=5">Cube Lab에서 UL/UR 배치</a>
+
+      <h2 id="step-6">4 · LSE ③ — M slice</h2>
+      <p class="goal">남은 M-slice 엣지 넷을 맞춤. 큐브가 끝나요.</p>
+      <div class="diag" data-state="6"><span class="diag-cap">완료</span></div>
+      <p>맞은편 엣지 교환은 <b>M2</b> 한 번. 4사이클은 짧은 M/U 시퀀스. 위가 어긋나면 AUF로 마무리하세요.</p>
+      <p>그래서 Roux 끝이 빨라 느껴져요: TPS가 높고, 큐브 회전이 없고, PLL 21개 대신 작은 패턴이에요.</p>
+      <div class="alg-box">
+        <div class="lbl">맞은편 엣지</div>
+        <code>M2</code>
+      </div>
+      <div class="alg-box">
+        <div class="lbl">4사이클</div>
+        <code>M' U2 M U2</code>
+      </div>
+      <a class="cta" href="../../../index.html?lang=ko&amp;n=3&amp;learn=roux&amp;step=6">Cube Lab에서 M slice 마무리</a>
+
+      <h2 id="practice">연습 경로</h2>
+      <ul>
+        <li>인스펙션에서 왼쪽 페어를 몇 초 안에 찾을 때까지 First Block만.</li>
+        <li>오른쪽 조각이 슬라이스에 있을 때 L / Lw / M을 건드리지 않고 Second Block 추가.</li>
+        <li>2-look CMLL(Sune 다음 A-perm) 드릴, 이어서 LSE 4a → 4b → 4c 순서.</li>
+        <li>각 단계가 무타임으로 편해진 뒤에만 타임 전체 Roux 솔브.</li>
+      </ul>
+
+      <h2 id="stuck">막혔을 때</h2>
+      <p>왼쪽 블록이 엉망이면 Second Block 조각이 슬라이스에 있을 때 L, Lw, 또는 M을 쓴 경우가 많아요. 다이어그램처럼 보이던 마지막 단계로 되돌린 뒤, 트레이너에서 그 단계를 다시 하세요.</p>
+      <p>M 시연이 아무 일도 안 하면 3×3이 아니에요 — Roux는 3×3 트랙이에요. 위 링크로 트레이너를 여세요.</p>
+      <p>첫 솔브 레시피가 필요하면? <a href="../../how-to-solve-3x3/index.html">3×3 맞추는 법 (입문)</a>. 층과 룩어헤드가 더 맞으면? <a href="../../how-to-solve-3x3/cfop/index.html">CFOP / 4-look</a>. 실제 큐브 색이 안 맞으면? Cube Lab에서 <a href="../../../index.html?lang=ko&amp;n=3&amp;learn=scan">여섯 면 스캔</a> — 입문 단계나 Fast solve가 열리며, Roux는 아니에요.</p>
+
+      <h2 id="next">이 페이지 다음</h2>
+      <p>2-look CMLL이 편해지면: 전체 CMLL(42), 이어서 EOLR로 LSE 4a·4b를 합치세요. 색 중립(x2 / y)이 First Block을 빠르게 해요. M-slice 마무리 때문에 Roux는 한손법에 자주 잘 맞아요.</p>
+
+      <section id="faq">
+        <h2>FAQ</h2>
+        <h3>Roux가 CFOP보다 나은가요?</h3>
+        <p>어느 쪽이 절대적으로 낫지는 않아요. Roux는 평균 수가 적고 회전도 적고, CFOP는 학습 자료와 룩어헤드 문화가 더 탄탄해요. 입문 후에 둘 다 써 보세요.</p>
+        <h3>전체 CMLL이 필요한가요?</h3>
+        <p>처음엔 아니요. 이 페이지는 2-look CMLL(Sune 다음 A-perm)이에요. 그게 편해진 뒤에 전체 CMLL 42케이스를 배워요.</p>
+        <h3>CMLL 중에 블록이 왜 깨지나요?</h3>
+        <p>Sune이 일부러 블록을 열었다가 되돌립니다. 공식을 끝까지 하세요. 엣지가 틀린 채로 남는 건 정상이에요 — 그게 LSE예요.</p>
+        <h3>Roux에서 무엇을 먼저 연습하나요?</h3>
+        <p>인스펙션에서 페어를 빨리 찾을 때까지 First Block, 왼쪽을 깨지 않고 Second Block, 그다음 2-look CMLL, 이어서 LSE 4a/4b/4c 순서예요.</p>
+      </section>
+
+      <footer class="page">
+        <p><a href="../../../index.html">Cube Lab</a> — 브라우저에서 플레이·학습·스캔·솔브. <a href="https://maxmode-now.com/">maxmode-now.com</a></p>
+      </footer>
+    </article>
+  </div>
+
+<script src="../../../lessons.js"></script>
+<script>
+(function () {
+  const HEX = { W: '#f0f0f0', Y: '#ffd60a', R: '#e8312a', O: '#ff8c2b', G: '#39c45a', B: '#2563eb', _: '#0d0e12' };
+  const states = (window.CubeLessons && window.CubeLessons.statesRoux) || [];
+
+  function makeDiagram(state) {
+    const n = 3, S = 11, G = 1, SP = 3, PAD = 4;
+    const FS = S * n + G * (n - 1);
+    const FP = FS + SP;
+    const W = PAD * 2 + 4 * FP - SP;
+    const H = PAD * 2 + 3 * FP - SP;
+    const rects = [];
+    function face(cells, col, row) {
+      if (!cells) return;
+      const ox = PAD + col * FP, oy = PAD + row * FP;
+      cells.forEach((c, i) => {
+        const r = Math.floor(i / n), cc = i % n;
+        rects.push('<rect x="' + (ox + cc * (S + G)) + '" y="' + (oy + r * (S + G)) + '" width="' + S + '" height="' + S + '" rx="2" fill="' + (HEX[c] || c) + '"/>');
+      });
+    }
+    face(state.U, 1, 0); face(state.L, 0, 1); face(state.F, 1, 1); face(state.R, 2, 1); face(state.B, 3, 1); face(state.D, 1, 2);
+    return '<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg"><rect width="' + W + '" height="' + H + '" rx="6" fill="#12151f"/>' + rects.join('') + '</svg>';
+  }
+
+  document.querySelectorAll('.diag[data-state]').forEach(el => {
+    const i = Number(el.dataset.state);
+    const state = states[i];
+    if (!state) return;
+    el.insertAdjacentHTML('beforeend', makeDiagram(state));
+  });
+})();
+</script>
+</body>
+</html>

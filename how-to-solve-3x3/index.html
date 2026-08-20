@@ -26,13 +26,67 @@
   ]
 }
 </script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Cube solving guides", "item": "https://cube.maxmode-now.com/how-to-solve/index.html" },
+    { "@type": "ListItem", "position": 2, "name": "How to solve a 3×3", "item": "https://cube.maxmode-now.com/how-to-solve-3x3/index.html" }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How long does a first 3×3 solve take?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Usually 20–40 minutes for a careful first solve with this layer-by-layer method. Speed comes later with CFOP or Roux."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Why do algorithms scramble layers I already solved?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Many recipes open a finished layer on purpose and restore it at the end. Finish the whole algorithm. If it stays broken, you rotated mid-alg or skipped a hold."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Should I learn CFOP or Roux next?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Either works after this page feels easy. CFOP is the common speed path; Roux uses blocks and an M-slice finish. Try both and pick what you enjoy drilling."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do I need to memorise every algorithm before my first solve?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Keep this page open. Memorise only after you have finished a few solves and know which steps feel slow."
+      }
+    }
+  ]
+}
+</script>
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://cube.maxmode-now.com/how-to-solve-3x3/index.html" />
 <meta property="og:title" content="How to Solve a Rubik’s Cube (Beginner Method) — Cube Lab" />
 <meta property="og:description" content="Learn the layer-by-layer method for the 3×3. White cross to last layer, with diagrams and algorithms. Practice each step in Cube Lab." />
 <meta property="og:image" content="https://cube.maxmode-now.com/docs/play.png" />
 <meta property="og:locale" content="en_US" />
+<meta property="og:locale:alternate" content="ko_KR" />
 <meta name="twitter:card" content="summary_large_image" />
+<link rel="alternate" hreflang="en" href="https://cube.maxmode-now.com/how-to-solve-3x3/index.html" />
+<link rel="alternate" hreflang="ko" href="https://cube.maxmode-now.com/ko/how-to-solve-3x3/index.html" />
+<link rel="alternate" hreflang="x-default" href="https://cube.maxmode-now.com/how-to-solve-3x3/index.html" />
 <link rel="icon" type="image/png" sizes="192x192" href="../icons/icon-192.png" />
 <style>
   :root {
@@ -150,11 +204,21 @@
     nav.toc { position: static; padding-bottom: 8px; }
     nav.toc ol { display: flex; flex-wrap: wrap; gap: 0 14px; padding-left: 0; list-style: none; }
   }
+
+  .lang-switch { display: flex; gap: 8px; align-items: center; font-size: 13px; font-weight: 600; flex: 0 0 auto; }
+  .lang-switch a { color: var(--muted); text-decoration: none; }
+  .lang-switch a:hover { color: var(--text); }
+  .lang-switch a[aria-current="true"] { color: var(--text-strong); }
+
 </style>
 </head>
 <body>
   <header class="top">
     <a class="brand" href="../index.html">Cube Lab</a>
+    <nav class="lang-switch" aria-label="Language">
+      <a href="./index.html" aria-current="true">EN</a>
+      <a href="../ko/how-to-solve-3x3/index.html">한국어</a>
+    </nav>
     <nav class="sizes" aria-label="Written guides">
       <a href="../how-to-solve/index.html">All</a>
       <a href="../how-to-solve-2x2/index.html">2×2</a>
@@ -174,6 +238,7 @@
       <h2>Steps</h2>
       <ol>
         <li><a href="#start">Before you start</a></li>
+        <li><a href="#why">Why this method</a></li>
         <li><a href="#notation">Notation</a></li>
         <li><a href="#step-1">White cross</a></li>
         <li><a href="#step-2">White corners</a></li>
@@ -182,7 +247,10 @@
         <li><a href="#step-5">Yellow face</a></li>
         <li><a href="#step-6">Corner positions</a></li>
         <li><a href="#step-7">Last edges</a></li>
+        <li><a href="#practice">Practice path</a></li>
         <li><a href="#stuck">Stuck?</a></li>
+        <li><a href="#next">After this page</a></li>
+        <li><a href="#faq">FAQ</a></li>
       </ol>
     </nav>
 
@@ -198,6 +266,9 @@
         <li>Hold the cube with the <b>white centre on top</b> and <b>green in front</b>, unless a step says to flip it.</li>
       </ul>
       <p class="note"><strong>Hold it the same way every time.</strong> Algorithms assume a face is Front. If you turn the cube in your hands without meaning to, the moves will look wrong.</p>
+
+      <h2 id="why">Why this method</h2>
+      <p>Layer-by-layer is the shortest path to a first solve: few algorithms, clear stages, and the same hold every time. Speed methods (CFOP, Roux) come after this recipe feels obvious — they reuse the same pieces with fewer looks.</p>
 
       <h2 id="notation">Notation</h2>
       <p class="goal">Each letter is a 90° clockwise turn of that face, as if looking straight at it.</p>
@@ -283,10 +354,32 @@
       </div>
       <a class="cta" href="../index.html?learn=beginner&amp;step=7">Finish the last edges in Cube Lab</a>
 
+      <h2 id="practice">Practice path</h2>
+      <ul>
+        <li>White cross and corners until the first layer always matches the side centres.</li>
+        <li>Add the middle layer after the white-down flip; use ▶ Demo when holds feel fuzzy.</li>
+        <li>Finish yellow untimed — keep this page open; do not race the first solves.</li>
+        <li>When a full solve needs no lookup, open <a href="./cfop/index.html">CFOP</a> or <a href="./roux/index.html">Roux</a>.</li>
+      </ul>
+
       <h2 id="stuck">Stuck?</h2>
       <p>If a layer you already solved is a mess, you likely rotated the cube mid-algorithm or skipped a hold instruction. Undo to the last stage that still looks like the diagram, then retry that step in the trainer — it will play the moves on a 3D cube.</p>
       <p>If you have a physical cube and the colours do not match this page, you can <a href="../index.html?learn=scan">scan all six faces</a> in Cube Lab. That opens beginner steps for your cube — the same method as this page. Choose Fast solve if you want a short computer solution instead.</p>
-      <p>When this feels easy, continue with the <a href="../how-to-solve-3x3/cfop/index.html">CFOP / 4-look written guide</a> or the <a href="../how-to-solve-3x3/roux/index.html">Roux block-building guide</a>. Solving a <a href="../how-to-solve-2x2/index.html">2×2</a> uses a shorter version of the same ideas. A <a href="../how-to-solve-4x4/index.html">4×4</a> or <a href="../how-to-solve-5x5/index.html">5×5</a> reduces to this method after centres and edge pairing.</p>
+
+      <h2 id="next">After this page</h2>
+      <p>Continue with the <a href="./cfop/index.html">CFOP / 4-look written guide</a> or the <a href="./roux/index.html">Roux block-building guide</a>. Solving a <a href="../how-to-solve-2x2/index.html">2×2</a> uses a shorter version of the same ideas. A <a href="../how-to-solve-4x4/index.html">4×4</a> or <a href="../how-to-solve-5x5/index.html">5×5</a> reduces to this method after centres and edge pairing.</p>
+
+      <section id="faq">
+        <h2>FAQ</h2>
+        <h3>How long does a first 3×3 solve take?</h3>
+        <p>Usually 20–40 minutes for a careful first solve with this layer-by-layer method. Speed comes later with CFOP or Roux.</p>
+        <h3>Why do algorithms scramble layers I already solved?</h3>
+        <p>Many recipes open a finished layer on purpose and restore it at the end. Finish the whole algorithm. If it stays broken, you rotated mid-alg or skipped a hold.</p>
+        <h3>Should I learn CFOP or Roux next?</h3>
+        <p>Either works after this page feels easy. CFOP is the common speed path; Roux uses blocks and an M-slice finish. Try both and pick what you enjoy drilling.</p>
+        <h3>Do I need to memorise every algorithm before my first solve?</h3>
+        <p>No. Keep this page open. Memorise only after you have finished a few solves and know which steps feel slow.</p>
+      </section>
 
       <footer class="page">
         <p><a href="../index.html">Cube Lab</a> — play, learn, scan, and solve in the browser. <a href="https://maxmode-now.com/">maxmode-now.com</a></p>

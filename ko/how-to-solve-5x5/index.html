@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>5×5 루빅스 큐브 맞추는 법 (축소법) — Cube Lab</title>
+<meta name="description" content="5×5 축소법: 3×3 센터, 트리플 엣지 페어링, last two edges, 이어서 3×3처럼 마무리. Cube Lab에서 연습." />
+<link rel="canonical" href="https://cube.maxmode-now.com/ko/how-to-solve-5x5/index.html" />
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": "5×5 루빅스 큐브 맞추는 법 (축소법)",
+  "description": "5×5 축소법 초보: 3×3 센터, 엣지 페어링, last two edges, 이어서 3×3 솔브.",
+  "url": "https://cube.maxmode-now.com/ko/how-to-solve-5x5/index.html",
+  "totalTime": "PT2H",
+  "tool": { "@type": "HowToTool", "name": "5×5 루빅스 큐브" },
+  "step": [
+    { "@type": "HowToStep", "position": 1, "name": "센터", "url": "https://cube.maxmode-now.com/ko/how-to-solve-5x5/index.html#step-1" },
+    { "@type": "HowToStep", "position": 2, "name": "엣지 페어링", "url": "https://cube.maxmode-now.com/ko/how-to-solve-5x5/index.html#step-2" },
+    { "@type": "HowToStep", "position": 3, "name": "Last two edges", "url": "https://cube.maxmode-now.com/ko/how-to-solve-5x5/index.html#step-3" },
+    { "@type": "HowToStep", "position": 4, "name": "3×3처럼 맞추기", "url": "https://cube.maxmode-now.com/ko/how-to-solve-5x5/index.html#step-4" },
+    { "@type": "HowToStep", "position": 5, "name": "OLL 패리티", "url": "https://cube.maxmode-now.com/ko/how-to-solve-5x5/index.html#step-5" }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "큐브 맞추기 가이드", "item": "https://cube.maxmode-now.com/ko/how-to-solve/index.html" },
+    { "@type": "ListItem", "position": 2, "name": "5×5 맞추는 법", "item": "https://cube.maxmode-now.com/ko/how-to-solve-5x5/index.html" }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "5×5에서 왜 축소법인가요?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "고정 센터가 각 면 색을 알려 줘요. 3×3 센터와 트리플 엣지를 만들어 퍼즐이 3×3처럼 보이게 한 뒤, 이미 아는 방법으로 마무리하세요."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "5×5에도 PLL 패리티가 있나요?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "없어요. 4×4와 달리 맞은편 엣지 둘이 안 바뀌는 경우는 안 나와요. OLL 패리티(엣지 하나 뒤집힘)와 last-two-edges 손맛은 나올 수 있어요."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Last two edges가 뭔가요?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "엣지 트리플이 둘만 남으면 보통 페어링이 센터를 깨요. 이 페이지의 last-two-edges 전용 시퀀스를 쓴 뒤 3×3처럼 이어가세요."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "4×4와 5×5 중 무엇을 먼저 배우요?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "3×3 이후면 둘 다 괜찮아요. 5×5는 고정 센터(색 지도가 쉬움), 4×4는 PLL 패리티가 추가돼요. 가진 큐브를 고르세요."
+      }
+    }
+  ]
+}
+</script>
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://cube.maxmode-now.com/ko/how-to-solve-5x5/index.html" />
+<meta property="og:title" content="5×5 루빅스 큐브 맞추는 법 (축소법) — Cube Lab" />
+<meta property="og:description" content="5×5 축소법: 3×3 센터, 트리플 엣지 페어링, last two edges, 이어서 3×3처럼 마무리. Cube Lab에서 연습." />
+<meta property="og:image" content="https://cube.maxmode-now.com/docs/play.png" />
+<meta property="og:locale" content="ko_KR" />
+<meta property="og:locale:alternate" content="en_US" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="alternate" hreflang="en" href="https://cube.maxmode-now.com/how-to-solve-5x5/index.html" />
+<link rel="alternate" hreflang="ko" href="https://cube.maxmode-now.com/ko/how-to-solve-5x5/index.html" />
+<link rel="alternate" hreflang="x-default" href="https://cube.maxmode-now.com/how-to-solve-5x5/index.html" />
+<link rel="icon" type="image/png" sizes="192x192" href="../../icons/icon-192.png" />
+<style>
+  :root {
+    --bg: #0f1117;
+    --sunken: #0e1018;
+    --surface: #181b24;
+    --border: #272b36;
+    --text: #e6e8ee;
+    --text-strong: #fff;
+    --muted: #9aa0ad;
+    --accent: #4c8dff;
+    --accent-hover: #5d99ff;
+    --warn: #ffd60a;
+    --on-accent: #fff;
+    --r: 12px;
+    --fs: 17px;
+    --safe-t: env(safe-area-inset-top, 0px);
+    --safe-b: env(safe-area-inset-bottom, 0px);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 400 var(--fs)/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { color: var(--accent-hover); text-decoration: underline; }
+  .top {
+    position: sticky; top: 0; z-index: 10;
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px;
+    padding: calc(10px + var(--safe-t)) 20px 10px;
+    background: rgba(15, 17, 23, 0.92); backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .brand { font-weight: 700; color: var(--text-strong); text-decoration: none; flex: 0 0 auto; }
+  .brand:hover { color: var(--accent); text-decoration: none; }
+  .lang-switch { display: flex; gap: 8px; font-size: 13px; font-weight: 600; flex: 0 0 auto; }
+  .lang-switch a { color: var(--muted); text-decoration: none; }
+  .lang-switch a:hover { color: var(--text); text-decoration: none; }
+  .lang-switch a[aria-current="true"] { color: var(--text-strong); }
+  nav.sizes {
+    display: flex; align-items: center; justify-content: center;
+    gap: 2px; flex: 1 1 auto;
+  }
+  nav.sizes a {
+    display: inline-flex; align-items: center; min-height: 32px; padding: 0 10px;
+    font-size: 13px; font-weight: 600; color: var(--muted);
+    text-decoration: none; border-radius: 8px; white-space: nowrap;
+  }
+  nav.sizes a:hover { color: var(--text); text-decoration: none; }
+  nav.sizes a[aria-current="page"] {
+    color: var(--text-strong); background: rgba(255, 255, 255, 0.08);
+  }
+  .wrap {
+    display: grid; grid-template-columns: 200px minmax(0, 40rem); gap: 40px;
+    max-width: 920px; margin: 0 auto; padding: 32px 20px calc(48px + var(--safe-b));
+  }
+  nav.toc { position: sticky; top: 108px; align-self: start; }
+  nav.toc h2 { margin: 0 0 8px; font-size: 11px; font-weight: 700; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--muted); }
+  nav.toc ol { margin: 0; padding: 0 0 0 1.1em; font-size: 13px; line-height: 1.7; }
+  nav.toc a { color: var(--muted); }
+  nav.toc a:hover { color: var(--text); }
+  h1 { font-size: 2rem; line-height: 1.2; color: var(--text-strong); margin: 0 0 12px; }
+  .lede { font-size: 1.05rem; color: var(--muted); margin: 0 0 24px; }
+  h2 { font-size: 1.35rem; color: var(--text-strong); margin: 2.2em 0 0.6em; }
+  h3 { font-size: 1.05rem; color: var(--text-strong); margin: 1.4em 0 0.4em; }
+  p { margin: 0 0 0.9em; }
+  ul { margin: 0 0 1em; padding-left: 1.2em; }
+  li { margin: 0.25em 0; }
+  .note {
+    margin: 1em 0; padding: 10px 12px;
+    background: var(--surface); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0;
+    font-size: 0.95rem; color: var(--muted);
+  }
+  .note strong { color: var(--text); }
+  .goal { color: var(--muted); font-size: 0.95rem; margin-bottom: 0.8em; }
+  .diag {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 6px;
+    margin: 12px 0 16px; padding: 12px; background: var(--sunken); border-radius: var(--r);
+    width: max-content; max-width: 100%; overflow-x: auto;
+  }
+  .diag-cap { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .alg-box {
+    margin: 12px 0 8px; padding: 10px 12px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+  }
+  .alg-box .lbl { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  .alg-box code {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 1.05rem; font-weight: 600; color: var(--warn); letter-spacing: .02em;
+    word-break: break-word;
+  }
+  .cta {
+    display: inline-flex; align-items: center; min-height: 40px; padding: 0 14px; margin: 8px 0 0;
+    font-size: 14px; font-weight: 600; color: var(--on-accent);
+    background: var(--accent); border-radius: 8px; text-decoration: none;
+  }
+  .cta:hover { background: var(--accent-hover); color: var(--on-accent); text-decoration: none; }
+  footer.page {
+    margin-top: 3em; padding-top: 1.2em; border-top: 1px solid var(--border);
+    font-size: 13px; color: var(--muted);
+  }
+  @media (max-width: 800px) {
+    nav.sizes { order: 3; flex: 1 1 100%; }
+    .wrap { grid-template-columns: 1fr; gap: 8px; padding-top: 20px; }
+    nav.toc { position: static; padding-bottom: 8px; }
+    nav.toc ol { display: flex; flex-wrap: wrap; gap: 0 14px; padding-left: 0; list-style: none; }
+  }
+</style>
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="../../index.html">Cube Lab</a>
+    <nav class="lang-switch" aria-label="Language">
+      <a href="../../how-to-solve-5x5/index.html">EN</a>
+      <a href="./index.html" aria-current="true">한국어</a>
+    </nav>
+    <nav class="sizes" aria-label="글 가이드">
+      <a href="../how-to-solve/index.html">전체</a>
+      <a href="../how-to-solve-2x2/index.html">2×2</a>
+      <a href="../how-to-solve-3x3/index.html">3×3</a>
+      <a href="../how-to-solve-4x4/index.html">4×4</a>
+      <a href="../how-to-solve-5x5/index.html" aria-current="page">5×5</a>
+    </nav>
+  </header>
+
+  <div class="wrap">
+    <nav class="toc" aria-label="이 페이지">
+      <h2>단계</h2>
+      <ol>
+        <li><a href="#start">시작하기 전에</a></li>
+        <li><a href="#why">왜 축소법인가</a></li>
+        <li><a href="#notation">표기법</a></li>
+        <li><a href="#step-1">센터</a></li>
+        <li><a href="#step-2">엣지 페어링</a></li>
+        <li><a href="#step-3">Last two edges</a></li>
+        <li><a href="#step-4">3×3처럼 맞추기</a></li>
+        <li><a href="#step-5">OLL 패리티</a></li>
+        <li><a href="#practice">연습 경로</a></li>
+        <li><a href="#stuck">막혔을 때</a></li>
+        <li><a href="#next">이 페이지 다음</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ol>
+    </nav>
+
+    <article>
+      <h1>5×5 맞추는 법</h1>
+      <p class="lede">축소법: 5×5를 3×3처럼 보이게 만든 뒤, 이미 아는 입문법으로 맞춥니다. 첫 완성은 보통 1–2시간. Cube Lab 5×5에서 수를 연습하세요.</p>
+
+      <h2 id="start">시작하기 전에</h2>
+      <p>5×5는 홀수 큐브예요. 각 면 <b>한가운데 스티커</b>는 서로에 대해 움직이지 않아요 — 그 여섯 센터가 각 면 색을 알려 주고, 3×3과 같아요. 흰↔노랑, 빨강↔주황, 초록↔파랑.</p>
+      <ul>
+        <li>각 면 “센터”는 그 고정 가운데를 둘러싼 <b>3×3 블록</b>입니다.</li>
+        <li>3×3식 엣지마다 조각이 <b>셋</b>: 가운데 엣지(두 색) + 윙 둘.</li>
+        <li>코너는 3×3과 같아요.</li>
+      </ul>
+      <p class="note"><strong>PLL 패리티는 없어요.</strong> <a href="../how-to-solve-4x4/index.html">4×4</a>와 달리 맞은편 엣지 둘이 안 바뀌는 경우는 안 나와요. 엣지 하나 뒤집힘(OLL 패리티)과 last-two-edges 손맛은 <em>나올 수</em> 있어요. 둘 다 아래에 있습니다.</p>
+
+      <h2 id="why">왜 축소법인가</h2>
+      <p>홀수 큐브는 고정 센터가 있어 축소가 자연스러워요: 가운데 스티커 주변에 3×3 센터를 만들고, 트리플 엣지를 페어링한 뒤 3×3처럼 맞춥니다. 입문·CFOP 지식을 다시 쓰고, last-two-edges와 OLL 패리티만 추가하면 돼요.</p>
+
+      <h2 id="notation">표기법</h2>
+      <p class="goal">바깥 면은 3×3과 같아요. 5×5는 안쪽(<b>2R</b>), mid(<b>3R</b>), wide(<b>Rw</b>, <b>3Rw</b>) 슬라이스가 더해져요.</p>
+      <p>전체 <a href="../how-to-solve/notation/index.html">큐브 표기법 참고</a> — mid/3-wide 층과 Cube Lab 조작을 포함 — 를 보세요.</p>
+      <p class="note"><strong>슬라이스는 되돌리세요.</strong> 페어링은 <b>Uw</b>로 윙을 모은 뒤, 그 슬라이스를 되돌려 3×3 센터가 돌아오게 합니다.</p>
+      <a class="cta" href="../../index.html?lang=ko&amp;n=5&amp;learn=beginner&amp;step=0">Cube Lab에서 표기법 보기</a>
+
+      <h2 id="step-1">1단계 · 센터</h2>
+      <p class="goal">고정 가운데 스티커 주변에, 모든 면에 같은 색 3×3 블록.</p>
+      <div class="diag" data-state="1"><span class="diag-cap">흰 3×3 센터 — 첫 목표</span></div>
+      <h3>흰, 이어서 노랑</h3>
+      <p>흰부터. 가운데 흰 스티커는 이미 맞아요 — 주변 센터 조각 여덟만 놓으면 됩니다. 안쪽 슬라이스로 <b>1×2 또는 1×3 바</b>를 만든 뒤 고정 센터에 붙이세요. 완성한 흰을 아래에 두고 위에 노랑을 만드세요.</p>
+      <div class="diag" data-state="2"><span class="diag-cap">3×3 센터 여섯 면 — 엣지는 아직 미페어</span></div>
+      <h3>마지막 센터 넷</h3>
+      <p>흰 아래, 노랑 위. 옆면 센터 둘을 바로 옆에 바로 맞춘 뒤, 마지막 둘은 커뮤터: 앞에 바를 만들고 넣으면 마지막 센터가 채워져요.</p>
+      <div class="alg-box">
+        <div class="lbl">앞 센터 바를 왼쪽으로 (예시)</div>
+        <code>Uw' 2R Uw</code>
+      </div>
+      <p>mid 슬라이스(<b>3R</b>)는 센터의 가운데 줄만 움직여요 — 바가 한 조각만 어긋날 때 유용합니다. 이미 맞춘 센터는 항상 되돌리세요.</p>
+      <a class="cta" href="../../index.html?lang=ko&amp;n=5&amp;learn=beginner&amp;step=1">Cube Lab에서 센터 만들기</a>
+
+      <h2 id="step-2">2단계 · 엣지 페어링</h2>
+      <p class="goal">엣지 조각 36개가 “tredge” 12개로 — 각 슬롯에 맞는 가운데 엣지 + 윙 둘.</p>
+      <div class="diag" data-state="3"><span class="diag-cap">흰–초록 트리플 하나가 앞-위 슬롯에</span></div>
+      <p><b>가운데 엣지</b>(두 색 조각, 3×3 엣지처럼)를 찾으세요. <b>앞-위</b>(UF)에 두세요. 같은 색을 공유하는 윙 둘을 찾으세요. wide U가 윙을 가운데 옆에 붙이고, 자라는 페어를 저장한 뒤 슬라이스를 되돌리세요.</p>
+      <ol>
+        <li><b>Uw</b>를 돌려 맞는 윙이 UF의 가운데 엣지 옆에 앉을 때까지.</li>
+        <li>그 슬롯을 아직 안 맞춘 엣지로 교체해 다음 슬라이스가 찢지 않게 — 보통 <b>R U R'</b>.</li>
+        <li>슬라이스 되돌리기: <b>Uw'</b>.</li>
+        <li>같은 엣지의 두 번째 윙도 반복한 뒤 다음으로.</li>
+      </ol>
+      <div class="alg-box">
+        <div class="lbl">UF에 윙 붙이기 → 저장 → 센터 복구</div>
+        <code>Uw R U R' Uw'</code>
+      </div>
+      <p>열두 엣지 중 <b>열</b>개가 완전히 페어될 때까지. 마지막 둘은 전용 단계가 필요해요 — 보통 저장으로 하나를 풀면 다른 하나를 맞출 수 없어요.</p>
+      <a class="cta" href="../../index.html?lang=ko&amp;n=5&amp;learn=beginner&amp;step=2">Cube Lab에서 엣지 페어링</a>
+
+      <h2 id="step-3">3단계 · Last two edges</h2>
+      <p class="goal">남은 엣지 둘. 앞-위와 뒤-위(또는 앞-위와 앞-오른쪽)에 두세요.</p>
+      <div class="diag" data-state="4"><span class="diag-cap">미해결 엣지 둘 — 나머지는 페어됨</span></div>
+      <p>messy한 엣지 둘을 <b>UF</b>와 <b>UB</b>에 두세요. 아래 공식은 이미 만든 센터를 깨지 않고 윙을 가운데 엣지로 순환합니다. 윙 배치에 따라 한 번, 또는 <b>U2</b> 뒤 한 번 더 필요할 수 있어요.</p>
+      <div class="alg-box">
+        <div class="lbl">Last two edges — 미해결 쌍을 UF·UB에</div>
+        <code>Rw U2 Rw U2 F2 Rw F2 3Rw' U2 Rw U2 Rw' U2 F2 Rw' F2 3Rw</code>
+      </div>
+      <p>Cube Lab: <b>Rw</b>는 <b>Wide</b>, <b>3Rw</b>는 <b>3-Wide</b>, U·F는 <b>Outer</b>. 끝나면 모든 엣지 슬롯이 맞는 트리플이어야 해요.</p>
+      <p class="note"><strong>트리플 하나가 아직 뒤집혀 보이면</strong>(옆면 색이 위, 노랑이 옆), 그건 OLL 패리티예요 — 3×3 마지막 층을 시작한 뒤 5단계로 건너뛰거나, 뒤집힌 엣지를 앞에 두고 지금 적용하세요.</p>
+      <a class="cta" href="../../index.html?lang=ko&amp;n=5&amp;learn=beginner&amp;step=3">Cube Lab에서 last two edges 마무리</a>
+
+      <h2 id="step-4">4단계 · 3×3처럼 맞추기</h2>
+      <p class="goal">바깥 수만. 각 3×3 센터는 3×3 센터, 각 트리플 엣지는 3×3 엣지.</p>
+      <div class="diag" data-state="5"><span class="diag-cap">축소된 5×5의 흰 크로스 — 3×3과 같은 아이디어</span></div>
+      <p>Layer를 다시 <b>Outer</b>로. <a href="../how-to-solve-3x3/index.html">3×3 입문법</a>을 따르세요: 흰 크로스, 흰 코너, 중간 엣지, 노란 크로스, 노란 면, 마지막 층 순열.</p>
+      <p>이미 CFOP를 알면 그걸 써도 돼요. 5×5 추가 작업은 끝난 상태입니다.</p>
+      <a class="cta" href="../../index.html?lang=ko&amp;n=5&amp;learn=beginner&amp;step=4">Cube Lab에서 3×3처럼 맞추기</a>
+
+      <h2 id="step-5">5단계 · OLL 패리티</h2>
+      <p class="goal">엣지 전체가 하나 뒤집혀 보여요. 축소 뒤에 나올 수 있고, 4×4 OLL 패리티와 같은 계열입니다.</p>
+      <div class="diag" data-state="6"><span class="diag-cap">앞 엣지 하나가 뒤집힌 노란 면</span></div>
+      <p>뒤집힌 트리플을 <b>앞</b>에 두세요. 안쪽 슬라이스 공식(윙만 — mid 슬라이스 아님)을 쓴 뒤, 3×3처럼 노란 크로스 / Sune / PLL을 이어가세요.</p>
+      <div class="alg-box">
+        <div class="lbl">OLL 패리티 — 앞 엣지 뒤집기</div>
+        <code>2R' U2 2L F2 2L' F2 2R2 U2 2R U2 2R' U2 F2 2R2 F2</code>
+      </div>
+      <p>Layer → <b>2R</b> / <b>2L</b>은 <b>Inner</b>, U·F는 <b>Outer</b>. 5×5에서는 4×4 PLL 패리티 공식이 필요 없어요.</p>
+      <a class="cta" href="../../index.html?lang=ko&amp;n=5&amp;learn=beginner&amp;step=5">Cube Lab에서 OLL 패리티 보기</a>
+
+      <h2 id="practice">연습 경로</h2>
+      <ul>
+        <li>센터만 — 모든 3×3 블록이 고정 가운데와 맞을 때까지.</li>
+        <li>엣지 페어링은 트리플이 둘만 남을 때까지, 그다음 last-two-edges를 따로 드릴.</li>
+        <li>3×3처럼 맞추고, 엣지 하나만 뒤집혀 보이면 OLL 패리티 — 3×3 OLL을 끝없이 억지로 쓰지 마세요.</li>
+        <li>큰 큐브 하나가 편해지면 <a href="../how-to-solve-4x4/index.html">4×4</a>와 비교해 보세요.</li>
+      </ul>
+
+      <h2 id="stuck">막혔을 때</h2>
+      <p>페어링 뒤 센터가 틀리면: <b>Uw</b>를 되돌리지 않은 거예요. 역수 슬라이스로 복구한 뒤 페어를 다시 저장하세요.</p>
+      <p>색이 맞는 센터 3×3은 맞춘 거예요 — 고정 가운데는 잘못된 색으로 돌아갈 수 없어요. 주변 여덟 조각이 섞이면 그 센터는 아직 안 끝났어요.</p>
+      <p>3×3 마지막 층 공식이 센터를 망가뜨리면, 안쪽·mid·wide를 실수로 쓴 거예요. last-two-edges나 OLL 패리티까지는 <b>Outer</b>만 쓰세요.</p>
+      <p>실제 큐브가 있으면 Cube Lab에서 <a href="../../index.html?lang=ko&amp;n=5&amp;learn=scan">여섯 면 스캔</a>할 수 있어요. Smart Solve가 열리며, 이 입문법과는 다른 경로입니다.</p>
+
+      <h2 id="next">이 페이지 다음</h2>
+      <p>짝수 큐브 사촌은 <a href="../how-to-solve-4x4/index.html">4×4 맞추는 법</a>(2×2 센터, 두 조각 엣지, PLL 패리티 추가). 3×3 단계가 필요하면 <a href="../how-to-solve-3x3/index.html">3×3 맞추는 법</a>.</p>
+
+      <section id="faq">
+        <h2>FAQ</h2>
+        <h3>5×5에서 왜 축소법인가요?</h3>
+        <p>고정 센터가 각 면 색을 알려 줘요. 3×3 센터와 트리플 엣지를 만들어 퍼즐이 3×3처럼 보이게 한 뒤, 이미 아는 방법으로 마무리하세요.</p>
+        <h3>5×5에도 PLL 패리티가 있나요?</h3>
+        <p>없어요. 4×4와 달리 맞은편 엣지 둘이 안 바뀌는 경우는 안 나와요. OLL 패리티(엣지 하나 뒤집힘)와 last-two-edges 손맛은 나올 수 있어요.</p>
+        <h3>Last two edges가 뭔가요?</h3>
+        <p>엣지 트리플이 둘만 남으면 보통 페어링이 센터를 깨요. 이 페이지의 last-two-edges 전용 시퀀스를 쓴 뒤 3×3처럼 이어가세요.</p>
+        <h3>4×4와 5×5 중 무엇을 먼저 배우요?</h3>
+        <p>3×3 이후면 둘 다 괜찮아요. 5×5는 고정 센터(색 지도가 쉬움), 4×4는 PLL 패리티가 추가돼요. 가진 큐브를 고르세요.</p>
+      </section>
+
+      <footer class="page">
+        <p><a href="../../index.html">Cube Lab</a> — 브라우저에서 플레이·학습·스캔·솔브. <a href="https://maxmode-now.com/">maxmode-now.com</a></p>
+      </footer>
+    </article>
+  </div>
+
+<script src="../../lessons.js"></script>
+<script>
+(function () {
+  const HEX = { W: '#f0f0f0', Y: '#ffd60a', R: '#e8312a', O: '#ff8c2b', G: '#39c45a', B: '#2563eb', _: '#0d0e12' };
+  const states = (window.CubeLessons && window.CubeLessons.states5) || [];
+
+  function makeDiagram(state) {
+    const n = 5, S = 6, G = 1, SP = 3, PAD = 4;
+    const FS = S * n + G * (n - 1);
+    const FP = FS + SP;
+    const W = PAD * 2 + 4 * FP - SP;
+    const H = PAD * 2 + 3 * FP - SP;
+    const rects = [];
+    function face(cells, col, row) {
+      if (!cells) return;
+      const ox = PAD + col * FP, oy = PAD + row * FP;
+      cells.forEach((c, i) => {
+        const r = Math.floor(i / n), cc = i % n;
+        rects.push('<rect x="' + (ox + cc * (S + G)) + '" y="' + (oy + r * (S + G)) + '" width="' + S + '" height="' + S + '" rx="1" fill="' + (HEX[c] || c) + '"/>');
+      });
+    }
+    face(state.U, 1, 0); face(state.L, 0, 1); face(state.F, 1, 1); face(state.R, 2, 1); face(state.B, 3, 1); face(state.D, 1, 2);
+    return '<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg"><rect width="' + W + '" height="' + H + '" rx="6" fill="#12151f"/>' + rects.join('') + '</svg>';
+  }
+
+  document.querySelectorAll('.diag[data-state]').forEach(el => {
+    const i = Number(el.dataset.state);
+    const state = states[i];
+    if (!state) return;
+    el.insertAdjacentHTML('beforeend', makeDiagram(state));
+  });
+})();
+</script>
+</body>
+</html>

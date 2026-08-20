@@ -1,25 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>PLL Library — 2-Look + Full 21 — Cube Lab</title>
-<meta name="description" content="Learn 2-Look PLL then all 21 one-look cases: corners then edges, AUF habit, recognition tips, practice path, and demos in Cube Lab." />
-<link rel="canonical" href="https://cube.maxmode-now.com/how-to-solve-3x3/cfop/pll/index.html" />
+<title>PLL 라이브러리 — 2-Look + Full 21 — Cube Lab</title>
+<meta name="description" content="2-Look PLL을 먼저 배우고 21개 one-look 케이스까지: 코너 다음 엣지, AUF 습관, 인식 팁, 연습 경로, Cube Lab 시연." />
+<link rel="canonical" href="https://cube.maxmode-now.com/ko/how-to-solve-3x3/cfop/pll/index.html" />
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "HowTo",
-  "name": "PLL Library for the 3×3 Rubik's Cube",
-  "description": "Start with 2-Look PLL, then browse all 21 one-look PLL cases.",
-  "url": "https://cube.maxmode-now.com/how-to-solve-3x3/cfop/pll/index.html",
+  "name": "3×3 루빅스 큐브 PLL 라이브러리",
+  "description": "2-Look PLL부터 시작한 뒤, one-look PLL 21개 케이스를 둘러봅니다.",
+  "url": "https://cube.maxmode-now.com/ko/how-to-solve-3x3/cfop/pll/index.html",
   "totalTime": "PT30M",
-  "tool": { "@type": "HowToTool", "name": "3×3 Rubik's Cube" },
+  "tool": { "@type": "HowToTool", "name": "3×3 루빅스 큐브" },
   "step": [
-    { "@type": "HowToStep", "position": 1, "name": "Why 2-Look then full PLL", "url": "https://cube.maxmode-now.com/how-to-solve-3x3/cfop/pll/index.html#why" },
-    { "@type": "HowToStep", "position": 2, "name": "Corner positions", "url": "https://cube.maxmode-now.com/how-to-solve-3x3/cfop/pll/index.html#corners" },
-    { "@type": "HowToStep", "position": 3, "name": "Edge positions", "url": "https://cube.maxmode-now.com/how-to-solve-3x3/cfop/pll/index.html#edges" },
-    { "@type": "HowToStep", "position": 4, "name": "Case library", "url": "https://cube.maxmode-now.com/how-to-solve-3x3/cfop/pll/index.html#library" }
+    { "@type": "HowToStep", "position": 1, "name": "왜 2-Look 다음 Full PLL", "url": "https://cube.maxmode-now.com/ko/how-to-solve-3x3/cfop/pll/index.html#why" },
+    { "@type": "HowToStep", "position": 2, "name": "코너 위치", "url": "https://cube.maxmode-now.com/ko/how-to-solve-3x3/cfop/pll/index.html#corners" },
+    { "@type": "HowToStep", "position": 3, "name": "엣지 위치", "url": "https://cube.maxmode-now.com/ko/how-to-solve-3x3/cfop/pll/index.html#edges" },
+    { "@type": "HowToStep", "position": 4, "name": "케이스 라이브러리", "url": "https://cube.maxmode-now.com/ko/how-to-solve-3x3/cfop/pll/index.html#library" }
   ]
 }
 </script>
@@ -28,9 +28,9 @@
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
   "itemListElement": [
-    { "@type": "ListItem", "position": 1, "name": "Cube solving guides", "item": "https://cube.maxmode-now.com/how-to-solve/index.html" },
-    { "@type": "ListItem", "position": 2, "name": "3×3 CFOP", "item": "https://cube.maxmode-now.com/how-to-solve-3x3/cfop/index.html" },
-    { "@type": "ListItem", "position": 3, "name": "PLL library", "item": "https://cube.maxmode-now.com/how-to-solve-3x3/cfop/pll/index.html" }
+    { "@type": "ListItem", "position": 1, "name": "큐브 풀이 가이드", "item": "https://cube.maxmode-now.com/ko/how-to-solve/index.html" },
+    { "@type": "ListItem", "position": 2, "name": "3×3 CFOP", "item": "https://cube.maxmode-now.com/ko/how-to-solve-3x3/cfop/index.html" },
+    { "@type": "ListItem", "position": 3, "name": "PLL 라이브러리", "item": "https://cube.maxmode-now.com/ko/how-to-solve-3x3/cfop/pll/index.html" }
   ]
 }
 </script>
@@ -41,59 +41,59 @@
   "mainEntity": [
     {
       "@type": "Question",
-      "name": "Should I permute corners or edges first?",
+      "name": "코너와 엣지 중 어느 쪽을 먼저 치환하나요?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "In 2-Look PLL, corners first (CP), then edges (EP). That is the standard on-ramp. Full PLL solves both in one algorithm."
+        "text": "2-Look PLL에서는 코너 먼저(CP), 그다음 엣지(EP). 이게 표준 입문 경로입니다. Full PLL은 둘을 한 알고리즘으로 풉니다."
       }
     },
     {
       "@type": "Question",
-      "name": "What is AUF?",
+      "name": "AUF란 무엇인가요?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Adjust U Face — a U or U' (or U2) after PLL so the side colours match the centres. The cube is not solved until that last U turn."
+        "text": "Adjust U Face — PLL 뒤에 U 또는 U'(또는 U2)를 해서 옆면 색이 센터와 맞게 맞추는 것입니다. 그 마지막 U 회전까지 끝나야 큐브가 풀린 것입니다."
       }
     },
     {
       "@type": "Question",
-      "name": "Do I need all 21 PLL cases?",
+      "name": "PLL 21개 케이스를 전부 외워야 하나요?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Not at first. 2-Look PLL covers every scramble with A-perm / E-perm plus U / H / Z. Add full 21 when 2-look is automatic."
+        "text": "처음에는 아닙니다. 2-Look PLL이면 A-perm / E-perm과 U / H / Z로 모든 스크램블을 커버합니다. 2-look이 자동일 때 Full 21을 추가하세요."
       }
     },
     {
       "@type": "Question",
-      "name": "How do I recognise PLL faster?",
+      "name": "PLL을 더 빨리 인식하려면?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Scan for headlights (two matching side stickers on one face), then bars, then whether corners or edges need a cycle. Hold headlights at the back for A-perm and a solved edge at the back for U-perm."
+        "text": "먼저 헤드라이트(한 면에 같은 옆 스티커 두 개), 그다음 바(막대), 그다음 코너·엣지 중 어느 쪽이 순환인지 봅니다. A-perm은 헤드라이트를 뒤에, U-perm은 맞춘 엣지를 뒤에 둡니다."
       }
     },
     {
       "@type": "Question",
-      "name": "Why did PLL leave the sides wrong?",
+      "name": "왜 PLL 후에 옆면이 안 맞나요?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "You probably skipped AUF, held the wrong face as Front, or used the wrong A/U direction. Undo to yellow-on-top after OLL and try again."
+        "text": "대개 AUF를 빠뜨렸거나, Front를 잘못 잡았거나, A/U 방향을 잘못 쓴 경우입니다. OLL 직후 노란 면 위로 되돌리고 다시 하세요."
       }
     }
   ]
 }
 </script>
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://cube.maxmode-now.com/how-to-solve-3x3/cfop/pll/index.html" />
-<meta property="og:title" content="PLL Library — Cube Lab" />
-<meta property="og:description" content="2-Look PLL on-ramp plus all 21 one-look PLL cases with demos in Cube Lab." />
+<meta property="og:url" content="https://cube.maxmode-now.com/ko/how-to-solve-3x3/cfop/pll/index.html" />
+<meta property="og:title" content="PLL 라이브러리 — Cube Lab" />
+<meta property="og:description" content="2-Look PLL 입문과 one-look PLL 21개 케이스, Cube Lab 시연 포함." />
 <meta property="og:image" content="https://cube.maxmode-now.com/docs/play.png" />
-<meta property="og:locale" content="en_US" />
-<meta property="og:locale:alternate" content="ko_KR" />
+<meta property="og:locale" content="ko_KR" />
+<meta property="og:locale:alternate" content="en_US" />
 <meta name="twitter:card" content="summary_large_image" />
 <link rel="alternate" hreflang="en" href="https://cube.maxmode-now.com/how-to-solve-3x3/cfop/pll/index.html" />
 <link rel="alternate" hreflang="ko" href="https://cube.maxmode-now.com/ko/how-to-solve-3x3/cfop/pll/index.html" />
 <link rel="alternate" hreflang="x-default" href="https://cube.maxmode-now.com/how-to-solve-3x3/cfop/pll/index.html" />
-<link rel="icon" type="image/png" sizes="192x192" href="../../../icons/icon-192.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="../../../../icons/icon-192.png" />
 <style>
   :root {
     --bg: #0f1117;
@@ -129,6 +129,8 @@
   }
   .brand { font-weight: 700; color: var(--text-strong); text-decoration: none; flex: 0 0 auto; }
   .brand:hover { color: var(--accent); text-decoration: none; }
+  .lang-switch { display: flex; gap: 8px; font-size: 13px; font-weight: 600; }
+  .lang-switch a[aria-current="true"] { color: var(--text-strong); }
   nav.sizes {
     display: flex; align-items: center; justify-content: center;
     gap: 2px; flex: 1 1 auto;
@@ -215,73 +217,67 @@
     nav.toc { position: static; padding-bottom: 8px; }
     nav.toc ol { display: flex; flex-wrap: wrap; gap: 0 14px; padding-left: 0; list-style: none; }
   }
-
-  .lang-switch { display: flex; gap: 8px; align-items: center; font-size: 13px; font-weight: 600; flex: 0 0 auto; }
-  .lang-switch a { color: var(--muted); text-decoration: none; }
-  .lang-switch a:hover { color: var(--text); }
-  .lang-switch a[aria-current="true"] { color: var(--text-strong); }
-
 </style>
 </head>
 <body>
   <header class="top">
-    <a class="brand" href="../../../index.html">Cube Lab</a>
+    <a class="brand" href="../../../../index.html">Cube Lab</a>
     <nav class="lang-switch" aria-label="Language">
-      <a href="./index.html" aria-current="true">EN</a>
-      <a href="../../../ko/how-to-solve-3x3/cfop/pll/index.html">한국어</a>
+      <a href="../../../../how-to-solve-3x3/cfop/pll/index.html">EN</a>
+      <a href="./index.html" aria-current="true">한국어</a>
     </nav>
-    <nav class="sizes" aria-label="Written guides">
-      <a href="../../../how-to-solve/index.html">All</a>
+    <nav class="sizes" aria-label="문서 가이드">
+      <a href="../../../how-to-solve/index.html">전체</a>
       <a href="../../../how-to-solve-2x2/index.html">2×2</a>
       <a href="../../../how-to-solve-3x3/index.html" aria-current="page">3×3</a>
       <a href="../../../how-to-solve-4x4/index.html">4×4</a>
       <a href="../../../how-to-solve-5x5/index.html">5×5</a>
     </nav>
-    <nav class="methods" aria-label="3×3 methods">
-      <a href="../../../how-to-solve-3x3/index.html">Beginner</a>
+    <nav class="methods" aria-label="3×3 해법">
+      <a href="../../../how-to-solve-3x3/index.html">입문</a>
       <a href="../../../how-to-solve-3x3/cfop/index.html" aria-current="page">CFOP</a>
       <a href="../../../how-to-solve-3x3/roux/index.html">Roux</a>
     </nav>
   </header>
 
   <div class="wrap">
-    <nav class="toc" aria-label="On this page">
-      <h2>On this page</h2>
+    <nav class="toc" aria-label="이 페이지">
+      <h2>이 페이지</h2>
       <ol>
-        <li><a href="#start">Before you start</a></li>
-        <li><a href="#why">Why 2-Look then full</a></li>
-        <li><a href="#corners">Corner positions</a></li>
-        <li><a href="#edges">Edge positions</a></li>
-        <li><a href="#library">Full PLL library</a></li>
-        <li><a href="#practice">Practice path</a></li>
-        <li><a href="#stuck">Stuck?</a></li>
-        <li><a href="#next">After this page</a></li>
+        <li><a href="#start">시작하기 전에</a></li>
+        <li><a href="#why">왜 2-Look 다음 Full</a></li>
+        <li><a href="#corners">코너 위치</a></li>
+        <li><a href="#edges">엣지 위치</a></li>
+        <li><a href="#library">Full PLL 라이브러리</a></li>
+        <li><a href="#practice">연습 경로</a></li>
+        <li><a href="#stuck">막혔을 때</a></li>
+        <li><a href="#next">다음 단계</a></li>
         <li><a href="#faq">FAQ</a></li>
       </ol>
     </nav>
 
     <article>
-      <h1>PLL library</h1>
-      <p class="lede">Start with <b>2-Look PLL</b> (corners, then edges), then drill all <b>21</b> one-look PLL cases. Filter by family, read one recognition tip per case, and demo any algorithm in Cube Lab.</p>
+      <h1>PLL 라이브러리</h1>
+      <p class="lede">먼저 <b>2-Look PLL</b>(코너 → 엣지)을 익히고, 이어서 <b>21</b>개 one-look PLL 케이스를 드릴하세요. 가족으로 필터하고, 케이스마다 인식 팁 하나를 읽은 뒤 Cube Lab에서 시연하세요.</p>
 
-      <h2 id="start">Before you start</h2>
-      <p>This page is the PLL part of <a href="../index.html">CFOP</a>. Finish <a href="../oll/index.html">OLL</a> first so the whole top face is yellow and white stays on the <b>bottom</b>.</p>
-      <p>2-Look PLL places the <b>corners first</b> (CP), then the <b>edges</b> (EP). Notation refresher: <a href="../../../how-to-solve/notation/index.html">cube notation</a> — H-perm uses <b>M</b>.</p>
-      <p class="note"><strong>Demo plays the case, then the fix.</strong> Cube Lab resets, applies the inverse instantly so you see the pattern, then animates the algorithm.</p>
-      <a class="cta" href="../../../index.html?n=3&amp;learn=pll&amp;step=0">Open 2-Look PLL in Cube Lab</a>
-      <p><a class="cta" href="../../../index.html?n=3&amp;learn=drill&amp;set=pll">Practice random PLL cases in Cube Lab</a></p>
+      <h2 id="start">시작하기 전에</h2>
+      <p>이 페이지는 <a href="../index.html">CFOP</a>의 PLL 부분입니다. 위 면 전체가 노란색이고 흰 면이 <b>아래</b>에 있도록 먼저 <a href="../oll/index.html">OLL</a>을 끝내세요.</p>
+      <p>2-Look PLL은 <b>코너 먼저</b>(CP), 그다음 <b>엣지</b>(EP)입니다. 노테이션 복습: <a href="../../../how-to-solve/notation/index.html">큐브 노테이션</a> — H-perm은 <b>M</b>을 씁니다.</p>
+      <p class="note"><strong>시연은 케이스 → 해법 순으로 재생됩니다.</strong> Cube Lab이 리셋한 뒤 역수를 즉시 적용해 패턴을 보여 주고, 알고리즘을 애니메이션으로 돌립니다.</p>
+      <a class="cta" href="../../../../index.html?lang=ko&amp;n=3&amp;learn=pll&amp;step=0">Cube Lab에서 2-Look PLL 열기</a>
+      <p><a class="cta" href="../../../../index.html?lang=ko&amp;n=3&amp;learn=drill&amp;set=pll">Cube Lab에서 랜덤 PLL 연습</a></p>
 
-      <h2 id="why">Why 2-Look then full PLL</h2>
-      <p>Full PLL is 21 algorithms. 2-Look PLL covers every scramble with corner algs (A-perm / E-perm) plus edge algs (Ua, Ub, H, Z). You finish the cube with two looks instead of one, but the list is short enough to learn this week.</p>
-      <p>Build an AUF habit early: after PLL, turn U until the sides match. The cube is not solved until that last U turn.</p>
+      <h2 id="why">왜 2-Look 다음 Full PLL</h2>
+      <p>Full PLL은 알고리즘 21개입니다. 2-Look PLL은 코너(A-perm / E-perm)와 엣지(Ua, Ub, H, Z)로 모든 스크램블을 커버합니다. 보는 횟수는 두 번이지만, 이번 주에 외울 수 있을 만큼 짧습니다.</p>
+      <p>일찍 AUF 습관을 만드세요: PLL 뒤에 옆면이 맞을 때까지 U를 돌립니다. 그 마지막 U까지 끝나야 큐브가 풀린 것입니다.</p>
 
-      <h2 id="corners">1. Corner positions</h2>
-      <p>Read headlights (two matching side colours on one U-face edge). Your goal is to seat the four top corners. Edges can wait.</p>
+      <h2 id="corners">1. 코너 위치</h2>
+      <p>헤드라이트(U면 한 변에 같은 옆 색 두 개)를 읽습니다. 목표는 위 코너 네 개를 자리에 앉히는 것입니다. 엣지는 나중에.</p>
       <ul>
-        <li><b>A-perm:</b> one pair of headlights. Hold them at the <b>back</b> and cycle the other three corners.</li>
-        <li><b>E-perm:</b> no headlights. Two diagonal corner pairs swap.</li>
+        <li><b>A-perm:</b> 헤드라이트 한 쌍. 그것들을 <b>뒤</b>에 두고 나머지 코너 셋을 순환시킵니다.</li>
+        <li><b>E-perm:</b> 헤드라이트 없음. 대각선 코너 쌍 두 개가 서로 바뀝니다.</li>
       </ul>
-      <p>If no corner is correct yet, apply A-perm once and look again. A diagonal swap can also be A-perm twice.</p>
+      <p>맞는 코너가 아직 없으면 A-perm을 한 번 하고 다시 보세요. 대각 교환은 A-perm 두 번으로도 됩니다.</p>
       <div class="card">
         <div class="card-head"><span class="card-title">A-perm (a)</span></div>
         <div class="card-meta"><code>R' F R' B2 R F' R' B2 R2</code></div>
@@ -291,14 +287,14 @@
         <div class="card-meta"><code>R B' R' F R B R' F' R B R' F R B' R' F'</code></div>
       </div>
 
-      <h2 id="edges">2. Edge positions</h2>
-      <p>Once the corners are seated, only four edge cases remain: <b>Ua, Ub, H,</b> and <b>Z</b>.</p>
+      <h2 id="edges">2. 엣지 위치</h2>
+      <p>코너가 자리에 앉으면 남는 엣지 케이스는 네 가지: <b>Ua, Ub, H,</b> 그리고 <b>Z</b>.</p>
       <ul>
-        <li><b>U-perm:</b> one solved edge. Hold it at the <b>back</b>.</li>
-        <li><b>H-perm:</b> headlights on all four sides. Opposite edges swap.</li>
-        <li><b>Z-perm:</b> diagonal bars of matching colour. Adjacent edges swap.</li>
+        <li><b>U-perm:</b> 맞춘 엣지 하나. 그것을 <b>뒤</b>에 둡니다.</li>
+        <li><b>H-perm:</b> 네 면에 모두 헤드라이트. 맞은편 엣지가 서로 바뀝니다.</li>
+        <li><b>Z-perm:</b> 같은 색의 대각 바. 인접 엣지가 서로 바뀝니다.</li>
       </ul>
-      <p>Finish with an AUF (a turn of the top) so the side colours line up.</p>
+      <p>마지막으로 AUF(위면 회전)로 옆면 색을 맞춥니다.</p>
       <div class="card">
         <div class="card-head"><span class="card-title">U-perm (a)</span></div>
         <div class="card-meta"><code>R U' R U R U R U' R' U' R2</code></div>
@@ -308,60 +304,60 @@
         <div class="card-meta"><code>M2 U M2 U2 M2 U M2</code></div>
       </div>
 
-      <h2 id="library">Full PLL library (21 cases)</h2>
-      <p>After 2-Look PLL, speedcubers learn <b>one algorithm per last-layer permutation</b>. The library below lists all <b>21</b> standard cases, grouped by family: <b>corners, edges, adjacent swap, diagonal swap,</b> and <b>G perms</b>.</p>
-      <p>Recognition for one-look: headlights and bars first, then name the case. Start with the edge and corner families you already know from 2-look, then add adjacent swaps and G-perms.</p>
-      <div class="chips" id="filters" role="group" aria-label="Filter cases"></div>
+      <h2 id="library">Full PLL 라이브러리 (21개 케이스)</h2>
+      <p>2-Look PLL 다음에 스피드큐버는 <b>라스트 레이어 치환마다 알고리즘 하나</b>를 배웁니다. 아래 라이브러리는 표준 <b>21</b>개 케이스를 가족—<b>코너, 엣지, 인접 교환, 대각 교환,</b> <b>G 펌</b>—으로 묶어 둡니다.</p>
+      <p>one-look 인식: 헤드라이트와 바를 먼저 보고 케이스 이름을 붙입니다. 2-look에서 이미 아는 엣지·코너 가족부터 시작한 뒤, 인접 교환과 G-perm을 추가하세요.</p>
+      <div class="chips" id="filters" role="group" aria-label="케이스 필터"></div>
       <p class="count" id="count"></p>
       <div id="list"></div>
 
-      <h2 id="practice">Practice path</h2>
+      <h2 id="practice">연습 경로</h2>
       <ul>
-        <li>Drill A-perm holds (headlights back) until setup is automatic.</li>
-        <li>Add Ua / Ub / H / Z; always finish with AUF.</li>
-        <li>Solve full CFOP with 2-look PLL only for a week of timed solves.</li>
-        <li>When CP and EP are fast, add one full-PLL family at a time from the library.</li>
+        <li>A-perm 잡는 법(헤드라이트 뒤)을 드릴해서 셋업이 자동이 될 때까지.</li>
+        <li>Ua / Ub / H / Z를 추가하고, 항상 AUF로 마무리.</li>
+        <li>한 주 동안 시간 측정 풀이를 2-look PLL만으로.</li>
+        <li>CP와 EP가 빨라지면 라이브러리에서 Full PLL 가족을 하나씩 추가.</li>
       </ul>
-      <p><a class="cta" href="../../../index.html?n=3&amp;learn=drill&amp;set=pll">Random PLL drill in Cube Lab</a></p>
+      <p><a class="cta" href="../../../../index.html?lang=ko&amp;n=3&amp;learn=drill&amp;set=pll">Cube Lab 랜덤 PLL 드릴</a></p>
 
-      <h2 id="stuck">Stuck?</h2>
-      <p>If corners will not seat, check headlights: none means E-perm (or A twice); one pair means A-perm with headlights at the back.</p>
-      <p>If edges look solved but sides are wrong, you forgot AUF — turn U, do not re-run PLL.</p>
-      <p>Need OLL first? <a href="../oll/index.html">OLL library</a>. Whole CFOP flow: <a href="../index.html">CFOP overview</a>.</p>
+      <h2 id="stuck">막혔을 때</h2>
+      <p>코너가 안 앉으면 헤드라이트를 확인하세요: 없으면 E-perm(또는 A 두 번); 한 쌍이면 헤드라이트를 뒤에 두고 A-perm.</p>
+      <p>엣지는 맞아 보이는데 옆면이 틀리면 AUF를 잊은 것입니다 — U만 돌리고 PLL을 다시 돌리지 마세요.</p>
+      <p>OLL이 먼저 필요하면 <a href="../oll/index.html">OLL 라이브러리</a>. CFOP 전체 흐름: <a href="../index.html">CFOP 개요</a>.</p>
 
-      <h2 id="next">After this page</h2>
-      <p>4-look last layer is complete once 2-look OLL and 2-look PLL are solid. Add full 21 PLL (and later full OLL) when you want fewer looks. For Cross and F2L depth, return to the <a href="../index.html">CFOP overview</a> and <a href="../f2l/index.html">F2L library</a>.</p>
+      <h2 id="next">다음 단계</h2>
+      <p>2-look OLL과 2-look PLL이 단단하면 4-look 라스트 레이어는 끝난 것입니다. 보는 횟수를 줄이려면 Full 21 PLL(나중에는 Full OLL)을 추가하세요. Cross·F2L을 더 깊게 보려면 <a href="../index.html">CFOP 개요</a>와 <a href="../f2l/index.html">F2L 라이브러리</a>로 돌아가세요.</p>
 
       <section id="faq">
         <h2>FAQ</h2>
-        <h3>Should I permute corners or edges first?</h3>
-        <p>In 2-Look PLL, corners first (CP), then edges (EP). That is the standard on-ramp. Full PLL solves both in one algorithm.</p>
-        <h3>What is AUF?</h3>
-        <p>Adjust U Face — a U or U' (or U2) after PLL so the side colours match the centres. The cube is not solved until that last U turn.</p>
-        <h3>Do I need all 21 PLL cases?</h3>
-        <p>Not at first. 2-Look PLL covers every scramble with A-perm / E-perm plus U / H / Z. Add full 21 when 2-look is automatic.</p>
-        <h3>How do I recognise PLL faster?</h3>
-        <p>Scan for headlights (two matching side stickers on one face), then bars, then whether corners or edges need a cycle. Hold headlights at the back for A-perm and a solved edge at the back for U-perm.</p>
-        <h3>Why did PLL leave the sides wrong?</h3>
-        <p>You probably skipped AUF, held the wrong face as Front, or used the wrong A/U direction. Undo to yellow-on-top after OLL and try again.</p>
+        <h3>코너와 엣지 중 어느 쪽을 먼저 치환하나요?</h3>
+        <p>2-Look PLL에서는 코너 먼저(CP), 그다음 엣지(EP). 이게 표준 입문 경로입니다. Full PLL은 둘을 한 알고리즘으로 풉니다.</p>
+        <h3>AUF란 무엇인가요?</h3>
+        <p>Adjust U Face — PLL 뒤에 U 또는 U'(또는 U2)를 해서 옆면 색이 센터와 맞게 맞추는 것입니다. 그 마지막 U 회전까지 끝나야 큐브가 풀린 것입니다.</p>
+        <h3>PLL 21개 케이스를 전부 외워야 하나요?</h3>
+        <p>처음에는 아닙니다. 2-Look PLL이면 A-perm / E-perm과 U / H / Z로 모든 스크램블을 커버합니다. 2-look이 자동일 때 Full 21을 추가하세요.</p>
+        <h3>PLL을 더 빨리 인식하려면?</h3>
+        <p>먼저 헤드라이트(한 면에 같은 옆 스티커 두 개), 그다음 바(막대), 그다음 코너·엣지 중 어느 쪽이 순환인지 봅니다. A-perm은 헤드라이트를 뒤에, U-perm은 맞춘 엣지를 뒤에 둡니다.</p>
+        <h3>왜 PLL 후에 옆면이 안 맞나요?</h3>
+        <p>대개 AUF를 빠뜨렸거나, Front를 잘못 잡았거나, A/U 방향을 잘못 쓴 경우입니다. OLL 직후 노란 면 위로 되돌리고 다시 하세요.</p>
       </section>
 
       <footer class="page">
-        <p><a href="../index.html">Back to CFOP</a> · <a href="../oll/index.html">OLL library</a> · <a href="../../../index.html">Cube Lab</a> — play, learn, scan, and solve in the browser. <a href="https://maxmode-now.com/">maxmode-now.com</a></p>
+        <p><a href="../index.html">CFOP으로 돌아가기</a> · <a href="../oll/index.html">OLL 라이브러리</a> · <a href="../../../../index.html">Cube Lab</a> — 브라우저에서 플레이·학습·스캔·풀이. <a href="https://maxmode-now.com/">maxmode-now.com</a></p>
       </footer>
     </article>
   </div>
 
-<script src="../../../vendor/cube.js"></script>
-<script src="../../../pll-cases-data.js"></script>
-<script src="../../../pll-cases.js"></script>
+<script src="../../../../vendor/cube.js"></script>
+<script src="../../../../pll-cases-data.js"></script>
+<script src="../../../../pll-cases.js"></script>
 <script>
 (function () {
   const HEX = { W: '#f0f0f0', Y: '#ffd60a', R: '#e8312a', O: '#ff8c2b', G: '#39c45a', B: '#2563eb', _: '#0d0e12' };
   const FACE_LETTER = { U: 'W', R: 'R', F: 'G', D: 'Y', L: 'O', B: 'B' };
   const P = window.CubePLL;
   const Cube = window.Cube;
-  const CAT_LABEL = Object.fromEntries((P.cats || []).map(c => [c.id, c.en]));
+  const CAT_LABEL = Object.fromEntries((P.cats || []).map(c => [c.id, c.ko || c.en]));
 
   function netFromAlg(alg) {
     if (!Cube || !P) return null;
@@ -404,7 +400,7 @@
   const countEl = document.getElementById('count');
   let filter = 'all';
 
-  const chips = [{ id: 'all', label: 'All' }].concat((P.cats || []).map(c => ({ id: c.id, label: c.en })));
+  const chips = [{ id: 'all', label: '전체' }].concat((P.cats || []).map(c => ({ id: c.id, label: c.ko || c.en })));
   chips.forEach(ch => {
     const b = document.createElement('button');
     b.type = 'button';
@@ -421,7 +417,7 @@
 
   function render() {
     const cases = (P.cases || []).filter(c => filter === 'all' || c.cat === filter);
-    countEl.textContent = cases.length + (filter === 'all' ? ' of 21 cases' : ' in this group');
+    countEl.textContent = cases.length + (filter === 'all' ? '개 케이스' : '개 (이 분류)');
     listEl.innerHTML = '';
     cases.forEach(c => {
       const state = netFromAlg(c.alg);
@@ -431,15 +427,15 @@
       card.innerHTML =
         '<div class="card-head">' +
           '<span class="card-id">' + c.id + '</span>' +
-          '<span class="card-title">' + c.title.en + '</span>' +
+          '<span class="card-title">' + (c.title.ko || c.title.en) + '</span>' +
           '<span class="card-cat">' + (CAT_LABEL[c.cat] || c.cat) + '</span>' +
         '</div>' +
         '<div class="card-body">' +
           (state ? '<div class="diag">' + makeDiagram(state) + '</div>' : '') +
           '<div class="card-meta">' +
             '<code>' + c.alg + '</code>' +
-            '<p class="tips">' + c.tips.en + '</p>' +
-            '<a class="cta" href="../../../index.html?n=3&amp;learn=pll&amp;case=' + encodeURIComponent(c.id) + '">Demo in Cube Lab</a>' +
+            '<p class="tips">' + (c.tips.ko || c.tips.en) + '</p>' +
+            '<a class="cta" href="../../../../index.html?lang=ko&amp;n=3&amp;learn=pll&amp;case=' + encodeURIComponent(c.id) + '">Cube Lab에서 시연</a>' +
           '</div>' +
         '</div>';
       listEl.appendChild(card);

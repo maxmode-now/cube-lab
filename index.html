@@ -850,7 +850,7 @@
         <option value="4" data-i18n="size4">4×4</option>
         <option value="5" data-i18n="size5">5×5</option>
       </select>
-      <span id="app-version" aria-label="Version">v2.4</span>
+      <span id="app-version" aria-label="Version">v2.5</span>
       <button type="button" id="settings-btn" class="btn-icon" aria-label="Settings" aria-expanded="false">⚙</button>
     </div>
   </header>
@@ -1522,6 +1522,14 @@ try {
   const saved = localStorage.getItem('cubeLang');
   if (saved === 'en' || saved === 'ko') lang = saved;
 } catch (e) { /* localStorage 차단 환경 — 기본값 유지 */ }
+try {
+  const urlLang = new URLSearchParams(location.search).get('lang');
+  if (urlLang === 'en' || urlLang === 'ko') {
+    lang = urlLang;
+    try { localStorage.setItem('cubeLang', lang); }
+    catch (e) { /* 저장 불가 — 이 세션에서만 적용 */ }
+  }
+} catch (e) { /* URLSearchParams 불가 — 무시 */ }
 
 let cubeN = 3;
 try {
@@ -3909,6 +3917,10 @@ function applyLang(next) {
   document.querySelectorAll('#lang-switch button').forEach(b => {
     b.classList.toggle('active', b.dataset.lang === lang);
   });
+  const guidesLink = document.querySelector('a.rail-btn[href*="how-to-solve"]');
+  if (guidesLink) {
+    guidesLink.href = lang === 'ko' ? './ko/how-to-solve/index.html' : './how-to-solve/index.html';
+  }
   syncPrefUi();
   syncDiagPalette();
 

@@ -22,13 +22,67 @@
   ]
 }
 </script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Cube solving guides", "item": "https://cube.maxmode-now.com/how-to-solve/index.html" },
+    { "@type": "ListItem", "position": 2, "name": "How to solve a 2×2", "item": "https://cube.maxmode-now.com/how-to-solve-2x2/index.html" }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Is a 2×2 harder or easier than a 3×3?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Fewer pieces, but no centres to aim at — you match corners to each other. Most people finish a first 2×2 faster than a first 3×3."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Why must the white sides match?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "A white face with mixed side colours leaves corners in the wrong seats. Those pieces will fight you on yellow. Match green to green around the first layer."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I know whether to use Sune or Antisune?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Put a familiar case in front, try Sune, AUF, and look again. If the yellow face is worse, undo or try Antisune from another angle. You do not need every case by name yet."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "When should I learn Ortega?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "After you can finish this beginner method without looking up the algorithms. Ortega adds seven OLL and five PBL cases for speed."
+      }
+    }
+  ]
+}
+</script>
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://cube.maxmode-now.com/how-to-solve-2x2/index.html" />
 <meta property="og:title" content="How to Solve a 2×2 Rubik’s Cube (Beginner Method) — Cube Lab" />
 <meta property="og:description" content="Learn a beginner method for the 2×2: white layer, yellow orientation, then permutation. Diagrams and algorithms, with practice in Cube Lab." />
 <meta property="og:image" content="https://cube.maxmode-now.com/docs/play.png" />
 <meta property="og:locale" content="en_US" />
+<meta property="og:locale:alternate" content="ko_KR" />
 <meta name="twitter:card" content="summary_large_image" />
+<link rel="alternate" hreflang="en" href="https://cube.maxmode-now.com/how-to-solve-2x2/index.html" />
+<link rel="alternate" hreflang="ko" href="https://cube.maxmode-now.com/ko/how-to-solve-2x2/index.html" />
+<link rel="alternate" hreflang="x-default" href="https://cube.maxmode-now.com/how-to-solve-2x2/index.html" />
 <link rel="icon" type="image/png" sizes="192x192" href="../icons/icon-192.png" />
 <style>
   :root {
@@ -147,11 +201,21 @@
     nav.toc { position: static; padding-bottom: 8px; }
     nav.toc ol { display: flex; flex-wrap: wrap; gap: 0 14px; padding-left: 0; list-style: none; }
   }
+
+  .lang-switch { display: flex; gap: 8px; align-items: center; font-size: 13px; font-weight: 600; flex: 0 0 auto; }
+  .lang-switch a { color: var(--muted); text-decoration: none; }
+  .lang-switch a:hover { color: var(--text); }
+  .lang-switch a[aria-current="true"] { color: var(--text-strong); }
+
 </style>
 </head>
 <body>
   <header class="top">
     <a class="brand" href="../index.html">Cube Lab</a>
+    <nav class="lang-switch" aria-label="Language">
+      <a href="./index.html" aria-current="true">EN</a>
+      <a href="../ko/how-to-solve-2x2/index.html">한국어</a>
+    </nav>
     <nav class="sizes" aria-label="Written guides">
       <a href="../how-to-solve/index.html">All</a>
       <a href="../how-to-solve-2x2/index.html" aria-current="page">2×2</a>
@@ -170,11 +234,15 @@
       <h2>Steps</h2>
       <ol>
         <li><a href="#start">Before you start</a></li>
+        <li><a href="#why">Why this method</a></li>
         <li><a href="#notation">Notation</a></li>
         <li><a href="#step-1">White layer</a></li>
         <li><a href="#step-2">Yellow orientation</a></li>
         <li><a href="#step-3">Yellow permutation</a></li>
+        <li><a href="#practice">Practice path</a></li>
         <li><a href="#stuck">Stuck?</a></li>
+        <li><a href="#next">After this page</a></li>
+        <li><a href="#faq">FAQ</a></li>
       </ol>
     </nav>
 
@@ -190,7 +258,10 @@
         <li>Keep one solved face as an <b>anchor</b>. Hold it the same way every time you run an algorithm.</li>
       </ul>
       <p class="note"><strong>Hold it the same way every time.</strong> Algorithms assume a face is Front. If you turn the cube in your hands without meaning to, the moves will look wrong.</p>
-      <p>Ready for speed? After your first solve, try <a href="./ortega/index.html">Ortega</a> — same three stages, with 7 OLL + 5 PBL algorithms. Open the <a href="../index.html?n=2&amp;learn=ortega&amp;step=0">Ortega Learn track</a> in Cube Lab.</p>
+
+      <h2 id="why">Why this method</h2>
+      <p>Layer-by-layer is the shortest path to a first 2×2 solve: one insert algorithm for white, two for yellow orientation, two for permutation. Ortega keeps the same three stages but replaces trial-and-error OLL with seven named cases — learn that after this page feels easy.</p>
+      <p>Ready for speed later? Open <a href="./ortega/index.html">Ortega</a> or the <a href="../index.html?n=2&amp;learn=ortega&amp;step=0">Ortega Learn track</a> in Cube Lab.</p>
 
       <h2 id="notation">Notation</h2>
       <p class="goal">Same letters as 3×3 — each letter is a 90° clockwise turn of that face, as if looking straight at it.</p>
@@ -217,7 +288,7 @@
       <p class="note"><strong>Flip the cube over.</strong> White (the layer you just finished) goes on the bottom. Yellow is now up. Keep it that way for the rest of the solve.</p>
       <div class="diag" data-state="2"><span class="diag-cap">Top all yellow — first layer still solved underneath</span></div>
       <p>The yellow stickers on top are usually mixed: some on top, some on the sides. Use <b>Sune</b> and <b>Antisune</b> until every top sticker is yellow.</p>
-      <p>Put a familiar case in front of you, apply one algorithm, then turn U (AUF) and look again. Repeat. You do not need to recognise every case by name — if Sune does not help, try Antisune from another angle.</p>
+      <p>Recognition without names: count how many yellow stickers already sit on U. Put an unoriented corner at front-right, try Sune, then AUF and look again. If the face gets worse, try Antisune from another angle. You do not need every case by name yet — Ortega will name them later.</p>
       <p class="note"><strong>It will look scrambled in between.</strong> The white layer may break and then come back. That is normal. Do not stop mid-algorithm.</p>
       <div class="alg-box">
         <div class="lbl">Sune</div>
@@ -249,11 +320,34 @@
       <a class="cta" href="../index.html?n=2&amp;learn=beginner&amp;step=3">Finish permutation in Cube Lab</a>
       <p class="goal">Opens this step with a solved 2×2 as the goal. Tap ▶ Demo for T-perm / Y-perm.</p>
 
+      <h2 id="practice">Practice path</h2>
+      <ul>
+        <li>White layer only until side colours always match around the face.</li>
+        <li>Add Sune / Antisune untimed; ignore permutation until the top is solid yellow every time.</li>
+        <li>Learn headlights → T-perm, then diagonal → Y-perm; always finish with AUF.</li>
+        <li>When this page needs no lookup, move to <a href="./ortega/index.html">Ortega</a>.</li>
+      </ul>
+
       <h2 id="stuck">Stuck?</h2>
       <p>If a layer you already solved is a mess, you likely rotated the cube mid-algorithm or skipped a hold instruction. Undo to the last stage that still looks like the diagram, then retry that step in the trainer — it will play the moves on a 3D cube.</p>
       <p>If you have a physical cube, you can <a href="../index.html?n=2&amp;learn=scan">scan all six faces</a> in Cube Lab. That opens beginner steps for your cube — the same method as this page. Choose Fast solve if you want a short computer solution instead.</p>
       <p>To stay on this method, open the <a href="../index.html?n=2&amp;learn=beginner&amp;step=1">2×2 beginner lesson</a> in Cube Lab and use ▶ Demo on each step.</p>
       <p>The 3×3 beginner method is the same idea with edges added: <a href="../how-to-solve-3x3/index.html">How to solve a 3×3</a>.</p>
+
+      <h2 id="next">After this page</h2>
+      <p>Learn <a href="./ortega/index.html">Ortega</a> for named OLL and PBL. Then try a <a href="../how-to-solve-3x3/index.html">3×3 beginner</a> solve — the white-corner insert is the same idea with edges added.</p>
+
+      <section id="faq">
+        <h2>FAQ</h2>
+        <h3>Is a 2×2 harder or easier than a 3×3?</h3>
+        <p>Fewer pieces, but no centres to aim at — you match corners to each other. Most people finish a first 2×2 faster than a first 3×3.</p>
+        <h3>Why must the white sides match?</h3>
+        <p>A white face with mixed side colours leaves corners in the wrong seats. Those pieces will fight you on yellow. Match green to green around the first layer.</p>
+        <h3>How do I know whether to use Sune or Antisune?</h3>
+        <p>Put a familiar case in front, try Sune, AUF, and look again. If the yellow face is worse, undo or try Antisune from another angle. You do not need every case by name yet.</p>
+        <h3>When should I learn Ortega?</h3>
+        <p>After you can finish this beginner method without looking up the algorithms. Ortega adds seven OLL and five PBL cases for speed.</p>
+      </section>
 
       <footer class="page">
         <p><a href="../index.html">Cube Lab</a> — play, learn, scan, and solve in the browser. <a href="https://maxmode-now.com/">maxmode-now.com</a></p>

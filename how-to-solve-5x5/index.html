@@ -24,13 +24,67 @@
   ]
 }
 </script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Cube solving guides", "item": "https://cube.maxmode-now.com/how-to-solve/index.html" },
+    { "@type": "ListItem", "position": 2, "name": "How to solve a 5×5", "item": "https://cube.maxmode-now.com/how-to-solve-5x5/index.html" }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Why reduction on 5×5?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Fixed centres tell you each face colour. Build 3×3 centres and triple edges until the puzzle behaves like a 3×3, then finish with the method you already know."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does 5×5 have PLL parity?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Unlike 4×4, you will not get two opposite edges that refuse to swap. You can get OLL parity (one flipped edge) and a fiddly last-two-edges case."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is last two edges?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "When only two edge triples remain, normal pairing breaks centres. Use the dedicated last-two-edges sequence on this page, then continue as a 3×3."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Should I learn 4×4 or 5×5 first?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Either works after 3×3. 5×5 has fixed centres (easier colour map); 4×4 adds PLL parity. Pick the cube you own."
+      }
+    }
+  ]
+}
+</script>
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://cube.maxmode-now.com/how-to-solve-5x5/index.html" />
 <meta property="og:title" content="How to Solve a 5×5 Rubik’s Cube (Reduction Method) — Cube Lab" />
 <meta property="og:description" content="Learn the 5×5 reduction method: 3×3 centres, triple edge pairing, last two edges, then finish as a 3×3. Practise in Cube Lab." />
 <meta property="og:image" content="https://cube.maxmode-now.com/docs/play.png" />
 <meta property="og:locale" content="en_US" />
+<meta property="og:locale:alternate" content="ko_KR" />
 <meta name="twitter:card" content="summary_large_image" />
+<link rel="alternate" hreflang="en" href="https://cube.maxmode-now.com/how-to-solve-5x5/index.html" />
+<link rel="alternate" hreflang="ko" href="https://cube.maxmode-now.com/ko/how-to-solve-5x5/index.html" />
+<link rel="alternate" hreflang="x-default" href="https://cube.maxmode-now.com/how-to-solve-5x5/index.html" />
 <link rel="icon" type="image/png" sizes="192x192" href="../icons/icon-192.png" />
 <style>
   :root {
@@ -137,11 +191,21 @@
     nav.toc { position: static; padding-bottom: 8px; }
     nav.toc ol { display: flex; flex-wrap: wrap; gap: 0 14px; padding-left: 0; list-style: none; }
   }
+
+  .lang-switch { display: flex; gap: 8px; align-items: center; font-size: 13px; font-weight: 600; flex: 0 0 auto; }
+  .lang-switch a { color: var(--muted); text-decoration: none; }
+  .lang-switch a:hover { color: var(--text); }
+  .lang-switch a[aria-current="true"] { color: var(--text-strong); }
+
 </style>
 </head>
 <body>
   <header class="top">
     <a class="brand" href="../index.html">Cube Lab</a>
+    <nav class="lang-switch" aria-label="Language">
+      <a href="./index.html" aria-current="true">EN</a>
+      <a href="../ko/how-to-solve-5x5/index.html">한국어</a>
+    </nav>
     <nav class="sizes" aria-label="Written guides">
       <a href="../how-to-solve/index.html">All</a>
       <a href="../how-to-solve-2x2/index.html">2×2</a>
@@ -156,13 +220,17 @@
       <h2>Steps</h2>
       <ol>
         <li><a href="#start">Before you start</a></li>
+        <li><a href="#why">Why reduction</a></li>
         <li><a href="#notation">Notation</a></li>
         <li><a href="#step-1">Centres</a></li>
         <li><a href="#step-2">Edge pairing</a></li>
         <li><a href="#step-3">Last two edges</a></li>
         <li><a href="#step-4">Solve as 3×3</a></li>
         <li><a href="#step-5">OLL parity</a></li>
+        <li><a href="#practice">Practice path</a></li>
         <li><a href="#stuck">Stuck?</a></li>
+        <li><a href="#next">After this page</a></li>
+        <li><a href="#faq">FAQ</a></li>
       </ol>
     </nav>
 
@@ -178,6 +246,9 @@
         <li>Corners are the same as on a 3×3.</li>
       </ul>
       <p class="note"><strong>No PLL parity.</strong> Unlike a <a href="../how-to-solve-4x4/index.html">4×4</a>, you will not get two opposite edges that refuse to swap. You <em>can</em> get a single flipped edge (OLL parity) and a fiddly last-two-edges case. Both are below.</p>
+
+      <h2 id="why">Why reduction</h2>
+      <p>Odd cubes keep fixed centres, so reduction is natural: build each 3×3 centre around the middle sticker, pair triple edges, then solve like a 3×3. You reuse beginner or CFOP knowledge and only add last-two-edges and OLL parity.</p>
 
       <h2 id="notation">Notation</h2>
       <p class="goal">Outer faces match 3×3. 5×5 adds inner (<b>2R</b>), mid (<b>3R</b>), and wide (<b>Rw</b>, <b>3Rw</b>) slices.</p>
@@ -247,12 +318,34 @@
       <p>Layer → <b>Inner</b> for <b>2R</b> / <b>2L</b>, <b>Outer</b> for U and F. You will not need the 4×4 PLL-parity algorithm on a 5×5.</p>
       <a class="cta" href="../index.html?n=5&amp;learn=beginner&amp;step=5">Watch OLL parity in Cube Lab</a>
 
+      <h2 id="practice">Practice path</h2>
+      <ul>
+        <li>Centres only until every 3×3 block matches its fixed middle.</li>
+        <li>Pair edges until only two triples remain, then drill last-two-edges separately.</li>
+        <li>Solve as a 3×3; when a single edge looks flipped, use OLL parity — do not force 3×3 OLL forever.</li>
+        <li>Compare with <a href="../how-to-solve-4x4/index.html">4×4</a> once one big cube feels comfortable.</li>
+      </ul>
+
       <h2 id="stuck">Stuck?</h2>
       <p>Centres wrong after pairing: you did not undo a <b>Uw</b>. Restore with the inverse slice, then store the pair again.</p>
       <p>A centre 3×3 that is the right colour is solved — the fixed middle cannot be rotated into a wrong colour. If the eight pieces around it are mixed, that centre is not done yet.</p>
       <p>If last-layer algorithms from 3×3 scramble the centres, you used an inner, mid, or wide turn by accident. Stay on <b>Outer</b> until you hit last-two-edges or OLL parity.</p>
       <p>If you have a physical cube, you can <a href="../index.html?n=5&amp;learn=scan">scan all six faces</a> in Cube Lab. That opens Smart Solve, which is a different path from this beginner method.</p>
+
+      <h2 id="next">After this page</h2>
       <p>The even-cube cousin is <a href="../how-to-solve-4x4/index.html">How to solve a 4×4</a> (2×2 centres, two-piece edges, plus PLL parity). Need the 3×3 steps? <a href="../how-to-solve-3x3/index.html">How to solve a 3×3</a>.</p>
+
+      <section id="faq">
+        <h2>FAQ</h2>
+        <h3>Why reduction on 5×5?</h3>
+        <p>Fixed centres tell you each face colour. Build 3×3 centres and triple edges until the puzzle behaves like a 3×3, then finish with the method you already know.</p>
+        <h3>Does 5×5 have PLL parity?</h3>
+        <p>No. Unlike 4×4, you will not get two opposite edges that refuse to swap. You can get OLL parity (one flipped edge) and a fiddly last-two-edges case.</p>
+        <h3>What is last two edges?</h3>
+        <p>When only two edge triples remain, normal pairing breaks centres. Use the dedicated last-two-edges sequence on this page, then continue as a 3×3.</p>
+        <h3>Should I learn 4×4 or 5×5 first?</h3>
+        <p>Either works after 3×3. 5×5 has fixed centres (easier colour map); 4×4 adds PLL parity. Pick the cube you own.</p>
+      </section>
 
       <footer class="page">
         <p><a href="../index.html">Cube Lab</a> — play, learn, scan, and solve in the browser. <a href="https://maxmode-now.com/">maxmode-now.com</a></p>

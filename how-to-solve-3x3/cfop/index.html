@@ -25,13 +25,76 @@
   ]
 }
 </script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Cube solving guides", "item": "https://cube.maxmode-now.com/how-to-solve/index.html" },
+    { "@type": "ListItem", "position": 2, "name": "3×3 beginner", "item": "https://cube.maxmode-now.com/how-to-solve-3x3/index.html" },
+    { "@type": "ListItem", "position": 3, "name": "CFOP", "item": "https://cube.maxmode-now.com/how-to-solve-3x3/cfop/index.html" }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Should I learn CFOP or Roux?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "CFOP is the common speed path: layers, lookahead, and huge learning resources. Roux uses fewer moves and fewer rotations, with an M-slice finish. Try both after beginner; pick the one you enjoy drilling."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do I need full OLL and PLL to use CFOP?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. This page is 4-look last layer: 2-look OLL and 2-look PLL. Full 57 OLL and 21 PLL come later."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How efficient should my cross be?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Aim for about 4–8 moves planned in inspection. Colour-match every white edge to its side centre. A white plus that does not match the sides is not finished."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "When should I memorise F2L algorithms?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "After the three basic inserts feel automatic. Use the F2L library for cases you keep fumbling; stay intuitive for easy pairs."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the practice order for CFOP?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Cross under 8 moves, then intuitive F2L, then 2-look OLL, then 2-look PLL. Timed full solves come after each stage is comfortable untimed."
+      }
+    }
+  ]
+}
+</script>
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://cube.maxmode-now.com/how-to-solve-3x3/cfop/index.html" />
 <meta property="og:title" content="How to Solve a 3×3 with CFOP (4-Look Last Layer) — Cube Lab" />
 <meta property="og:description" content="Learn CFOP for the 3×3: Cross, F2L, then 4-look last layer (2-look OLL and 2-look PLL). Diagrams and algorithms, with practice in Cube Lab." />
 <meta property="og:image" content="https://cube.maxmode-now.com/docs/play.png" />
 <meta property="og:locale" content="en_US" />
+<meta property="og:locale:alternate" content="ko_KR" />
 <meta name="twitter:card" content="summary_large_image" />
+<link rel="alternate" hreflang="en" href="https://cube.maxmode-now.com/how-to-solve-3x3/cfop/index.html" />
+<link rel="alternate" hreflang="ko" href="https://cube.maxmode-now.com/ko/how-to-solve-3x3/cfop/index.html" />
+<link rel="alternate" hreflang="x-default" href="https://cube.maxmode-now.com/how-to-solve-3x3/cfop/index.html" />
 <link rel="icon" type="image/png" sizes="192x192" href="../../icons/icon-192.png" />
 <style>
   :root {
@@ -150,11 +213,21 @@
     nav.toc { position: static; padding-bottom: 8px; }
     nav.toc ol { display: flex; flex-wrap: wrap; gap: 0 14px; padding-left: 0; list-style: none; }
   }
+
+  .lang-switch { display: flex; gap: 8px; align-items: center; font-size: 13px; font-weight: 600; flex: 0 0 auto; }
+  .lang-switch a { color: var(--muted); text-decoration: none; }
+  .lang-switch a:hover { color: var(--text); }
+  .lang-switch a[aria-current="true"] { color: var(--text-strong); }
+
 </style>
 </head>
 <body>
   <header class="top">
     <a class="brand" href="../../index.html">Cube Lab</a>
+    <nav class="lang-switch" aria-label="Language">
+      <a href="./index.html" aria-current="true">EN</a>
+      <a href="../../ko/how-to-solve-3x3/cfop/index.html">한국어</a>
+    </nav>
     <nav class="sizes" aria-label="Written guides">
       <a href="../../how-to-solve/index.html">All</a>
       <a href="../../how-to-solve-2x2/index.html">2×2</a>
@@ -174,6 +247,7 @@
       <h2>Steps</h2>
       <ol>
         <li><a href="#start">Before you start</a></li>
+        <li><a href="#why">Why CFOP</a></li>
         <li><a href="#overview">CFOP overview</a></li>
         <li><a href="#step-1">Cross</a></li>
         <li><a href="#step-2">F2L</a></li>
@@ -181,7 +255,10 @@
         <li><a href="#step-4">OLL · yellow corners</a></li>
         <li><a href="#step-5">PLL · corners</a></li>
         <li><a href="#step-6">PLL · edges</a></li>
+        <li><a href="#practice">Practice path</a></li>
         <li><a href="#stuck">Stuck?</a></li>
+        <li><a href="#next">After this page</a></li>
+        <li><a href="#faq">FAQ</a></li>
       </ol>
     </nav>
 
@@ -190,9 +267,13 @@
       <p class="lede">The standard speedcubing method: Cross, F2L, OLL, PLL. This page is the entry-level 4-look last layer — few algorithms, then practise each step in Cube Lab.</p>
 
       <h2 id="start">Before you start</h2>
-      <p>If you cannot yet solve a 3×3, use the <a href="../../how-to-solve-3x3/index.html">beginner method</a> first. CFOP is the same cube with fewer moves once that recipe feels easy.</p>
+      <p>If you cannot yet solve a 3×3, use the <a href="../../how-to-solve-3x3/index.html">beginner method</a> first. CFOP is the same cube with fewer moves once that recipe feels easy. Notation: <a href="../../how-to-solve/notation/index.html">cube notation reference</a>.</p>
       <p>Hold white on the <b>bottom</b> after the cross (unlike the beginner pages, which build white on top). Algorithms still assume a face is Front — do not turn the cube in your hands mid-algorithm.</p>
       <p class="note"><strong>4-look last layer, not full CFOP.</strong> Full OLL is 57 cases and full PLL is 21. Here you split OLL into two looks and PLL into two looks, so you only need a handful of algorithms.</p>
+
+      <h2 id="why">Why CFOP</h2>
+      <p>CFOP is the mainstream speed path: layers, strong lookahead, and the largest set of tutorials and case libraries. Prefer blocks, fewer rotations, and an M-slice finish? Compare with <a href="../roux/index.html#overview">Roux</a> (that page has a side-by-side table).</p>
+      <p>Most cubers learn CFOP after beginner because Cross and F2L reuse the same white-first intuition, then swap the slow beginner last layer for 4-look OLL/PLL.</p>
 
       <h2 id="overview">CFOP overview</h2>
       <p class="goal">Fewer moves, faster times — four stages: Cross · F2L · OLL · PLL.</p>
@@ -201,17 +282,18 @@
       <a class="cta" href="../../index.html?n=3&amp;learn=cfop&amp;step=0">Watch the CFOP overview in Cube Lab</a>
 
       <h2 id="step-1">1 · Cross — efficiently</h2>
-      <p class="goal">Build the bottom white cross in about 4–7 moves by planning ahead.</p>
+      <p class="goal">Build the bottom white cross in about 4–8 moves by planning ahead during inspection.</p>
       <div class="diag" data-state="1"><span class="diag-cap">White cross matching the side centres</span></div>
-      <p>Same white cross as the beginner method, but instead of one edge at a time you plan the whole route during inspection. Trace all four cross edges in your head. There is no set algorithm — intuition plus practice.</p>
-      <p>Most solvers then flip the cube so white stays on the <b>bottom</b> for F2L and the last layer.</p>
+      <p>Same white cross as the beginner method, but you plan the whole route before the timer starts. Trace all four white edges in your head: where each sits, which face turn brings it to D, and whether the side colour already matches.</p>
+      <p>A white plus that does not match the side centres is not finished — those edges will fight F2L. Prefer placing edges so their second colour lines up with the centre; daisy-on-top then flip to D is fine while learning, but aim for direct inserts as you get faster.</p>
+      <p>Most solvers then keep white on the <b>bottom</b> for F2L and the last layer. There is no set algorithm — inspection plus practice.</p>
       <a class="cta" href="../../index.html?n=3&amp;learn=cfop&amp;step=1">Practise the cross in Cube Lab</a>
 
       <h2 id="step-2">2 · F2L — pairing corner + edge</h2>
       <p class="goal">Insert the first two layers by pairing a corner and edge and placing them together.</p>
       <div class="diag" data-state="3"><span class="diag-cap">First two layers done — white on the bottom</span></div>
-      <p>The beginner method inserts corners, then middle-layer edges, separately. F2L builds a <b>corner+edge pair</b> and drops both into a slot at once.</p>
-      <p>The basic case: the pair is split in the top layer and the slot is empty. Algorithms below assume the <b>front-right</b> slot. Mirror them left or right depending on where the pair sits.</p>
+      <p>The beginner method inserts corners, then middle-layer edges, separately. F2L builds a <b>corner+edge pair</b> and drops both into a slot at once — fewer moves, and you start looking at the next pair while the current one finishes.</p>
+      <p>The basic case: the pair is split in the top layer and the slot is empty. Algorithms below assume the <b>front-right</b> slot. Mirror them left or right depending on where the pair sits. AUF (U turns) to set up; do not rotate the whole cube mid-insert.</p>
       <div class="alg-box">
         <div class="lbl">Insert into the right slot</div>
         <code>U R U' R'</code>
@@ -225,7 +307,7 @@
         <code>U' F' U F</code>
       </div>
       <a class="cta" href="../../index.html?n=3&amp;learn=cfop&amp;step=2">Watch F2L inserts in Cube Lab</a>
-      <p>When the three basic inserts feel easy, use the <a href="./f2l/index.html">F2L case library</a> for all 41 front-right cases, grouped like the intuitive ideas above.</p>
+      <p>When the three basic inserts feel easy, use the <a href="./f2l/index.html">F2L case library</a> for recognition ideas and all 41 front-right cases — learning order and FAQ live there.</p>
 
       <h2 id="step-3">3 · OLL ① — yellow cross</h2>
       <p class="goal">Get a yellow + on top (orient the edges). Side colours do not matter yet.</p>
@@ -281,9 +363,34 @@
       <a class="cta" href="../../index.html?n=3&amp;learn=cfop&amp;step=6">Finish the last edges in Cube Lab</a>
       <p>Need a focused drill page? The <a href="./pll/index.html">PLL library</a> covers 2-Look PLL and the full 21-case set.</p>
 
+      <h2 id="practice">Practice path</h2>
+      <ul>
+        <li>Cross only: scramble, inspect, solve white cross under ~8 moves; ignore the rest.</li>
+        <li>Add F2L with the three basic inserts; pause to name the pair before you turn.</li>
+        <li>Add 2-look OLL, then 2-look PLL — untimed full solves until the holds are automatic.</li>
+        <li>Timed solves once 4-look last layer needs no lookup. Then deepen with the <a href="./f2l/index.html">F2L</a>, <a href="./oll/index.html">OLL</a>, and <a href="./pll/index.html">PLL</a> libraries.</li>
+      </ul>
+
       <h2 id="stuck">Stuck?</h2>
       <p>If a layer you already solved is a mess, you likely rotated the cube mid-algorithm. Undo to the last stage that still looks like the diagram, then retry that step in the trainer.</p>
       <p>Need the first-solve recipe instead? <a href="../../how-to-solve-3x3/index.html">How to solve a 3×3 (beginner)</a>. Prefer blocks and M-slice flow? <a href="../../how-to-solve-3x3/roux/index.html">Roux</a>. Physical cube colours do not match? <a href="../../index.html?n=3&amp;learn=scan">Scan all six faces</a> in Cube Lab — that opens beginner steps or Fast solve, not CFOP.</p>
+
+      <h2 id="next">After this page</h2>
+      <p>When 4-look last layer is comfortable, add cases from the libraries: F2L first (biggest time save), then full PLL, then full OLL. Colour neutrality on the cross (any colour as D) comes later.</p>
+
+      <section id="faq">
+        <h2>FAQ</h2>
+        <h3>Should I learn CFOP or Roux?</h3>
+        <p>CFOP is the common speed path: layers, lookahead, and huge learning resources. Roux uses fewer moves and fewer rotations, with an M-slice finish. Try both after beginner; pick the one you enjoy drilling. Side-by-side: <a href="../roux/index.html#overview">Roux overview</a>.</p>
+        <h3>Do I need full OLL and PLL to use CFOP?</h3>
+        <p>No. This page is 4-look last layer: 2-look OLL and 2-look PLL. Full 57 OLL and 21 PLL come later.</p>
+        <h3>How efficient should my cross be?</h3>
+        <p>Aim for about 4–8 moves planned in inspection. Colour-match every white edge to its side centre. A white plus that does not match the sides is not finished.</p>
+        <h3>When should I memorise F2L algorithms?</h3>
+        <p>After the three basic inserts feel automatic. Use the <a href="./f2l/index.html">F2L library</a> for cases you keep fumbling; stay intuitive for easy pairs.</p>
+        <h3>What is the practice order for CFOP?</h3>
+        <p>Cross under 8 moves, then intuitive F2L, then 2-look OLL, then 2-look PLL. Timed full solves come after each stage is comfortable untimed.</p>
+      </section>
 
       <footer class="page">
         <p><a href="../../index.html">Cube Lab</a> — play, learn, scan, and solve in the browser. <a href="https://maxmode-now.com/">maxmode-now.com</a></p>

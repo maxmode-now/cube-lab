@@ -20,13 +20,67 @@
   }
 }
 </script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Cube solving guides", "item": "https://cube.maxmode-now.com/how-to-solve/index.html" },
+    { "@type": "ListItem", "position": 2, "name": "Cube notation", "item": "https://cube.maxmode-now.com/how-to-solve/notation/index.html" }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What does a prime (') mean?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Counter-clockwise 90° looking at that face. R' turns the right face the other way from R."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the difference between M and x?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "M turns only the middle slice between L and R. x rotates the whole cube on the same axis as R — every layer moves."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is a wide turn?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Rw (or lowercase r in some Roux writing) turns the outer face plus the adjacent slice. On 3×3 that is R plus M′; on 4×4+ it is outer plus inner."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Where is this notation used in the guides?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Every how-to page links here. Beginner and CFOP use U–B and primes; Roux adds M and wide r; 4×4/5×5 add inner, wide, and mid layers."
+      }
+    }
+  ]
+}
+</script>
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://cube.maxmode-now.com/how-to-solve/notation/index.html" />
 <meta property="og:title" content="Cube Notation Reference — U, M, wide, x/y/z | Cube Lab" />
 <meta property="og:description" content="WCA-style cube notation: face turns U–B, prime and half turns, M/E/S slices, wide and big-cube slices, and x/y/z rotations — with Cube Lab controls." />
 <meta property="og:image" content="https://cube.maxmode-now.com/docs/play.png" />
 <meta property="og:locale" content="en_US" />
+<meta property="og:locale:alternate" content="ko_KR" />
 <meta name="twitter:card" content="summary_large_image" />
+<link rel="alternate" hreflang="en" href="https://cube.maxmode-now.com/how-to-solve/notation/index.html" />
+<link rel="alternate" hreflang="ko" href="https://cube.maxmode-now.com/ko/how-to-solve/notation/index.html" />
+<link rel="alternate" hreflang="x-default" href="https://cube.maxmode-now.com/how-to-solve/notation/index.html" />
 <link rel="icon" type="image/png" sizes="192x192" href="../../icons/icon-192.png" />
 <style>
   :root {
@@ -158,11 +212,21 @@
     nav.toc { position: static; padding-bottom: 8px; }
     nav.toc ol { display: flex; flex-wrap: wrap; gap: 0 14px; padding-left: 0; list-style: none; }
   }
+
+  .lang-switch { display: flex; gap: 8px; align-items: center; font-size: 13px; font-weight: 600; flex: 0 0 auto; }
+  .lang-switch a { color: var(--muted); text-decoration: none; }
+  .lang-switch a:hover { color: var(--text); }
+  .lang-switch a[aria-current="true"] { color: var(--text-strong); }
+
 </style>
 </head>
 <body>
   <header class="top">
     <a class="brand" href="../../index.html">Cube Lab</a>
+    <nav class="lang-switch" aria-label="Language">
+      <a href="./index.html" aria-current="true">EN</a>
+      <a href="../../ko/how-to-solve/notation/index.html">한국어</a>
+    </nav>
     <nav class="sizes" aria-label="Written guides">
       <a href="../index.html">All</a>
       <a href="./index.html" aria-current="page">Notation</a>
@@ -177,11 +241,13 @@
         <li><a href="#suffix">Prime &amp; half</a></li>
         <li><a href="#hold">How to hold</a></li>
         <li><a href="#examples">Examples</a></li>
+        <li><a href="#where">Where this shows up</a></li>
         <li><a href="#mslice">M E S</a></li>
         <li><a href="#wide">Wide turns</a></li>
         <li><a href="#bigcube">Big cubes</a></li>
         <li><a href="#rotation">x y z</a></li>
         <li><a href="#cubelab">Cube Lab</a></li>
+        <li><a href="#faq">FAQ</a></li>
       </ol>
     </nav>
 
@@ -231,7 +297,23 @@
         <div class="lbl">Short trigger (right → up → undo → undo)</div>
         <code>R U R' U'</code>
       </div>
+      <div class="alg-box">
+        <div class="lbl">Sune — common OLL / CMLL orient</div>
+        <code>R U R' U R U2 R'</code>
+      </div>
+      <div class="alg-box">
+        <div class="lbl">Sexy move then M2 — Roux LSE flavour</div>
+        <code>R U R' U' M2</code>
+      </div>
       <a class="cta" href="../../index.html?learn=beginner&amp;step=0">Watch notation in Cube Lab</a>
+
+      <h2 id="where">Where this shows up</h2>
+      <ul>
+        <li><a href="../../how-to-solve-3x3/index.html">3×3 beginner</a> and <a href="../../how-to-solve-2x2/index.html">2×2 beginner</a> — face turns, primes, half turns.</li>
+        <li><a href="../../how-to-solve-3x3/cfop/index.html">CFOP</a> and its <a href="../../how-to-solve-3x3/cfop/f2l/index.html">F2L</a> / <a href="../../how-to-solve-3x3/cfop/oll/index.html">OLL</a> / <a href="../../how-to-solve-3x3/cfop/pll/index.html">PLL</a> libraries — same letters; PLL H-perm uses <b>M</b>.</li>
+        <li><a href="../../how-to-solve-3x3/roux/index.html">Roux</a> — <b>M</b>, wide <b>r</b> / <b>Rw</b>, and LSE with M + U.</li>
+        <li><a href="../../how-to-solve-4x4/index.html">4×4</a> / <a href="../../how-to-solve-5x5/index.html">5×5</a> — inner <b>2R</b>, wide <b>Rw</b>, mid <b>3R</b> on 5×5.</li>
+      </ul>
 
       <h2 id="mslice">M, E, and S slices <span class="tag">3×3</span></h2>
       <p class="goal">Middle slices between opposite faces. Each turns the same way as its reference face.</p>
@@ -302,6 +384,18 @@
         </table>
       </div>
       <p>Back to the <a href="../index.html">guide hub</a> for 2×2–5×5 solving methods, CFOP, and Roux.</p>
+
+      <section id="faq">
+        <h2>FAQ</h2>
+        <h3>What does a prime (') mean?</h3>
+        <p>Counter-clockwise 90° looking at that face. <code>R'</code> turns the right face the other way from <code>R</code>.</p>
+        <h3>What is the difference between M and x?</h3>
+        <p><b>M</b> turns only the middle slice between L and R. <b>x</b> rotates the whole cube on the same axis as R — every layer moves.</p>
+        <h3>What is a wide turn?</h3>
+        <p><code>Rw</code> (or lowercase <code>r</code> in some Roux writing) turns the outer face plus the adjacent slice. On 3×3 that is R plus M′; on 4×4+ it is outer plus inner.</p>
+        <h3>Where is this notation used in the guides?</h3>
+        <p>Every how-to page links here. Beginner and CFOP use U–B and primes; Roux adds M and wide r; 4×4/5×5 add inner, wide, and mid layers.</p>
+      </section>
 
       <footer class="page">
         <p><a href="../../index.html">Cube Lab</a> — play, learn, scan, and solve in the browser. <a href="https://maxmode-now.com/">maxmode-now.com</a></p>
