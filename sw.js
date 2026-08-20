@@ -1,5 +1,5 @@
-const STATIC = 'cube-static-v2.5';
-const RUNTIME = 'cube-runtime-v2.5';
+const STATIC = 'cube-static-v2.6';
+const RUNTIME = 'cube-runtime-v2.6';
 
 const PRECACHE = [
   './index.html',
@@ -29,6 +29,11 @@ function isCdn(url) {
     || url.hostname.endsWith('.unpkg.com')
     || url.hostname === 'cdn.jsdelivr.net'
     || url.hostname.endsWith('.jsdelivr.net');
+}
+
+function looksLikeHtml(res) {
+  const ctype = (res.headers.get('content-type') || '').toLowerCase();
+  return ctype.includes('text/html');
 }
 
 self.addEventListener('install', event => {
@@ -80,15 +85,24 @@ self.addEventListener('fetch', event => {
   const local = url.origin === self.location.origin;
   if (!local && !isCdn(url)) return;
 
-  event.respondWith(
-    caches.match(req).then(hit => {
-      if (hit) return hit;
-      return fetch(req).then(res => {
-        if (!res.ok) return res;
-        const copy = res.clone();
-        caches.open(local ? STATIC : RUNTIME).then(cache => cache.put(req, copy));
-        return res;
-      });
-    })
-  );
+  event.respondWith((async () => {
+    const hit = await caches.match(req);
+    if (hit) {
+      const cachedType = hit.headers.get('content-type') || '';
+      if (/\.(js|mjs|css|json)$/i.test(url.pathname) && cachedType.includes('text/html')) {
+        const cache = await caches.open(local ? STATIC : RUNTIME);
+        await cache.delete(req);
+      } else {
+        return hit;
+      }
+    }
+    const res = await fetch(req);
+    if (!res.ok) return res;
+    if (looksLikeHtml(res) && /\.(js|mjs|css|json)$/i.test(url.pathname)) {
+      return res; // do not cache HTML stand-ins for assets
+    }
+    const cache = await caches.open(local ? STATIC : RUNTIME);
+    cache.put(req, res.clone());
+    return res;
+  })());
 });

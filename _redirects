@@ -1,0 +1,7 @@
+# Cloudflare Pages: do NOT SPA-fallback the whole site to /index.html.
+# Missing /ko/* must 404 (or serve real guide HTML), never the app shell —
+# otherwise relative *.js requests return HTML and throw:
+#   Uncaught SyntaxError: Unexpected token '<'
+#
+# Keep this file so a Pages "SPA" preset does not reintroduce a catch-all.
+# (No /* /index.html 200 rule on purpose.)

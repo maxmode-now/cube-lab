@@ -5,6 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <script>
 (function () {
+  // SPA hosts that fall back to this app for missing /ko/* would load
+  // relative *.js as HTML → "Unexpected token '<'". Send those URLs to the
+  // deployed GitHub Pages mirror until the custom-domain origin has /ko/.
+  var path = location.pathname || '';
+  if (path === '/ko' || path.indexOf('/ko/') === 0) {
+    location.replace('https://maxmode-now.github.io/cube-lab' + path + location.search + location.hash);
+    return;
+  }
   var root = document.documentElement;
   function standalone() {
     return window.navigator.standalone === true
@@ -850,7 +858,7 @@
         <option value="4" data-i18n="size4">4×4</option>
         <option value="5" data-i18n="size5">5×5</option>
       </select>
-      <span id="app-version" aria-label="Version">v2.5</span>
+      <span id="app-version" aria-label="Version">v2.6</span>
       <button type="button" id="settings-btn" class="btn-icon" aria-label="Settings" aria-expanded="false">⚙</button>
     </div>
   </header>
