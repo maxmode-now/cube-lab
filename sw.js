@@ -1,5 +1,5 @@
-const STATIC = 'cube-static-v3.0';
-const RUNTIME = 'cube-runtime-v3.0';
+const STATIC = 'cube-static-v3.1';
+const RUNTIME = 'cube-runtime-v3.1';
 
 const PRECACHE = [
   './index.html',
@@ -20,6 +20,7 @@ const PRECACHE = [
   './solver-worker.js',
   './vendor/cube.js',
   './vendor/solve.js',
+  './icons/favicon.ico',
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/apple-touch-icon.png',
