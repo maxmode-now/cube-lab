@@ -441,6 +441,22 @@
     background: var(--accent); color: var(--on-accent); border-color: var(--accent);
   }
   #times-empty { color: var(--muted); font-size: var(--fs-sm); text-align: center; padding: 16px 0; margin: 0; }
+  #times-summary {
+    display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: baseline;
+    padding: 10px var(--pad-panel) 8px; border-bottom: 1px solid var(--border);
+    font-size: var(--fs-xs); font-weight: 600; color: var(--muted);
+  }
+  #times-summary strong { color: var(--text); font-weight: 700; }
+  #play-share {
+    pointer-events: auto; display: none; margin-top: 6px;
+    min-height: var(--h-ctl-sm); padding: 0 12px; width: auto;
+    font-size: var(--fs-xs); font-weight: 700;
+  }
+  #shell[data-mode="play"] #play-hud.has-scramble #play-share { display: inline-flex; }
+  #drill-mode { margin-bottom: 10px; }
+  #drill-due {
+    margin: 8px 0 0; font-size: var(--fs-xs); font-weight: 600; color: var(--muted);
+  }
   #stats .stat.inspect-warn b { color: var(--warn); }
   #stats .stat.inspect-late b { color: #ff9f0a; }
   #stats .stat.inspect-plus2 b,
@@ -858,7 +874,7 @@
         <option value="4" data-i18n="size4">4×4</option>
         <option value="5" data-i18n="size5">5×5</option>
       </select>
-      <span id="app-version" aria-label="Version">v2.6</span>
+      <span id="app-version" aria-label="Version">v2.7</span>
       <button type="button" id="settings-btn" class="btn-icon" aria-label="Settings" aria-expanded="false">⚙</button>
     </div>
   </header>
@@ -884,13 +900,16 @@
         <span id="play-ao5">ao5 —</span>
         <span id="play-ao12">ao12 —</span>
         <span id="play-pb">PB —</span>
+        <span id="play-today">today —</span>
       </button>
+      <button type="button" id="play-share" class="btn-sm" data-i18n="shareScramble">Copy link</button>
     </div>
     <aside id="times-sheet" aria-label="Session times">
       <div class="sheet-head" style="padding: var(--pad-panel); border-bottom: 1px solid var(--border);">
         <h2 data-i18n="session" style="font-size: var(--fs-md); margin: 0;">Session</h2>
         <button type="button" id="times-close" class="btn-icon" aria-label="Close">✕</button>
       </div>
+      <div id="times-summary" hidden></div>
       <div id="times-body"></div>
     </aside>
     <aside id="moves-sheet" aria-label="Moves">
@@ -969,6 +988,7 @@
           <button type="button" id="open-oll" class="n3-only" data-i18n="openOll">🌕 OLL library</button>
           <button type="button" id="open-pll" class="n3-only" data-i18n="openPll">🔄 PLL library</button>
           <button type="button" id="open-drill" class="n23-only" data-i18n="openDrill">🎯 Case drill</button>
+          <button type="button" id="open-review" class="n23-only" data-i18n="openReview">🔁 Review due cases</button>
           <button type="button" id="open-roux" class="n3-only" data-i18n="openRoux">🧱 Blocks (Roux)</button>
           <button type="button" id="detect-stage" class="n3-only" data-i18n="detectStage">🎯 Find My Step (Beginner)</button>
         </div>
@@ -990,6 +1010,10 @@
       </div>
 
       <div id="drill">
+        <div id="drill-mode" class="seg" role="tablist" aria-label="Drill mode">
+          <button type="button" data-drill-mode="all" class="active" data-i18n="drillModeAll">All cases</button>
+          <button type="button" data-drill-mode="review" data-i18n="drillModeReview">Review</button>
+        </div>
         <div id="drill-sets" class="seg" role="tablist" aria-label="Drill set">
           <button type="button" class="n2-only" data-set="ortega" data-i18n="drillOrtegaAll">All</button>
           <button type="button" class="n2-only" data-set="ortega-oll" data-i18n="drillOrtegaOll">OLL</button>
@@ -999,6 +1023,7 @@
           <button type="button" class="n3-only" data-set="pll" data-i18n="drillPll">PLL</button>
         </div>
         <p id="drill-hint" data-i18n="drillHint">Read the case. Solve it. If the top is twisted, finish with U.</p>
+        <p id="drill-due" hidden></p>
       </div>
 
       <div id="solver">
@@ -1121,6 +1146,14 @@
         <button type="button" data-inspection="off" data-i18n="inspectionOff">Off</button>
       </div>
 
+      <div class="label" data-i18n="dailyGoalLabel">Daily goal</div>
+      <div id="goal-switch" class="seg" role="group" aria-label="Daily goal">
+        <button type="button" data-goal="0" data-i18n="dailyGoalOff">Off</button>
+        <button type="button" data-goal="25">25</button>
+        <button type="button" data-goal="50" class="active">50</button>
+        <button type="button" data-goal="100">100</button>
+      </div>
+
       <div class="label" data-i18n="langLabel">Language</div>
       <div id="lang-switch" class="seg" role="group" aria-label="Language">
         <button type="button" data-lang="en">EN</button>
@@ -1219,6 +1252,7 @@
 <script src="cube-math.js"></script>
 <script src="cube-engine.js"></script>
 <script src="cube-timer.js"></script>
+<script src="cube-review.js"></script>
 <script src="cube-scan.js"></script>
 <script src="f2l-cases.js"></script>
 <script src="oll-cases-data.js"></script>
@@ -1251,7 +1285,7 @@ const I18N = {
     turnFace: 'Turn a face', ccwHint: "Shift+click or key = counter-clockwise (′)",
     scramble: 'Scramble', undo: 'Undo', reset: 'Reset',
     unitSec: 's', unitMoves: ' moves',
-    openTut: '📖 Tutorial (Beginner)', openOrtega: '⚡ Speed (Ortega)', openCfop: '⚡ Speed (CFOP / 4-look)', openF2l: '🧩 F2L cases', openOll: '🌕 OLL library', openPll: '🔄 PLL library', openDrill: '🎯 Case drill', openRoux: '🧱 Blocks (Roux)',
+    openTut: '📖 Tutorial (Beginner)', openOrtega: '⚡ Speed (Ortega)', openCfop: '⚡ Speed (CFOP / 4-look)', openF2l: '🧩 F2L cases', openOll: '🌕 OLL library', openPll: '🔄 PLL library', openDrill: '🎯 Case drill', openReview: '🔁 Review due cases', openRoux: '🧱 Blocks (Roux)',
     openSolver: '🧠 Smart Solve', detectStage: '🎯 Find My Step (Beginner)',
     analyzing: 'Analyzing the current cube…',
     solveNext: '▶ Next move', solveAll: '⏭ Solve all',
@@ -1292,7 +1326,19 @@ const I18N = {
     drillOrtegaAll: 'All', drillOrtegaOll: 'OLL', drillOrtegaPbl: 'PBL',
     drillRetry: 'Retry', drillSkip: 'Skip',
     drillHint: 'Read the case. Solve it. If the top is twisted, finish with U.',
+    drillModeAll: 'All cases', drillModeReview: 'Review',
+    drillDue: n => `${n} due`,
+    drillReviewEmpty: 'No due cases yet — drill normally, then review skips and hard cases here.',
     drillSolved: name => `${name} — next`,
+    shareScramble: 'Copy link',
+    shareCopied: 'Link copied',
+    shareFailed: 'Could not copy link',
+    dailyGoalLabel: 'Daily goal',
+    dailyGoalOff: 'Off',
+    todayLabel: 'today',
+    todayGoal: (n, g) => `today ${n}/${g}`,
+    todayCount: n => `today ${n}`,
+    todayMean: avg => `avg ${avg}`,
     trackBeginner: 'Solving the Cube — Beginner Method',
     trackBeginner2: 'Solving the 2×2 — Beginner',
     trackOrtega: 'Speed — 2×2 Ortega',
@@ -1390,7 +1436,7 @@ const I18N = {
     turnFace: '면 돌리기', ccwHint: 'Shift+클릭 또는 키 = 반시계(′)',
     scramble: '섞기', undo: '되돌리기', reset: '리셋',
     unitSec: '초', unitMoves: '수',
-    openTut: '📖 튜토리얼 (초보자법)', openOrtega: '⚡ 속도 (Ortega)', openCfop: '⚡ 효율 (CFOP / 4-look)', openF2l: '🧩 F2L 케이스', openOll: '🌕 OLL 라이브러리', openPll: '🔄 PLL 라이브러리', openDrill: '🎯 케이스 드릴', openRoux: '🧱 블록 (Roux)',
+    openTut: '📖 튜토리얼 (초보자법)', openOrtega: '⚡ 속도 (Ortega)', openCfop: '⚡ 효율 (CFOP / 4-look)', openF2l: '🧩 F2L 케이스', openOll: '🌕 OLL 라이브러리', openPll: '🔄 PLL 라이브러리', openDrill: '🎯 케이스 드릴', openReview: '🔁 복습할 케이스', openRoux: '🧱 블록 (Roux)',
     openSolver: '🧠 스마트 풀이', detectStage: '🎯 내 단계 찾기 (초보자법)',
     analyzing: '현재 큐브를 분석합니다…',
     solveNext: '▶ 다음 한 수', solveAll: '⏭ 전체 풀기',
@@ -1431,7 +1477,19 @@ const I18N = {
     drillOrtegaAll: '전체', drillOrtegaOll: 'OLL', drillOrtegaPbl: 'PBL',
     drillRetry: '다시', drillSkip: '건너뛰기',
     drillHint: '케이스를 읽고 맞추세요. 맨 위가 비뚤면 U로 마무리하세요.',
+    drillModeAll: '전체', drillModeReview: '복습',
+    drillDue: n => `${n}개 남음`,
+    drillReviewEmpty: '복습할 케이스가 아직 없습니다. 드릴에서 풀거나 건너뛴 케이스가 여기 모입니다.',
     drillSolved: name => `${name} — 다음`,
+    shareScramble: '링크 복사',
+    shareCopied: '링크를 복사했습니다',
+    shareFailed: '링크를 복사하지 못했습니다',
+    dailyGoalLabel: '오늘 목표',
+    dailyGoalOff: '끄기',
+    todayLabel: '오늘',
+    todayGoal: (n, g) => `오늘 ${n}/${g}`,
+    todayCount: n => `오늘 ${n}`,
+    todayMean: avg => `평균 ${avg}`,
     trackBeginner: '큐브 맞추기 — 초보자법',
     trackBeginner2: '2×2 맞추기 — 초보자법',
     trackOrtega: '속도 — 2×2 Ortega',
@@ -1582,17 +1640,22 @@ function requireN3(label) {
 }
 
 const T = globalThis.CubeTimer;
+const R = globalThis.CubeReview;
 const playHud = document.getElementById('play-hud');
 const playScrEl = document.getElementById('play-scramble');
 const playAvgsBtn = document.getElementById('play-avgs');
 const playAo5El = document.getElementById('play-ao5');
 const playAo12El = document.getElementById('play-ao12');
 const playPbEl = document.getElementById('play-pb');
+const playTodayEl = document.getElementById('play-today');
+const playShareBtn = document.getElementById('play-share');
 const timesSheet = document.getElementById('times-sheet');
 const timesBody = document.getElementById('times-body');
+const timesSummary = document.getElementById('times-summary');
 const movesSheet = document.getElementById('moves-sheet');
 const movesBtn = document.getElementById('moves-btn');
 let movesOpen = false;
+let drillReviewMode = false;
 const timerStat = document.querySelector('#stats .stat');
 const timerUnit = timerStat ? timerStat.querySelector('[data-i18n="unitSec"]') : null;
 
@@ -1686,9 +1749,26 @@ function renderPlayHud() {
   playAo5El.textContent = t('ao5') + ' ' + T.formatAvg(s.ao5);
   playAo12El.textContent = t('ao12') + ' ' + T.formatAvg(s.ao12);
   playPbEl.textContent = t('pb') + ' ' + T.formatAvg(s.pb);
+  const day = T.dailyStats(engine.n);
+  const goal = T.getDailyGoal();
+  if (playTodayEl) {
+    playTodayEl.textContent = goal > 0
+      ? t('todayGoal')(day.count, goal)
+      : t('todayCount')(day.count);
+  }
 }
 
 function renderTimesSheet() {
+  const day = T.dailyStats(engine.n);
+  const goal = T.getDailyGoal();
+  if (timesSummary) {
+    const bits = [
+      '<span>' + (goal > 0 ? t('todayGoal')(day.count, goal) : t('todayCount')(day.count)) + '</span>',
+    ];
+    if (day.mean != null) bits.push('<span>' + t('todayMean')(T.formatAvg(day.mean)) + '</span>');
+    timesSummary.innerHTML = bits.join('');
+    timesSummary.hidden = false;
+  }
   const list = T.times(engine.n);
   if (!list.length) {
     timesBody.innerHTML = '<p id="times-empty">' + t('sessionEmpty') + '</p>';
@@ -1714,6 +1794,39 @@ function renderTimesSheet() {
     );
   }
   timesBody.innerHTML = parts.join('');
+}
+
+function scrambleShareUrl(alg) {
+  const u = new URL(location.href);
+  u.search = '';
+  u.hash = '';
+  u.searchParams.set('n', String(engine.n));
+  u.searchParams.set('scramble', String(alg || '').trim());
+  return u.toString();
+}
+
+async function copyScrambleLink() {
+  const alg = (playAttempt.scramble || '').trim();
+  if (!alg) return;
+  const url = scrambleShareUrl(alg);
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(url);
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = url;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+    toast(t('shareCopied'), 'hint');
+  } catch (e) {
+    toast(t('shareFailed'), 'err');
+  }
 }
 
 function setTimesOpen(on) {
@@ -1967,6 +2080,7 @@ document.querySelectorAll('#layer-mode [data-layer]').forEach(btn => {
 document.getElementById('scramble').addEventListener('click', () => startPlayScramble());
 document.getElementById('reset').addEventListener('click', reset);
 document.getElementById('undo').addEventListener('click', () => engine.undo());
+if (playShareBtn) playShareBtn.addEventListener('click', () => { copyScrambleLink(); });
 
 playAvgsBtn.addEventListener('click', () => {
   setTimesOpen(!timesSheet.classList.contains('open'));
@@ -2395,7 +2509,7 @@ function demoInverseAlg(alg) {
   });
 }
 
-function drillCasesOf(set) {
+function drillCasesAll(set) {
   const D = globalThis.CubeLessons && globalThis.CubeLessons.ortegaDrill;
   if (set === 'f2l') return (globalThis.CubeF2L && globalThis.CubeF2L.cases) || [];
   if (set === 'oll') return (globalThis.CubeOLL && globalThis.CubeOLL.cases) || [];
@@ -2406,11 +2520,36 @@ function drillCasesOf(set) {
   return [];
 }
 
+function drillCasesOf(set) {
+  const all = drillCasesAll(set);
+  if (!drillReviewMode || !R) return all;
+  const due = R.dueCases(set, all);
+  return due.length ? due : all;
+}
+
+function syncDrillModeUi() {
+  document.querySelectorAll('#drill-mode [data-drill-mode]').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.drillMode === (drillReviewMode ? 'review' : 'all'));
+  });
+  const dueEl = document.getElementById('drill-due');
+  if (!dueEl) return;
+  const set = drill && drill.currentSet();
+  if (!drillReviewMode || !set || !R) {
+    dueEl.hidden = true;
+    dueEl.textContent = '';
+    return;
+  }
+  const n = R.countDue(set, drillCasesAll(set));
+  dueEl.hidden = false;
+  dueEl.textContent = t('drillDue')(n);
+}
+
 function syncDrillUi() {
   const set = drill && drill.currentSet();
   document.querySelectorAll('#drill-sets [data-set]').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.set === set);
   });
+  syncDrillModeUi();
   const locked = !drill || !drill.isActive() || drill.isBusy();
   const retryBtn = document.getElementById('drill-retry');
   const skipBtn = document.getElementById('drill-skip');
@@ -2428,28 +2567,66 @@ drill = globalThis.CubeDrill.create({
   t,
   toast,
   onChange: syncDrillUi,
+  onResult: function (set, c, ok) {
+    if (R && c && c.id != null) R.record(set, c.id, !!ok);
+    syncDrillModeUi();
+  },
 });
 syncDrillUi();
 
-function openDrill(set) {
+function openDrill(set, opts) {
+  const wantReview = !!(opts && opts.review);
+  drillReviewMode = wantReview;
+  syncDrillModeUi();
   const name = (set || '').toLowerCase();
   if (engine.n === 2) {
     openOverlay('drill');
     const ok = name === 'ortega' || name === 'ortega-oll' || name === 'ortega-pbl';
-    drill.start(ok ? name : 'ortega');
+    const chosen = ok ? name : 'ortega';
+    if (drillReviewMode && R && R.countDue(chosen, drillCasesAll(chosen)) === 0) {
+      toast(t('drillReviewEmpty'), 'hint');
+    }
+    drill.start(chosen);
     syncDrillUi();
     return;
   }
   if (engine.n !== 3) return;
   openOverlay('drill');
-  if (name === 'f2l' || name === 'oll' || name === 'pll') drill.start(name);
+  const chosen = (name === 'f2l' || name === 'oll' || name === 'pll') ? name : 'f2l';
+  if (drillReviewMode && R && R.countDue(chosen, drillCasesAll(chosen)) === 0) {
+    toast(t('drillReviewEmpty'), 'hint');
+  }
+  drill.start(chosen);
   syncDrillUi();
 }
 
 document.getElementById('open-drill').addEventListener('click', () => openDrill());
+const openReviewBtn = document.getElementById('open-review');
+if (openReviewBtn) {
+  openReviewBtn.addEventListener('click', () => openDrill(engine.n === 2 ? 'ortega' : 'f2l', { review: true }));
+}
+document.querySelectorAll('#drill-mode [data-drill-mode]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const next = btn.dataset.drillMode === 'review';
+    if (next === drillReviewMode) return;
+    drillReviewMode = next;
+    syncDrillModeUi();
+    if (panelMode !== 'drill') openOverlay('drill');
+    const set = (drill && drill.currentSet())
+      || (engine.n === 2 ? 'ortega' : 'f2l');
+    if (drillReviewMode && R && R.countDue(set, drillCasesAll(set)) === 0) {
+      toast(t('drillReviewEmpty'), 'hint');
+    }
+    drill.start(set);
+    syncDrillUi();
+  });
+});
 document.querySelectorAll('#drill-sets [data-set]').forEach(btn => {
   btn.addEventListener('click', () => {
     if (panelMode !== 'drill') openOverlay('drill');
+    if (drillReviewMode && R && R.countDue(btn.dataset.set, drillCasesAll(btn.dataset.set)) === 0) {
+      toast(t('drillReviewEmpty'), 'hint');
+    }
     drill.start(btn.dataset.set);
   });
 });
@@ -2507,13 +2684,23 @@ function applyDeepLink() {
     const want = nRaw === '2' ? 2 : 3;
     if (engine.n !== want) setCubeN(want);
     if (engine.n !== 2 && engine.n !== 3) return;
-    openDrill((q.get('set') || '').toLowerCase());
+    openDrill((q.get('set') || '').toLowerCase(), { review: q.get('review') === '1' });
     return;
   }
   if (learn !== 'beginner' && learn !== 'ortega' && learn !== 'cfop' && learn !== 'roux' && learn !== 'f2l' && learn !== 'oll' && learn !== 'pll') {
     if (nRaw === '2' || nRaw === '3' || nRaw === '4' || nRaw === '5') {
       const want = Number(nRaw);
       if (engine.n !== want) setCubeN(want);
+    }
+    const scrambleRaw = (q.get('scramble') || '').trim();
+    if (scrambleRaw) {
+      const alg = scrambleRaw.replace(/\+/g, ' ').replace(/\s+/g, ' ').trim();
+      if (alg) {
+        Promise.resolve(engine.applyScramble(alg)).then(ok => {
+          if (ok) beginAttempt(alg);
+        });
+      }
+      return;
     }
     applyPractice(q.get('practice'));
     return;
@@ -3866,6 +4053,10 @@ function syncPrefUi() {
   document.querySelectorAll('#inspection-switch [data-inspection]').forEach(b => {
     b.classList.toggle('active', (b.dataset.inspection === 'on') === insp);
   });
+  const goal = String(T.getDailyGoal());
+  document.querySelectorAll('#goal-switch [data-goal]').forEach(b => {
+    b.classList.toggle('active', b.dataset.goal === goal);
+  });
 }
 
 document.querySelectorAll('#numbers-switch [data-numbers]').forEach(b => {
@@ -3883,6 +4074,15 @@ document.querySelectorAll('#inspection-switch [data-inspection]').forEach(b => {
   b.addEventListener('click', () => {
     T.setInspection(b.dataset.inspection === 'on');
     syncPrefUi();
+  });
+});
+
+document.querySelectorAll('#goal-switch [data-goal]').forEach(b => {
+  b.addEventListener('click', () => {
+    T.setDailyGoal(Number(b.dataset.goal));
+    syncPrefUi();
+    renderPlayHud();
+    if (timesSheet.classList.contains('open')) renderTimesSheet();
   });
 });
 

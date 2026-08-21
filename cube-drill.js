@@ -30,6 +30,7 @@
       var t = opts.t;
       var toast = opts.toast;
       var onChange = opts.onChange || function () {};
+      var onResult = opts.onResult || function () {};
 
       var active = false;
       var busy = false;
@@ -117,6 +118,7 @@
 
       function skip() {
         if (!active || busy || pendingAdvance) return;
+        if (current) onResult(setName, current, false);
         nextCase();
       }
 
@@ -125,7 +127,9 @@
         if (!engine.isSolved() || engine.stats.moveCount <= 0) return;
         pendingAdvance = true;
         emit();
-        var name = labelOf(current);
+        var solvedCase = current;
+        onResult(setName, solvedCase, true);
+        var name = labelOf(solvedCase);
         toast(t('drillSolved')(name), 'solved');
         nextTimer = setTimeout(function () {
           nextTimer = 0;
@@ -156,6 +160,7 @@
         isActive: function () { return active; },
         isBusy: function () { return busy || pendingAdvance; },
         currentSet: function () { return setName; },
+        current: function () { return current; },
       };
     },
   };

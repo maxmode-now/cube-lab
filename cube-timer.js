@@ -10,7 +10,12 @@
   const DNF_MS = 17000;
 
   function emptyStore() {
-    return { v: 1, inspection: true, bySize: { '2': [], '3': [], '4': [], '5': [] } };
+    return {
+      v: 1,
+      inspection: true,
+      dailyGoal: 50,
+      bySize: { '2': [], '3': [], '4': [], '5': [] },
+    };
   }
 
   function sizeKey(n) {
@@ -26,6 +31,8 @@
       if (!parsed || parsed.v !== 1 || !parsed.bySize) return emptyStore();
       const out = emptyStore();
       out.inspection = parsed.inspection !== false;
+      const g0 = Number(parsed.dailyGoal);
+      out.dailyGoal = [0, 25, 50, 100].indexOf(g0) >= 0 ? g0 : 50;
       for (let i = 0; i < SIZES.length; i++) {
         const k = SIZES[i];
         const arr = parsed.bySize[k];
@@ -175,6 +182,45 @@
     };
   }
 
+  function startOfLocalDay(ms) {
+    const d = new Date(ms || Date.now());
+    d.setHours(0, 0, 0, 0);
+    return d.getTime();
+  }
+
+  function dailyStats(n, at) {
+    const day0 = startOfLocalDay(at);
+    const day1 = day0 + 86400000;
+    const list = times(n);
+    let count = 0;
+    let sum = 0;
+    let ok = 0;
+    for (let i = 0; i < list.length; i++) {
+      const e = list[i];
+      const when = e.at || 0;
+      if (when < day0 || when >= day1) continue;
+      count++;
+      if (e.penalty === 'DNF') continue;
+      ok++;
+      sum += comparable(e);
+    }
+    return {
+      count: count,
+      mean: ok > 0 ? roundMs(sum / ok) : null,
+    };
+  }
+
+  function getDailyGoal() {
+    const g0 = Number(store.dailyGoal);
+    return [0, 25, 50, 100].indexOf(g0) >= 0 ? g0 : 50;
+  }
+
+  function setDailyGoal(n) {
+    const g0 = Number(n);
+    store.dailyGoal = [0, 25, 50, 100].indexOf(g0) >= 0 ? g0 : 0;
+    persist();
+  }
+
   function getInspection() { return store.inspection !== false; }
   function setInspection(on) {
     store.inspection = !!on;
@@ -185,8 +231,9 @@
     INSPECT_MS, DNF_MS,
     truncMs, roundMs, comparable, formatClock, formatEntry, formatAvg,
     averageOf, pbOf, inspectPenalty, inspectMark,
-    times, add, update, remove, stats,
+    times, add, update, remove, stats, dailyStats,
+    getDailyGoal, setDailyGoal,
     getInspection, setInspection,
-    _test: { load, emptyStore, KEY, MAX, sizeKey },
+    _test: { load, emptyStore, KEY, MAX, sizeKey, startOfLocalDay },
   };
 })(typeof globalThis !== 'undefined' ? globalThis : this);

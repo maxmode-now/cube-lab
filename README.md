@@ -57,12 +57,15 @@ how-to-solve-2x2/
 how-to-solve-3x3/
 how-to-solve-4x4/
 how-to-solve-5x5/
+ko/
 manifest.json
 sw.js
 cube-engine.js
 cube-math.js
 cube-solver.js
 beginner-solver.js
+cube-timer.js
+cube-review.js
 cube-scan.js
 lessons.js
 f2l-cases.js
@@ -81,7 +84,8 @@ PWA install needs HTTPS and a hostname. It will not appear on `file://` or a bar
 | File | Role |
 | --- | --- |
 | `index.html` | Shell, layout, i18n, mode wiring |
-| `cube-timer.js` | Play session times, ao5/ao12, inspection penalties |
+| `cube-timer.js` | Play session times, ao5/ao12, daily goal, inspection penalties |
+| `cube-review.js` | Case-drill spaced-repetition queue (localStorage) |
 | `cube-solver.js` | Kociemba wrapper around `cubejs` |
 | `beginner-solver.js` | Layer-by-layer beginner path for 2×2 and 3×3 |
 | `cube-scan.js` | Six-face capture and color mapping |
