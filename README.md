@@ -94,6 +94,10 @@ PWA install needs HTTPS and a hostname. It will not appear on `file://` or a bar
 
 Three.js `r160` and `cubejs` 1.3.1 are loaded from CDNs. The solver runs entirely on the client.
 
+## License
+
+[MIT](LICENSE) © 2026 maxmode
+
 ## Contact
 
 [maxmode-now.com](https://maxmode-now.com/) · [maxmode.now@gmail.com](mailto:maxmode.now@gmail.com)
