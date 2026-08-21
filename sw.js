@@ -1,5 +1,5 @@
-const STATIC = 'cube-static-v2.7';
-const RUNTIME = 'cube-runtime-v2.7';
+const STATIC = 'cube-static-v2.8';
+const RUNTIME = 'cube-runtime-v2.8';
 
 const PRECACHE = [
   './index.html',
